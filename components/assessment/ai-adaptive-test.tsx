@@ -5,7 +5,6 @@ import ReactMarkdown from "react-markdown";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useLanguage } from "@/contexts/language-context";
 import { useAccessibility } from "@/contexts/accessibility-context";
@@ -281,27 +280,30 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
   };
 
   return (
-    <Card className="flex h-[600px] flex-col">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Bot className="h-5 w-5 text-primary" aria-hidden="true" />
-          {t("aiTest.title")}
+    <Card className="flex min-h-0 w-full max-w-full flex-col overflow-hidden rounded-xl border shadow-sm sm:h-[600px] sm:max-h-[min(600px,90vh)] h-[min(640px,calc(100dvh-9rem))]">
+      <CardHeader className="shrink-0 space-y-1 px-4 pb-2 pt-4 sm:px-6">
+        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+          <Bot className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+          <span className="leading-tight">{t("aiTest.title")}</span>
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-pretty text-sm leading-snug">
           {t("aiTest.subtitle")}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-1 flex-col">
-        <ScrollArea className="flex-1 pr-4" ref={scrollRef}>
-          <div className="space-y-4">
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-0 px-4 pb-24 pt-0 sm:px-6 sm:pb-6">
+        <div
+          ref={scrollRef}
+          className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pr-1 [-webkit-overflow-scrolling:touch] sm:pr-2"
+        >
+          <div className="w-full min-w-0 space-y-4 pb-2">
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex gap-3 ${
-                  message.role === "user" ? "flex-row-reverse" : ""
+                className={`flex w-full min-w-0 gap-2 sm:gap-3 ${
+                  message.role === "user" ? "flex-row-reverse" : "flex-row"
                 }`}
               >
-                <Avatar className="h-8 w-8 shrink-0">
+                <Avatar className="mt-0.5 h-8 w-8 shrink-0">
                   <AvatarFallback
                     className={
                       message.role === "assistant"
@@ -317,24 +319,31 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
                   </AvatarFallback>
                 </Avatar>
                 <div
-                  className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                  className={`min-w-0 flex-1 rounded-xl px-3 py-2.5 sm:max-w-[min(100%,42rem)] sm:px-4 ${
+                    message.role === "user" ? "max-w-[min(100%,85%)]" : ""
+                  } ${
                     message.role === "assistant"
-                      ? "bg-muted text-foreground"
+                      ? "bg-muted/90 text-foreground"
                       : "bg-primary text-primary-foreground"
                   }`}
                   role={message.role === "assistant" ? "status" : undefined}
                   aria-live={message.role === "assistant" ? "polite" : undefined}
                 >
                   {message.role === "assistant" ? (
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="prose prose-sm dark:prose-invert max-w-none min-w-0">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+                      <div
+                        className="prose prose-sm min-w-0 max-w-none text-[15px] leading-relaxed text-foreground dark:prose-invert
+                          prose-p:my-2 prose-p:break-words first:prose-p:mt-0 last:prose-p:mb-0
+                          prose-headings:mb-2 prose-headings:mt-3 prose-headings:text-base prose-headings:font-semibold first:prose-headings:mt-0
+                          prose-ul:my-2 prose-li:my-0.5 prose-strong:text-foreground"
+                      >
                         <ReactMarkdown>{message.content}</ReactMarkdown>
                       </div>
                       <Button
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 shrink-0"
+                        className="-mr-1 h-9 w-9 shrink-0 self-end sm:self-start sm:-mt-0.5"
                         onClick={() => {
                           const plain = message.content
                             .replace(/\*\*?/g, "")
@@ -353,7 +362,7 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
                       </Button>
                     </div>
                   ) : (
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                    <p className="text-[15px] leading-relaxed break-words whitespace-pre-wrap">
                       {message.content}
                     </p>
                   )}
@@ -361,13 +370,13 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
               </div>
             ))}
             {isTyping && (
-              <div className="flex gap-3">
+              <div className="flex w-full min-w-0 gap-2 sm:gap-3">
                 <Avatar className="h-8 w-8 shrink-0">
                   <AvatarFallback className="bg-primary text-primary-foreground">
                     <Bot className="h-4 w-4" />
                   </AvatarFallback>
                 </Avatar>
-                <div className="rounded-lg bg-muted px-4 py-2">
+                <div className="min-w-0 flex-1 rounded-xl bg-muted/90 px-4 py-3">
                   <div className="flex gap-1">
                     <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.3s]" />
                     <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.15s]" />
@@ -377,22 +386,22 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
 
-        <div className="mt-4 border-t pt-4 space-y-3">
+        <div className="mt-3 shrink-0 space-y-3 border-t pt-3">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleSubmit();
             }}
-            className="flex gap-2"
+            className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2"
           >
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={t("aiTest.placeholder")}
               rows={2}
-              className="min-h-[60px] resize-none flex-1"
+              className="min-h-[52px] w-full resize-none text-base sm:min-h-[60px] sm:flex-1"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -401,31 +410,33 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
               }}
               aria-label={t("aiTest.placeholder")}
             />
-            <Button
-              type="button"
-              variant={isListening ? "destructive" : "outline"}
-              size="icon"
-              className="h-[60px] w-12 shrink-0"
-              onClick={toggleMic}
-              disabled={isTyping}
-              aria-label={isListening ? "Detener micrófono" : "Dictar con micrófono"}
-              title={isListening ? "Detener micrófono" : "Dictar (es-GT)"}
-            >
-              {isListening ? (
-                <Square className="h-5 w-5" />
-              ) : (
-                <Mic className="h-5 w-5" />
-              )}
-            </Button>
-            <Button
-              type="submit"
-              size="icon"
-              className="h-[60px] w-12 shrink-0"
-              disabled={!input.trim() || isTyping}
-              aria-label={t("aiTest.send")}
-            >
-              <Send className="h-5 w-5" />
-            </Button>
+            <div className="flex shrink-0 flex-row justify-end gap-2 sm:justify-start">
+              <Button
+                type="button"
+                variant={isListening ? "destructive" : "outline"}
+                size="icon"
+                className="h-11 w-11 sm:h-[60px] sm:w-12"
+                onClick={toggleMic}
+                disabled={isTyping}
+                aria-label={isListening ? "Detener micrófono" : "Dictar con micrófono"}
+                title={isListening ? "Detener micrófono" : "Dictar (es-GT)"}
+              >
+                {isListening ? (
+                  <Square className="h-5 w-5" />
+                ) : (
+                  <Mic className="h-5 w-5" />
+                )}
+              </Button>
+              <Button
+                type="submit"
+                size="icon"
+                className="h-11 w-11 sm:h-[60px] sm:w-12"
+                disabled={!input.trim() || isTyping}
+                aria-label={t("aiTest.send")}
+              >
+                <Send className="h-5 w-5" />
+              </Button>
+            </div>
           </form>
           {speechError && (
             <p className="text-sm text-destructive" role="alert">
@@ -435,7 +446,7 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
 
           <Button
             onClick={onComplete}
-            className="w-full"
+            className="w-full pr-14 sm:pr-4"
             size="lg"
             disabled={messages.length === 0 || isTyping}
           >
