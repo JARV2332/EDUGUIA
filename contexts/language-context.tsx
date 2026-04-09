@@ -1,0 +1,572 @@
+"use client"
+
+import { createContext, useContext, useState, useEffect, ReactNode } from "react"
+
+type Language = "en" | "es"
+
+interface LanguageContextType {
+  language: Language
+  setLanguage: (lang: Language) => void
+  t: (key: string) => string
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
+
+const translations: Record<Language, Record<string, string>> = {
+  en: {
+    // Navigation
+    "nav.dashboard": "Dashboard",
+    "nav.assessment": "Assessment",
+    "nav.progress": "Progress",
+    "nav.toolkit": "Toolkit",
+    "nav.students": "Students",
+    "nav.reports": "Reports",
+    "nav.settings": "Settings",
+    
+    // Dashboard
+    "dashboard.title": "Dashboard",
+    "dashboard.welcome": "Welcome back",
+    "dashboard.overview": "Here's an overview of your educational inclusion platform.",
+    "dashboard.totalStudents": "Total Students",
+    "dashboard.activeIEPs": "Active IEPs",
+    "dashboard.assessmentsThisMonth": "Assessments This Month",
+    "dashboard.avgProgress": "Avg. Progress",
+    "dashboard.recentStudents": "Recent Students",
+    "dashboard.viewAll": "View all",
+    "dashboard.lastAssessment": "Last assessment",
+    "dashboard.quickActions": "Quick Actions",
+    "dashboard.newAssessment": "New Assessment",
+    "dashboard.newAssessmentDesc": "Start a comprehensive multi-step assessment for a student.",
+    "dashboard.viewProgress": "View Progress",
+    "dashboard.viewProgressDesc": "Track student milestones and development over time.",
+    "dashboard.inclusionToolkit": "Inclusion Toolkit",
+    "dashboard.inclusionToolkitDesc": "Access crisis protocols and immersive reading tools.",
+    "dashboard.start": "Start",
+    "dashboard.view": "View",
+    "dashboard.open": "Open",
+    
+    // Assessment
+    "assessment.title": "Student Assessment",
+    "assessment.subtitle": "Complete the following steps to generate a comprehensive inclusion profile.",
+    "assessment.step1": "Student Info",
+    "assessment.step2": "Sensorial & Physical",
+    "assessment.step3": "Neurodivergence & Behavior",
+    "assessment.step4": "AI Adaptive Test",
+    "assessment.step5": "Results",
+    "assessment.next": "Next",
+    "assessment.previous": "Previous",
+    "assessment.submit": "Submit Assessment",
+    "assessment.generating": "Generating Results...",
+    
+    // Student Info
+    "studentInfo.title": "Student Information",
+    "studentInfo.fullName": "Full Name",
+    "studentInfo.fullNamePlaceholder": "Enter student's full name",
+    "studentInfo.dateOfBirth": "Age",
+    "studentInfo.grade": "Grade Level",
+    "studentInfo.selectGrade": "Select grade",
+    "studentInfo.school": "School Name",
+    "studentInfo.schoolPlaceholder": "Enter school name",
+    "studentInfo.teacher": "Primary Teacher",
+    "studentInfo.teacherPlaceholder": "Enter teacher's name",
+    "studentInfo.guardianName": "Guardian Name",
+    "studentInfo.guardianNamePlaceholder": "Enter guardian's name",
+    "studentInfo.guardianEmail": "Guardian Email",
+    "studentInfo.guardianEmailPlaceholder": "Enter guardian's email",
+    "studentInfo.guardianPhone": "Guardian Phone",
+    "studentInfo.guardianPhonePlaceholder": "Enter phone number",
+    
+    // Sensorial & Physical
+    "sensorial.title": "Sensorial & Physical Assessment",
+    "sensorial.subtitle": "Evaluate visual, hearing, and motor abilities along with current assistive technologies.",
+    "sensorial.visualAcuity": "Visual Acuity",
+    "sensorial.visualAcuityDesc": "Rate the student's visual capabilities",
+    "sensorial.hearingLevel": "Hearing Level",
+    "sensorial.hearingLevelDesc": "Rate the student's auditory capabilities",
+    "sensorial.motorSkills": "Fine Motor Skills",
+    "sensorial.motorSkillsDesc": "Rate hand-eye coordination and fine motor control",
+    "sensorial.grossMotor": "Gross Motor Skills",
+    "sensorial.grossMotorDesc": "Rate large muscle movement and coordination",
+    "sensorial.normal": "Normal",
+    "sensorial.mild": "Mild Impairment",
+    "sensorial.moderate": "Moderate Impairment",
+    "sensorial.severe": "Severe Impairment",
+    "sensorial.assistiveTech": "Current Assistive Technologies",
+    "sensorial.glasses": "Glasses/Contact Lenses",
+    "sensorial.hearingAid": "Hearing Aid",
+    "sensorial.wheelchair": "Wheelchair/Mobility Aid",
+    "sensorial.speechDevice": "Speech-generating Device",
+    "sensorial.braille": "Braille Display",
+    "sensorial.screenReader": "Screen Reader",
+    "sensorial.adaptiveKeyboard": "Adaptive Keyboard/Mouse",
+    "sensorial.additionalNotes": "Additional Notes",
+    "sensorial.additionalNotesPlaceholder": "Any additional observations about sensorial or physical needs...",
+    
+    // Neurodivergence & Behavior
+    "neuro.title": "Neurodivergence & Behavior Assessment",
+    "neuro.subtitle": "Rate indicators based on DSM-5 criteria. This helps identify areas that may benefit from additional support.",
+    "neuro.attention": "Attention & Focus",
+    "neuro.attentionDesc": "Difficulty sustaining attention, easily distracted, forgetful",
+    "neuro.hyperactivity": "Hyperactivity & Impulsivity",
+    "neuro.hyperactivityDesc": "Fidgeting, difficulty staying seated, excessive talking, interrupting",
+    "neuro.social": "Social Interaction",
+    "neuro.socialDesc": "Difficulty with social cues, maintaining conversations, eye contact",
+    "neuro.anxiety": "Anxiety & Emotional Regulation",
+    "neuro.anxietyDesc": "Excessive worry, difficulty managing emotions, fear responses",
+    "neuro.sensory": "Sensory Processing",
+    "neuro.sensoryDesc": "Over or under-sensitivity to sounds, textures, lights, or movement",
+    "neuro.notObserved": "Not Observed",
+    "neuro.occasional": "Occasional",
+    "neuro.frequent": "Frequent",
+    "neuro.veryFrequent": "Very Frequent",
+    "neuro.existingDiagnoses": "Existing Diagnoses",
+    "neuro.adhd": "ADHD",
+    "neuro.asd": "Autism Spectrum Disorder",
+    "neuro.dyslexia": "Dyslexia",
+    "neuro.dyscalculia": "Dyscalculia",
+    "neuro.dysgraphia": "Dysgraphia",
+    "neuro.anxietyDisorder": "Anxiety Disorder",
+    "neuro.ocd": "OCD",
+    "neuro.other": "Other",
+    
+    // AI Adaptive Test
+    "aiTest.title": "AI Adaptive Assessment",
+    "aiTest.subtitle": "Our AI will ask questions to better understand the student's learning profile. Answer naturally.",
+    "aiTest.placeholder": "Type your response here...",
+    "aiTest.send": "Send",
+    "aiTest.complete": "Complete Assessment",
+    "aiTest.progress": "Assessment Progress",
+    "aiTest.thinking": "Thinking...",
+    "aiTest.greeting": "Hello! I'm here to help understand how {name} learns best. I'll ask some questions about their learning experiences. Let's start: Can you describe a recent situation where {name} was particularly engaged or successful in learning something new?",
+    "aiTest.question1": "That's helpful. Now, are there specific environments or conditions where {name} seems to focus better? For example, quiet spaces, background music, or specific times of day?",
+    "aiTest.question2": "Interesting. How does {name} typically respond when they encounter a challenging task? Do they prefer to work through it independently, ask for help, or take breaks?",
+    "aiTest.question3": "Thank you. One more question: What motivates {name} the most in learning? Is it praise, tangible rewards, personal interest in the topic, or something else?",
+    "aiTest.question4": "Great insights! Based on our conversation, I have a good understanding of {name}'s learning profile. Click 'Complete Assessment' to see the comprehensive results and recommendations.",
+    
+    // Results
+    "results.title": "Assessment Results",
+    "results.subtitle": "Comprehensive analysis and personalized recommendations for",
+    "results.readAloud": "Read Aloud",
+    "results.stop": "Stop",
+    "results.exportPdf": "Export to PDF",
+    "results.learningProfile": "Learning Profile Summary",
+    "results.priorityRecommendations": "Priority Recommendations",
+    "results.high": "High Priority",
+    "results.medium": "Medium Priority",
+    "results.low": "Low Priority",
+    "results.accommodations": "Recommended Accommodations",
+    "results.nextSteps": "Suggested Next Steps",
+    "results.startNew": "Start New Assessment",
+    "results.viewProgress": "View Progress Tracking",
+    "results.saveStudentAndViewProgress": "Save student & view in Progress",
+    
+    // Progress
+    "progress.title": "Student Progress Tracking",
+    "progress.subtitle": "Monitor development, log observations, and track milestones over time.",
+    "progress.selectStudent": "Select a Student",
+    "progress.noStudentSelected": "No Student Selected",
+    "progress.selectPrompt": "Select a student from the list above to view their progress details.",
+    "progress.timeline": "Timeline",
+    "progress.charts": "Charts",
+    "progress.quickLog": "Quick Log",
+    "progress.addObservation": "Add Observation",
+    "progress.milestone": "Milestone",
+    "progress.observation": "Observation",
+    "progress.intervention": "Intervention",
+    "progress.initialVsCurrent": "Initial vs Current Assessment",
+    "progress.monthlyProgress": "Monthly Progress",
+    
+    // Quick Log
+    "quickLog.title": "Quick Daily Log",
+    "quickLog.date": "Date",
+    "quickLog.mood": "Overall Mood",
+    "quickLog.excellent": "Excellent",
+    "quickLog.good": "Good",
+    "quickLog.neutral": "Neutral",
+    "quickLog.challenging": "Challenging",
+    "quickLog.difficult": "Difficult",
+    "quickLog.engagement": "Engagement Level",
+    "quickLog.socialInteraction": "Social Interaction",
+    "quickLog.notes": "Observation Notes",
+    "quickLog.notesPlaceholder": "Describe any notable behaviors, achievements, or concerns...",
+    "quickLog.save": "Save Log",
+    "quickLog.cancel": "Cancel",
+    
+    // Toolkit
+    "toolkit.title": "Inclusion Toolkit",
+    "toolkit.subtitle": "Access tools and resources to support inclusive education.",
+    "toolkit.crisisProtocols": "Crisis Protocols",
+    "toolkit.crisisDesc": "Quick access to sensory crisis management protocols",
+    "toolkit.immersiveReader": "Immersive Reader",
+    "toolkit.immersiveDesc": "Text simplification and accessibility tools",
+    "toolkit.visualSupports": "Visual Supports",
+    "toolkit.visualDesc": "Picture schedules and visual communication aids",
+    "toolkit.socialStories": "Social Stories",
+    "toolkit.socialDesc": "Customizable social narratives for various situations",
+    "toolkit.sensoryTools": "Sensory Tools",
+    "toolkit.sensoryDesc": "Calming activities and sensory regulation resources",
+    "toolkit.communicationBoards": "Communication Boards",
+    "toolkit.communicationDesc": "AAC boards and symbol-based communication",
+    "toolkit.comingSoon": "Coming Soon",
+    
+    // Crisis Button
+    "crisis.button": "Sensory Crisis Protocol",
+    "crisis.title": "Sensory Crisis Protocol",
+    "crisis.subtitle": "Follow these steps to help de-escalate and support the student",
+    "crisis.step": "Step",
+    "crisis.completed": "Mark as Completed",
+    "crisis.allCompleted": "All Steps Completed",
+    "crisis.resolved": "Great job! The crisis has been addressed.",
+    "crisis.startOver": "Start Over",
+    "crisis.close": "Close",
+    "crisis.step1Title": "Ensure Safety",
+    "crisis.step1Desc": "Remove any dangerous objects. Create space around the student. Keep other students calm and at a distance.",
+    "crisis.step2Title": "Reduce Stimulation",
+    "crisis.step2Desc": "Dim lights if possible. Lower your voice. Minimize movement and noise in the area.",
+    "crisis.step3Title": "Offer Calm Presence",
+    "crisis.step3Desc": "Stay nearby but don't crowd. Use a soft, reassuring tone. Avoid direct eye contact if it causes distress.",
+    "crisis.step4Title": "Provide Sensory Tools",
+    "crisis.step4Desc": "Offer noise-canceling headphones, fidget tools, weighted blanket, or a quiet space to retreat.",
+    "crisis.step5Title": "Wait and Observe",
+    "crisis.step5Desc": "Give the student time to self-regulate. Don't rush the process. Note what seems to help.",
+    "crisis.step6Title": "Gentle Re-engagement",
+    "crisis.step6Desc": "Once calm, offer water or a simple activity. Gradually return to routine when ready.",
+    
+    // Immersive Reader
+    "reader.title": "Immersive Reader",
+    "reader.sampleText": "Sample Educational Text",
+    "reader.pasteText": "Or paste your own text here...",
+    "reader.textSettings": "Text Settings",
+    "reader.fontSize": "Font Size",
+    "reader.lineHeight": "Line Height",
+    "reader.letterSpacing": "Letter Spacing",
+    "reader.readingTools": "Reading Tools",
+    "reader.highlightKeywords": "Highlight Keywords",
+    "reader.simplifyText": "Simplify Text",
+    "reader.syllables": "Show Syllables",
+    "reader.highContrast": "High Contrast",
+    "reader.dyslexicFont": "Dyslexic-Friendly Font",
+    "reader.textToSpeech": "Text to Speech",
+    "reader.speak": "Speak Text",
+    "reader.stopSpeaking": "Stop Speaking",
+    "reader.originalText": "The quick brown fox jumps over the lazy dog. This sentence contains every letter of the alphabet and is often used for testing fonts and keyboards. Learning to read is an important milestone in every child's education journey.",
+    "reader.simplifiedText": "A fast brown fox jumps over a sleepy dog. This sentence has all the letters A to Z. It helps test how words look. Reading is very important for kids to learn.",
+    
+    // Accessibility Menu
+    "a11y.title": "Accessibility",
+    "a11y.highContrast": "High Contrast",
+    "a11y.largeText": "Large Text",
+    "a11y.dyslexicFont": "Dyslexic Font",
+    "a11y.darkMode": "Dark Mode",
+    
+    // Language
+    "language": "Language",
+    "language.en": "English",
+    "language.es": "Spanish",
+    
+    // Common
+    "common.save": "Save",
+    "common.cancel": "Cancel",
+    "common.close": "Close",
+    "common.loading": "Loading...",
+    "common.error": "Error",
+    "common.success": "Success",
+    "common.from": "from",
+    "common.of": "of",
+  },
+  es: {
+    // Navigation
+    "nav.dashboard": "Panel Principal",
+    "nav.assessment": "Evaluacion",
+    "nav.progress": "Progreso",
+    "nav.toolkit": "Herramientas",
+    "nav.students": "Estudiantes",
+    "nav.reports": "Reportes",
+    "nav.settings": "Configuracion",
+    
+    // Dashboard
+    "dashboard.title": "Panel Principal",
+    "dashboard.welcome": "Bienvenido de nuevo",
+    "dashboard.overview": "Aqui tienes un resumen de tu plataforma de inclusion educativa.",
+    "dashboard.totalStudents": "Total de Estudiantes",
+    "dashboard.activeIEPs": "PEIs Activos",
+    "dashboard.assessmentsThisMonth": "Evaluaciones Este Mes",
+    "dashboard.avgProgress": "Progreso Promedio",
+    "dashboard.recentStudents": "Estudiantes Recientes",
+    "dashboard.viewAll": "Ver todos",
+    "dashboard.lastAssessment": "Ultima evaluacion",
+    "dashboard.quickActions": "Acciones Rapidas",
+    "dashboard.newAssessment": "Nueva Evaluacion",
+    "dashboard.newAssessmentDesc": "Iniciar una evaluacion integral de varios pasos para un estudiante.",
+    "dashboard.viewProgress": "Ver Progreso",
+    "dashboard.viewProgressDesc": "Seguir los hitos y desarrollo del estudiante a lo largo del tiempo.",
+    "dashboard.inclusionToolkit": "Kit de Inclusion",
+    "dashboard.inclusionToolkitDesc": "Acceder a protocolos de crisis y herramientas de lectura inmersiva.",
+    "dashboard.start": "Iniciar",
+    "dashboard.view": "Ver",
+    "dashboard.open": "Abrir",
+    
+    // Assessment
+    "assessment.title": "Evaluacion del Estudiante",
+    "assessment.subtitle": "Complete los siguientes pasos para generar un perfil de inclusion integral.",
+    "assessment.step1": "Info del Estudiante",
+    "assessment.step2": "Sensorial y Fisico",
+    "assessment.step3": "Neurodivergencia y Conducta",
+    "assessment.step4": "Prueba Adaptativa IA",
+    "assessment.step5": "Resultados",
+    "assessment.next": "Siguiente",
+    "assessment.previous": "Anterior",
+    "assessment.submit": "Enviar Evaluacion",
+    "assessment.generating": "Generando Resultados...",
+    
+    // Student Info
+    "studentInfo.title": "Informacion del Estudiante",
+    "studentInfo.fullName": "Nombre Completo",
+    "studentInfo.fullNamePlaceholder": "Ingrese el nombre completo del estudiante",
+    "studentInfo.dateOfBirth": "Edad",
+    "studentInfo.grade": "Nivel de Grado",
+    "studentInfo.selectGrade": "Seleccionar grado",
+    "studentInfo.school": "Nombre de la Escuela",
+    "studentInfo.schoolPlaceholder": "Ingrese el nombre de la escuela",
+    "studentInfo.teacher": "Maestro Principal",
+    "studentInfo.teacherPlaceholder": "Ingrese el nombre del maestro",
+    "studentInfo.guardianName": "Nombre del Tutor",
+    "studentInfo.guardianNamePlaceholder": "Ingrese el nombre del tutor",
+    "studentInfo.guardianEmail": "Correo del Tutor",
+    "studentInfo.guardianEmailPlaceholder": "Ingrese el correo del tutor",
+    "studentInfo.guardianPhone": "Telefono del Tutor",
+    "studentInfo.guardianPhonePlaceholder": "Ingrese el numero de telefono",
+    
+    // Sensorial & Physical
+    "sensorial.title": "Evaluacion Sensorial y Fisica",
+    "sensorial.subtitle": "Evaluar las capacidades visuales, auditivas y motoras junto con las tecnologias de asistencia actuales.",
+    "sensorial.visualAcuity": "Agudeza Visual",
+    "sensorial.visualAcuityDesc": "Evaluar las capacidades visuales del estudiante",
+    "sensorial.hearingLevel": "Nivel Auditivo",
+    "sensorial.hearingLevelDesc": "Evaluar las capacidades auditivas del estudiante",
+    "sensorial.motorSkills": "Motricidad Fina",
+    "sensorial.motorSkillsDesc": "Evaluar la coordinacion ojo-mano y control motor fino",
+    "sensorial.grossMotor": "Motricidad Gruesa",
+    "sensorial.grossMotorDesc": "Evaluar el movimiento muscular grande y coordinacion",
+    "sensorial.normal": "Normal",
+    "sensorial.mild": "Deterioro Leve",
+    "sensorial.moderate": "Deterioro Moderado",
+    "sensorial.severe": "Deterioro Severo",
+    "sensorial.assistiveTech": "Tecnologias de Asistencia Actuales",
+    "sensorial.glasses": "Gafas/Lentes de Contacto",
+    "sensorial.hearingAid": "Audifono",
+    "sensorial.wheelchair": "Silla de Ruedas/Ayuda de Movilidad",
+    "sensorial.speechDevice": "Dispositivo Generador de Voz",
+    "sensorial.braille": "Pantalla Braille",
+    "sensorial.screenReader": "Lector de Pantalla",
+    "sensorial.adaptiveKeyboard": "Teclado/Raton Adaptativo",
+    "sensorial.additionalNotes": "Notas Adicionales",
+    "sensorial.additionalNotesPlaceholder": "Cualquier observacion adicional sobre necesidades sensoriales o fisicas...",
+    
+    // Neurodivergence & Behavior
+    "neuro.title": "Evaluacion de Neurodivergencia y Conducta",
+    "neuro.subtitle": "Califique los indicadores segun los criterios del DSM-5. Esto ayuda a identificar areas que pueden beneficiarse de apoyo adicional.",
+    "neuro.attention": "Atencion y Enfoque",
+    "neuro.attentionDesc": "Dificultad para mantener la atencion, se distrae facilmente, olvidadizo",
+    "neuro.hyperactivity": "Hiperactividad e Impulsividad",
+    "neuro.hyperactivityDesc": "Inquietud, dificultad para permanecer sentado, habla excesiva, interrumpe",
+    "neuro.social": "Interaccion Social",
+    "neuro.socialDesc": "Dificultad con senales sociales, mantener conversaciones, contacto visual",
+    "neuro.anxiety": "Ansiedad y Regulacion Emocional",
+    "neuro.anxietyDesc": "Preocupacion excesiva, dificultad para manejar emociones, respuestas de miedo",
+    "neuro.sensory": "Procesamiento Sensorial",
+    "neuro.sensoryDesc": "Hiper o hiposensibilidad a sonidos, texturas, luces o movimiento",
+    "neuro.notObserved": "No Observado",
+    "neuro.occasional": "Ocasional",
+    "neuro.frequent": "Frecuente",
+    "neuro.veryFrequent": "Muy Frecuente",
+    "neuro.existingDiagnoses": "Diagnosticos Existentes",
+    "neuro.adhd": "TDAH",
+    "neuro.asd": "Trastorno del Espectro Autista",
+    "neuro.dyslexia": "Dislexia",
+    "neuro.dyscalculia": "Discalculia",
+    "neuro.dysgraphia": "Disgrafia",
+    "neuro.anxietyDisorder": "Trastorno de Ansiedad",
+    "neuro.ocd": "TOC",
+    "neuro.other": "Otro",
+    
+    // AI Adaptive Test
+    "aiTest.title": "Evaluacion Adaptativa con IA",
+    "aiTest.subtitle": "Nuestra IA hara preguntas para comprender mejor el perfil de aprendizaje del estudiante. Responda naturalmente.",
+    "aiTest.placeholder": "Escriba su respuesta aqui...",
+    "aiTest.send": "Enviar",
+    "aiTest.complete": "Completar Evaluacion",
+    "aiTest.progress": "Progreso de la Evaluacion",
+    "aiTest.thinking": "Pensando...",
+    "aiTest.greeting": "Hola! Estoy aqui para ayudar a entender como {name} aprende mejor. Hare algunas preguntas sobre sus experiencias de aprendizaje. Comencemos: Puede describir una situacion reciente donde {name} estuviera particularmente comprometido o exitoso aprendiendo algo nuevo?",
+    "aiTest.question1": "Eso es util. Ahora, hay entornos o condiciones especificas donde {name} parece concentrarse mejor? Por ejemplo, espacios tranquilos, musica de fondo, o momentos especificos del dia?",
+    "aiTest.question2": "Interesante. Como responde tipicamente {name} cuando encuentra una tarea desafiante? Prefiere trabajar de forma independiente, pedir ayuda, o tomar descansos?",
+    "aiTest.question3": "Gracias. Una pregunta mas: Que motiva mas a {name} en el aprendizaje? Es el elogio, recompensas tangibles, interes personal en el tema, u otra cosa?",
+    "aiTest.question4": "Excelentes perspectivas! Basado en nuestra conversacion, tengo una buena comprension del perfil de aprendizaje de {name}. Haga clic en 'Completar Evaluacion' para ver los resultados y recomendaciones integrales.",
+    
+    // Results
+    "results.title": "Resultados de la Evaluacion",
+    "results.subtitle": "Analisis integral y recomendaciones personalizadas para",
+    "results.readAloud": "Leer en Voz Alta",
+    "results.stop": "Detener",
+    "results.exportPdf": "Exportar a PDF",
+    "results.learningProfile": "Resumen del Perfil de Aprendizaje",
+    "results.priorityRecommendations": "Recomendaciones Prioritarias",
+    "results.high": "Alta Prioridad",
+    "results.medium": "Prioridad Media",
+    "results.low": "Baja Prioridad",
+    "results.accommodations": "Adaptaciones Recomendadas",
+    "results.nextSteps": "Proximos Pasos Sugeridos",
+    "results.startNew": "Iniciar Nueva Evaluacion",
+    "results.viewProgress": "Ver Seguimiento de Progreso",
+    "results.saveStudentAndViewProgress": "Guardar estudiante y ver en Progreso",
+    
+    // Progress
+    "progress.title": "Seguimiento del Progreso del Estudiante",
+    "progress.subtitle": "Monitorear el desarrollo, registrar observaciones y seguir hitos a lo largo del tiempo.",
+    "progress.selectStudent": "Seleccionar un Estudiante",
+    "progress.noStudentSelected": "Ningun Estudiante Seleccionado",
+    "progress.selectPrompt": "Seleccione un estudiante de la lista anterior para ver los detalles de su progreso.",
+    "progress.timeline": "Línea de tiempo",
+    "progress.charts": "Gráficos",
+    "progress.quickLog": "Registro Rapido",
+    "progress.addObservation": "Agregar Observacion",
+    "progress.milestone": "Hito",
+    "progress.observation": "Observacion",
+    "progress.intervention": "Intervencion",
+    "progress.initialVsCurrent": "Evaluacion Inicial vs Actual",
+    "progress.monthlyProgress": "Progreso Mensual",
+    
+    // Quick Log
+    "quickLog.title": "Registro Diario Rapido",
+    "quickLog.date": "Fecha",
+    "quickLog.mood": "Estado de Animo General",
+    "quickLog.excellent": "Excelente",
+    "quickLog.good": "Bueno",
+    "quickLog.neutral": "Neutral",
+    "quickLog.challenging": "Desafiante",
+    "quickLog.difficult": "Dificil",
+    "quickLog.engagement": "Nivel de Participacion",
+    "quickLog.socialInteraction": "Interaccion Social",
+    "quickLog.notes": "Notas de Observacion",
+    "quickLog.notesPlaceholder": "Describa cualquier comportamiento notable, logros o preocupaciones...",
+    "quickLog.save": "Guardar Registro",
+    "quickLog.cancel": "Cancelar",
+    
+    // Toolkit
+    "toolkit.title": "Kit de Herramientas de Inclusion",
+    "toolkit.subtitle": "Acceda a herramientas y recursos para apoyar la educacion inclusiva.",
+    "toolkit.crisisProtocols": "Protocolos de Crisis",
+    "toolkit.crisisDesc": "Acceso rapido a protocolos de manejo de crisis sensoriales",
+    "toolkit.immersiveReader": "Lector Inmersivo",
+    "toolkit.immersiveDesc": "Simplificacion de texto y herramientas de accesibilidad",
+    "toolkit.visualSupports": "Apoyos Visuales",
+    "toolkit.visualDesc": "Horarios con imagenes y ayudas de comunicacion visual",
+    "toolkit.socialStories": "Historias Sociales",
+    "toolkit.socialDesc": "Narrativas sociales personalizables para varias situaciones",
+    "toolkit.sensoryTools": "Herramientas Sensoriales",
+    "toolkit.sensoryDesc": "Actividades de calma y recursos de regulacion sensorial",
+    "toolkit.communicationBoards": "Tableros de Comunicacion",
+    "toolkit.communicationDesc": "Tableros CAA y comunicacion basada en simbolos",
+    "toolkit.comingSoon": "Proximamente",
+    
+    // Crisis Button
+    "crisis.button": "Protocolo de Crisis Sensorial",
+    "crisis.title": "Protocolo de Crisis Sensorial",
+    "crisis.subtitle": "Siga estos pasos para ayudar a desescalar y apoyar al estudiante",
+    "crisis.step": "Paso",
+    "crisis.completed": "Marcar como Completado",
+    "crisis.allCompleted": "Todos los Pasos Completados",
+    "crisis.resolved": "Excelente trabajo! La crisis ha sido atendida.",
+    "crisis.startOver": "Comenzar de Nuevo",
+    "crisis.close": "Cerrar",
+    "crisis.step1Title": "Asegurar la Seguridad",
+    "crisis.step1Desc": "Retire cualquier objeto peligroso. Cree espacio alrededor del estudiante. Mantenga a los otros estudiantes calmados y a distancia.",
+    "crisis.step2Title": "Reducir Estimulacion",
+    "crisis.step2Desc": "Atenuar las luces si es posible. Baje su voz. Minimice el movimiento y ruido en el area.",
+    "crisis.step3Title": "Ofrecer Presencia Calmada",
+    "crisis.step3Desc": "Permanezca cerca pero no agobie. Use un tono suave y tranquilizador. Evite el contacto visual directo si causa angustia.",
+    "crisis.step4Title": "Proporcionar Herramientas Sensoriales",
+    "crisis.step4Desc": "Ofrezca audifonos con cancelacion de ruido, herramientas fidget, manta con peso, o un espacio tranquilo para retirarse.",
+    "crisis.step5Title": "Esperar y Observar",
+    "crisis.step5Desc": "De tiempo al estudiante para autorregularse. No apresure el proceso. Note lo que parece ayudar.",
+    "crisis.step6Title": "Reenganche Gradual",
+    "crisis.step6Desc": "Una vez calmado, ofrezca agua o una actividad simple. Vuelva gradualmente a la rutina cuando este listo.",
+    
+    // Immersive Reader
+    "reader.title": "Lector Inmersivo",
+    "reader.sampleText": "Texto Educativo de Muestra",
+    "reader.pasteText": "O pegue su propio texto aqui...",
+    "reader.textSettings": "Configuracion de Texto",
+    "reader.fontSize": "Tamano de Fuente",
+    "reader.lineHeight": "Altura de Linea",
+    "reader.letterSpacing": "Espaciado de Letras",
+    "reader.readingTools": "Herramientas de Lectura",
+    "reader.highlightKeywords": "Resaltar Palabras Clave",
+    "reader.simplifyText": "Simplificar Texto",
+    "reader.syllables": "Mostrar Silabas",
+    "reader.highContrast": "Alto Contraste",
+    "reader.dyslexicFont": "Fuente para Dislexia",
+    "reader.textToSpeech": "Texto a Voz",
+    "reader.speak": "Leer Texto",
+    "reader.stopSpeaking": "Detener Lectura",
+    "reader.originalText": "El rapido zorro marron salta sobre el perro perezoso. Esta oracion contiene muchas letras del alfabeto y se usa a menudo para probar fuentes y teclados. Aprender a leer es un hito importante en el viaje educativo de cada nino.",
+    "reader.simplifiedText": "Un zorro marron rapido salta sobre un perro dormido. Esta oracion tiene muchas letras. Ayuda a probar como se ven las palabras. Leer es muy importante para que los ninos aprendan.",
+    
+    // Accessibility Menu
+    "a11y.title": "Accesibilidad",
+    "a11y.highContrast": "Alto Contraste",
+    "a11y.largeText": "Texto Grande",
+    "a11y.dyslexicFont": "Fuente Dislexia",
+    "a11y.darkMode": "Modo Oscuro",
+    
+    // Language
+    "language": "Idioma",
+    "language.en": "Ingles",
+    "language.es": "Espanol",
+    
+    // Common
+    "common.save": "Guardar",
+    "common.cancel": "Cancelar",
+    "common.close": "Cerrar",
+    "common.loading": "Cargando...",
+    "common.error": "Error",
+    "common.success": "Exito",
+    "common.from": "desde",
+    "common.of": "de",
+  }
+}
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguage] = useState<Language>("en")
+
+  useEffect(() => {
+    const savedLang = localStorage.getItem("language") as Language
+    if (savedLang && (savedLang === "en" || savedLang === "es")) {
+      setLanguage(savedLang)
+    }
+  }, [])
+
+  const handleSetLanguage = (lang: Language) => {
+    setLanguage(lang)
+    localStorage.setItem("language", lang)
+  }
+
+  const t = (key: string): string => {
+    return translations[language][key] || key
+  }
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  )
+}
+
+export function useLanguage() {
+  const context = useContext(LanguageContext)
+  if (context === undefined) {
+    throw new Error("useLanguage must be used within a LanguageProvider")
+  }
+  return context
+}
