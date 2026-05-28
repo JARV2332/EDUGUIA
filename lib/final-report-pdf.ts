@@ -9,6 +9,7 @@ import {
   renderConversationSection,
   type ConversationPdfLabels,
 } from "@/lib/progress-report-pdf";
+import { triggerBrowserPdfDownload } from "@/lib/pdf-download";
 
 export interface DownloadFinalReportPdfOptions {
   studentName: string;
@@ -32,26 +33,11 @@ const SUBJECT_LABELS: {
   { key: "other", es: "Otros apoyos", en: "Other supports", kaqchikel: "Juley chik" },
 ];
 
-export async function downloadFinalReportPdf(
-  options: DownloadFinalReportPdfOptions
-): Promise<void> {
+/** Genera y descarga el PDF de forma síncrona (evita bloqueo del navegador tras await). */
+export function downloadFinalReportPdf(options: DownloadFinalReportPdfOptions): void {
   const { studentName, assessmentData, snapshot, uiLanguage } = options;
   const isEs = uiLanguage === "es";
   const reportLang = snapshot.reportLanguage;
-
-  let logoBase64: string | null = null;
-  try {
-    const res = await fetch("/logo.jpeg");
-    const blob = await res.blob();
-    logoBase64 = await new Promise<string>((resolve, reject) => {
-      const r = new FileReader();
-      r.onloadend = () => resolve(r.result as string);
-      r.onerror = reject;
-      r.readAsDataURL(blob);
-    });
-  } catch {
-    // sin logo
-  }
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageHeight = 297;
@@ -69,17 +55,8 @@ export async function downloadFinalReportPdf(
     if (cursorY + needed > maxY) {
       doc.addPage();
       cursorY = marginTop;
-      if (logoBase64) {
-        doc.addImage(logoBase64, "JPEG", marginLeft, 8, 45, 18);
-        cursorY = 8 + 18 + 4;
-      }
     }
   };
-
-  if (logoBase64) {
-    doc.addImage(logoBase64, "JPEG", marginLeft, 8, 45, 18);
-    cursorY = 8 + 18 + 4;
-  }
 
   const addTitle = (text: string) => {
     maybeNewPage(lineHeightTitle * 2);
@@ -156,7 +133,14 @@ export async function downloadFinalReportPdf(
         ? "Subject-specific strategies"
         : "Estrategias por materia";
 
-  const ss = snapshot.subjectStrategies;
+  const ss = snapshot.subjectStrategies ?? {
+    numeracy: [],
+    language: [],
+    foreignLanguage: [],
+    arts: [],
+    ict: [],
+    other: [],
+  };
   const hasSubjects = SUBJECT_LABELS.some(({ key }) => ss[key]?.length);
   if (hasSubjects) {
     addSectionTitle(subjectSectionTitle);
@@ -237,5 +221,5 @@ export async function downloadFinalReportPdf(
   });
 
   const safeName = studentName.replace(/\s+/g, "_").slice(0, 30) || "estudiante";
-  doc.save(`Informe_Final_${safeName}.pdf`);
+  triggerBrowserPdfDownload(doc, `Informe_Final_${safeName}.pdf`);
 }

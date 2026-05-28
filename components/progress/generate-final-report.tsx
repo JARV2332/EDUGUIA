@@ -100,6 +100,34 @@ export function GenerateFinalReport({
   const turnCount =
     assessmentData.aiResponses.length + (assessmentData.followUpLog?.length ?? 0);
 
+  const handleDownload = () => {
+    if (!snapshotToDownload?.report?.length) {
+      setError(
+        language === "es"
+          ? "Primero genera el informe final."
+          : "Generate the final report first."
+      );
+      return;
+    }
+
+    setDownloading(true);
+    setError(null);
+
+    try {
+      downloadFinalReportPdf({
+        studentName,
+        assessmentData,
+        snapshot: snapshotToDownload,
+        uiLanguage: language === "es" ? "es" : "en",
+      });
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : t("progress.downloadPdfError"));
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   return (
     <div className="space-y-4 rounded-lg border bg-muted/20 p-4">
       <div>
