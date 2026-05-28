@@ -1,16 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { FileText, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { FileDown, FileText, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { useStudents } from "@/contexts/students-context";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { AssessmentData, ReportSnapshot } from "@/lib/student-store";
 import { buildConversationSummary } from "@/lib/generate-report";
+import { downloadFinalReportPdf } from "@/lib/final-report-pdf";
 
 interface GenerateFinalReportProps {
   studentId: string;
+  studentName: string;
   assessmentData: AssessmentData;
   currentSnapshot?: ReportSnapshot;
   onGenerated?: (snapshot: ReportSnapshot) => void;
@@ -18,6 +20,7 @@ interface GenerateFinalReportProps {
 
 export function GenerateFinalReport({
   studentId,
+  studentName,
   assessmentData,
   currentSnapshot,
   onGenerated,
@@ -25,7 +28,16 @@ export function GenerateFinalReport({
   const { t, language } = useLanguage();
   const { updateStudent } = useStudents();
   const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastSnapshot, setLastSnapshot] = useState<ReportSnapshot | undefined>(currentSnapshot);
+
+  useEffect(() => {
+    if (currentSnapshot) setLastSnapshot(currentSnapshot);
+  }, [currentSnapshot]);
+
+  const snapshotToDownload = lastSnapshot ?? currentSnapshot;
+  const canDownload = Boolean(snapshotToDownload?.report?.length);
 
   const hasConversation =
     assessmentData.aiResponses.length > 0 ||
@@ -67,7 +79,11 @@ export function GenerateFinalReport({
       });
 
       if (updated?.reportSnapshot) {
+        setLastSnapshot(updated.reportSnapshot);
         onGenerated?.(updated.reportSnapshot);
+      } else if (data.snapshot) {
+        setLastSnapshot(data.snapshot);
+        onGenerated?.(data.snapshot);
       }
     } catch (err) {
       console.error(err);
@@ -104,14 +120,30 @@ export function GenerateFinalReport({
         </Alert>
       )}
 
-      <Button onClick={() => void handleGenerate()} disabled={loading || !hasConversation}>
-        {loading ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
-        ) : (
-          <FileText className="mr-2 h-4 w-4" aria-hidden="true" />
-        )}
-        {loading ? t("progress.generatingReport") : t("progress.generateFinalReport")}
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button onClick={() => void handleGenerate()} disabled={loading || !hasConversation}>
+          {loading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+          ) : (
+            <FileText className="mr-2 h-4 w-4" aria-hidden="true" />
+          )}
+          {loading ? t("progress.generatingReport") : t("progress.generateFinalReport")}
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => void handleDownload()}
+          disabled={!canDownload || downloading || loading}
+        >
+          {downloading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+          ) : (
+            <FileDown className="mr-2 h-4 w-4" aria-hidden="true" />
+          )}
+          {downloading ? t("progress.downloadingPdf") : t("progress.downloadFinalReportPdf")}
+        </Button>
+      </div>
     </div>
   );
 }

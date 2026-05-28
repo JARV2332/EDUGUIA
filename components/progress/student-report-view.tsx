@@ -60,6 +60,7 @@ export function StudentReportView({
         </Card>
         <GenerateFinalReport
           studentId={studentId}
+          studentName={studentName}
           assessmentData={assessmentData}
           onGenerated={handleGenerated}
         />
@@ -82,6 +83,7 @@ export function StudentReportView({
 
       <GenerateFinalReport
         studentId={studentId}
+        studentName={studentName}
         assessmentData={assessmentData}
         currentSnapshot={activeSnapshot}
         onGenerated={handleGenerated}
