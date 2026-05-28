@@ -203,6 +203,9 @@ const translations: Record<Language, Record<string, string>> = {
     "progress.noConversationForReport": "There is no saved conversation yet. Complete the assessment or write in follow-up chat first.",
     "progress.conversationTurns": "Conversation turns",
     "progress.chatSaved": "Conversations are saved automatically (device and cloud when signed in).",
+    "progress.downloadFinalReportPdf": "Download final report (PDF)",
+    "progress.downloadingPdf": "Downloading…",
+    "progress.downloadPdfError": "Could not download the PDF.",
     
     // Quick Log
     "quickLog.title": "Quick Daily Log",
@@ -492,6 +495,9 @@ const translations: Record<Language, Record<string, string>> = {
     "progress.noConversationForReport": "Aún no hay conversación guardada. Completa la evaluación o escribe en el chat de seguimiento primero.",
     "progress.conversationTurns": "Turnos de conversación",
     "progress.chatSaved": "Las conversaciones se guardan automáticamente (dispositivo y nube si iniciaste sesión).",
+    "progress.downloadFinalReportPdf": "Descargar informe final (PDF)",
+    "progress.downloadingPdf": "Descargando…",
+    "progress.downloadPdfError": "No se pudo descargar el PDF.",
     
     // Quick Log
     "quickLog.title": "Registro Diario Rapido",
