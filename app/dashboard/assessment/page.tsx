@@ -66,8 +66,24 @@ function DashboardAssessmentPageContent() {
   const [draftEstudianteId, setDraftEstudianteId] = useState<string | null>(null);
   const [reportSnapshot, setReportSnapshot] = useState<ReportSnapshot | null>(null);
   const { t } = useLanguage();
-  const { addStudent, createDraftStudent, students } = useStudents();
-  const handleReportSnapshotChange = useCallback((snapshot: ReportSnapshot) => setReportSnapshot(snapshot), []);
+  const { addStudent, createDraftStudent, students, updateStudent } = useStudents();
+  const handleReportSnapshotChange = useCallback(
+    (snapshot: ReportSnapshot) => {
+      setReportSnapshot(snapshot);
+      if (draftEstudianteId) {
+        void updateStudent(draftEstudianteId, { reportSnapshot: snapshot, assessmentData: data });
+      }
+    },
+    [draftEstudianteId, data, updateStudent]
+  );
+
+  useEffect(() => {
+    if (!draftEstudianteId || currentStep < 4) return;
+    const timer = setTimeout(() => {
+      void updateStudent(draftEstudianteId, { assessmentData: data });
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [data, draftEstudianteId, currentStep, updateStudent]);
 
   useEffect(() => {
     if (!preloadStudentId || students.length === 0) return;
