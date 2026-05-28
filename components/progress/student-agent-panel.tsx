@@ -24,15 +24,12 @@ interface StudentAgentPanelProps {
   studentId: string;
   assessmentData: AssessmentData;
   onFollowUpSent?: (userMessage: string, assistantReply: string) => void;
-  /** Persiste el intercambio en assessment_data (local + Supabase) */
-  onFollowUpSaved?: (userMessage: string, assistantReply: string) => void;
 }
 
 export function StudentAgentPanel({
   studentId,
   assessmentData,
   onFollowUpSent,
-  onFollowUpSaved,
 }: StudentAgentPanelProps) {
   const { language, t } = useLanguage();
   const { speakText, stopSpeaking, isSpeaking } = useAccessibility();
@@ -120,7 +117,6 @@ export function StudentAgentPanel({
       const reply = dataResp.reply.trim();
       setPendingFollowUp((prev) => [...prev, { role: "assistant", content: reply }]);
       onFollowUpSent?.(trimmed, reply);
-      onFollowUpSaved?.(trimmed, reply);
       await loadPlans();
       setPendingFollowUp([]);
     } catch (err) {

@@ -92,6 +92,8 @@ export interface TimelineEntry {
   title: string;
   description: string;
   author: string;
+  /** Respuesta de EduGuIA (seguimiento en Progreso) */
+  aiResponse?: string;
 }
 
 /** Sección del informe para persistir (sin ícono React). */
