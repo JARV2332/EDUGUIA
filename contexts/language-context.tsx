@@ -22,6 +22,8 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.students": "Students",
     "nav.reports": "Reports",
     "nav.settings": "Settings",
+    "nav.logout": "Log out",
+    "nav.loggingOut": "Signing out...",
     
     // Dashboard
     "dashboard.title": "Dashboard",
@@ -137,6 +139,7 @@ const translations: Record<Language, Record<string, string>> = {
     "aiTest.complete": "Complete Assessment",
     "aiTest.progress": "Assessment Progress",
     "aiTest.thinking": "Thinking...",
+    "aiTest.you": "You",
     "aiTest.greeting": "Hello! I'm here to help understand how {name} learns best. I'll ask some questions about their learning experiences. Let's start: Can you describe a recent situation where {name} was particularly engaged or successful in learning something new?",
     "aiTest.question1": "That's helpful. Now, are there specific environments or conditions where {name} seems to focus better? For example, quiet spaces, background music, or specific times of day?",
     "aiTest.question2": "Interesting. How does {name} typically respond when they encounter a challenging task? Do they prefer to work through it independently, ask for help, or take breaks?",
@@ -283,6 +286,8 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.students": "Estudiantes",
     "nav.reports": "Reportes",
     "nav.settings": "Configuracion",
+    "nav.logout": "Cerrar sesión",
+    "nav.loggingOut": "Cerrando sesión...",
     
     // Dashboard
     "dashboard.title": "Panel Principal",
@@ -398,6 +403,7 @@ const translations: Record<Language, Record<string, string>> = {
     "aiTest.complete": "Completar Evaluacion",
     "aiTest.progress": "Progreso de la Evaluacion",
     "aiTest.thinking": "Pensando...",
+    "aiTest.you": "Tú",
     "aiTest.greeting": "Hola! Estoy aqui para ayudar a entender como {name} aprende mejor. Hare algunas preguntas sobre sus experiencias de aprendizaje. Comencemos: Puede describir una situacion reciente donde {name} estuviera particularmente comprometido o exitoso aprendiendo algo nuevo?",
     "aiTest.question1": "Eso es util. Ahora, hay entornos o condiciones especificas donde {name} parece concentrarse mejor? Por ejemplo, espacios tranquilos, musica de fondo, o momentos especificos del dia?",
     "aiTest.question2": "Interesante. Como responde tipicamente {name} cuando encuentra una tarea desafiante? Prefiere trabajar de forma independiente, pedir ayuda, o tomar descansos?",

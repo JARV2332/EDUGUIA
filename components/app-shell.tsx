@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/language-context";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -16,6 +17,7 @@ import {
   Wrench,
   Menu,
   ChevronLeft,
+  LogOut,
 } from "lucide-react";
 
 interface AppShellProps {
@@ -26,9 +28,24 @@ interface AppShellProps {
 
 export function AppShell({ children, basePath = "/dashboard" }: AppShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const { t } = useLanguage();
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      router.push("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      setLoggingOut(false);
+    }
+  };
 
   const navigation = [
     { name: t("nav.dashboard"), href: basePath || "/", icon: LayoutDashboard },
@@ -86,8 +103,28 @@ export function AppShell({ children, basePath = "/dashboard" }: AppShellProps) {
         </nav>
       </ScrollArea>
 
-      {!mobile && (
-        <div className="border-t border-sidebar-border p-2">
+      <div className="border-t border-sidebar-border p-2 space-y-1">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            void handleLogout();
+            if (mobile) setMobileOpen(false);
+          }}
+          disabled={loggingOut}
+          className={cn(
+            "w-full text-sidebar-foreground/80 hover:bg-red-500/15 hover:text-red-200",
+            collapsed && !mobile ? "justify-center px-2" : "justify-start gap-2"
+          )}
+          aria-label={t("nav.logout")}
+        >
+          <LogOut className="h-4 w-4 shrink-0" aria-hidden="true" />
+          {(!collapsed || mobile) && (
+            <span>{loggingOut ? t("nav.loggingOut") : t("nav.logout")}</span>
+          )}
+        </Button>
+
+        {!mobile && (
           <Button
             variant="ghost"
             size="sm"
@@ -95,13 +132,12 @@ export function AppShell({ children, basePath = "/dashboard" }: AppShellProps) {
             className="w-full justify-center text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            <ChevronLeft className={cn(
-              "h-4 w-4 transition-transform",
-              collapsed && "rotate-180"
-            )} />
+            <ChevronLeft
+              className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")}
+            />
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 
