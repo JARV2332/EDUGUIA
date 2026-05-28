@@ -145,7 +145,7 @@ export function renderConversationSection(
 
     doc.setDrawColor(220, 228, 235);
     doc.setFillColor(isAssistant ? 248 : 252, isAssistant ? 250 : 253, isAssistant ? 252 : 255);
-    doc.roundedRect(marginLeft, cursorY - 2, maxWidth, boxH, 2, 2, "FD");
+    doc.rect(marginLeft, cursorY - 2, maxWidth, boxH, "FD");
 
     lines.forEach((line: string) => {
       doc.text(line, indent, cursorY + 2);
