@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Galería | EduKids GT</title>
+  <meta name="description" content="Galería de actividades, talleres y proyectos — EduKids GT Guatemala">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/assets/site.css">
+  <link rel="stylesheet" href="/assets/eduguia-theme.css">
+  <link rel="stylesheet" href="/assets/landing-content.css">
+</head>
+<body class="wp-static-export landing-page landing-page--galeria">
+<header class="site-header" role="banner">
+  <div class="site-header__bar">
+    <a class="site-logo" href="/" aria-label="EduKids - Inicio">
+      <img src="/assets/logo-edukids.png" alt="EduKids" width="140" height="64" loading="eager">
+    </a>
+    <button class="site-nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" data-nav-toggle>
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Principal">
+      <a href="/">Inicio</a>
+      <a href="/servicios/">Servicios</a>
+      <a href="/galeria/" aria-current="page">Galería</a>
+      <a href="/preguntas-frecuentes/">FAQ</a>
+      <a href="/comunicate-con-nosotros/">Contacto</a>
+    </nav>
+    <a class="site-header__cta" href="/login">EDUGUIA</a>
+  </div>
+</header>
+
+<main class="site-main">
+  <header class="page-hero">
+    <div class="page-hero__inner">
+      <h1>Galería</h1>
+      <p>Momentos de nuestros talleres, proyectos y experiencias STEAM con niñas y niños.</p>
+    </div>
+  </header>
+
+  <div class="landing-content">
+    <div class="gallery-grid">
+      <figure class="gallery-item">
+        <img src="/wp-content/uploads/2021/09/imagen-2_optimized.png" alt="Actividad EduKids" loading="lazy">
+      </figure>
+      <figure class="gallery-item">
+        <img src="/wp-content/uploads/2021/09/imagen-3_optimized.png" alt="Taller de robótica" loading="lazy">
+      </figure>
+      <figure class="gallery-item">
+        <img src="/wp-content/uploads/2021/09/imagen-1_optimized-3.png" alt="Proyecto STEAM" loading="lazy">
+      </figure>
+      <figure class="gallery-item">
+        <img src="/wp-content/uploads/2020/03/WhatsApp-Image-2019-12-02-at-12.44.20-AM-4.jpeg" alt="Clase EduKids" loading="lazy">
+      </figure>
+      <figure class="gallery-item">
+        <img src="/wp-content/uploads/2020/03/WhatsApp-Image-2019-12-02-at-12.44.14-AM-1.jpeg" alt="Estudiantes en taller" loading="lazy">
+      </figure>
+      <figure class="gallery-item">
+        <img src="/wp-content/uploads/2020/08/CodingCritters-LearningResources-scaled.jpg" alt="Robótica educativa" loading="lazy">
+      </figure>
+      <figure class="gallery-item">
+        <img src="/wp-content/uploads/2019/08/portfolio-1a.jpg" alt="Portafolio proyecto 1" loading="lazy">
+      </figure>
+      <figure class="gallery-item">
+        <img src="/wp-content/uploads/2019/08/portfolio-2a.jpg" alt="Portafolio proyecto 2" loading="lazy">
+      </figure>
+      <figure class="gallery-item">
+        <img src="/wp-content/uploads/2021/09/LOGO-EDU-KIDS.png" alt="EduKids en acción" loading="lazy">
+      </figure>
+    </div>
+
+    <div class="landing-cta" style="margin-top:48px">
+      <h3>¿Quieres que tu hijo viva estas experiencias?</h3>
+      <p>Conoce nuestros cursos y talleres.</p>
+      <a class="btn-primary" href="/servicios/">Ver servicios</a>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="site-footer__inner">
+    <div class="site-footer__brand">
+      <img src="/assets/logo-edukids.png" alt="EduKids" width="120" height="72" loading="lazy">
+      <p>Educación en robótica y STEAM para niños y jóvenes en Guatemala.</p>
+    </div>
+    <div class="site-footer__links">
+      <a href="https://www.facebook.com/edukidsguatemala/" target="_blank" rel="noopener">Facebook</a>
+      <a href="https://www.instagram.com/edukids_gt/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://wa.link/mw5cov" target="_blank" rel="noopener">WhatsApp</a>
+    </div>
+    <p class="site-footer__copy">© 2026 EduKidsGt — Todos los derechos reservados.</p>
+  </div>
+</footer>
+<script>
+document.querySelector('[data-nav-toggle]')?.addEventListener('click', function () {
+  const nav = document.getElementById('site-nav');
+  const open = nav.classList.toggle('is-open');
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+</script>
+</body>
+</html>

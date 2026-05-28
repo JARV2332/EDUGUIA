@@ -24,7 +24,7 @@ interface AppShellProps {
   basePath?: string;
 }
 
-export function AppShell({ children, basePath = "" }: AppShellProps) {
+export function AppShell({ children, basePath = "/dashboard" }: AppShellProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);

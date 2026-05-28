@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comunícate con nosotros | EduKids GT</title>
+  <meta name="description" content="Contacto EduKids GT — robótica y STEAM en Guatemala">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="/assets/site.css">
+  <link rel="stylesheet" href="/assets/eduguia-theme.css">
+  <link rel="stylesheet" href="/assets/landing-content.css">
+</head>
+<body class="wp-static-export landing-page landing-page--contacto">
+<header class="site-header" role="banner">
+  <div class="site-header__bar">
+    <a class="site-logo" href="/" aria-label="EduKids - Inicio">
+      <img src="/assets/logo-edukids.png" alt="EduKids" width="140" height="64" loading="eager">
+    </a>
+    <button class="site-nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" data-nav-toggle>
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="site-nav" id="site-nav" aria-label="Principal">
+      <a href="/">Inicio</a>
+      <a href="/servicios/">Servicios</a>
+      <a href="/galeria/">Galería</a>
+      <a href="/preguntas-frecuentes/">FAQ</a>
+      <a href="/comunicate-con-nosotros/" aria-current="page">Contacto</a>
+    </nav>
+    <a class="site-header__cta" href="/login">EDUGUIA</a>
+  </div>
+</header>
+
+<main class="site-main">
+  <header class="page-hero">
+    <div class="page-hero__inner">
+      <h1>Comunícate con nosotros</h1>
+      <p>Cuéntanos en qué podemos ayudarte. Te responderemos lo antes posible.</p>
+    </div>
+  </header>
+
+  <div class="landing-content">
+    <p class="page-intro">
+      Escríbenos para inscripciones, información de cursos o alianzas. ¡Esperamos saber de ti!
+    </p>
+
+    <div class="contact-cards">
+      <div class="contact-card">
+        <p><strong>Facebook</strong></p>
+        <p><a href="https://www.facebook.com/edukidsguatemala" target="_blank" rel="noopener">@edukidsguatemala</a></p>
+      </div>
+      <div class="contact-card">
+        <p><strong>Instagram</strong></p>
+        <p><a href="https://www.instagram.com/edukids_gt/" target="_blank" rel="noopener">@edukids_gt</a></p>
+      </div>
+      <div class="contact-card">
+        <p><strong>WhatsApp</strong></p>
+        <p><a href="https://wa.link/mw5cov" target="_blank" rel="noopener">5988 6915</a></p>
+      </div>
+      <div class="contact-card">
+        <p><strong>Correo</strong></p>
+        <p><a href="mailto:info@edukidsgt.com">info@edukidsgt.com</a></p>
+      </div>
+    </div>
+
+    <div class="landing-cta">
+      <h3>Plataforma para docentes</h3>
+      <p>Accede a EDUGUIA para herramientas de inclusión y seguimiento educativo.</p>
+      <a class="btn-primary" href="/login">Entrar a EDUGUIA</a>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="site-footer__inner">
+    <div class="site-footer__brand">
+      <img src="/assets/logo-edukids.png" alt="EduKids" width="120" height="72" loading="lazy">
+      <p>Educación en robótica y STEAM para niños y jóvenes en Guatemala.</p>
+    </div>
+    <div class="site-footer__links">
+      <a href="https://www.facebook.com/edukidsguatemala/" target="_blank" rel="noopener">Facebook</a>
+      <a href="https://www.instagram.com/edukids_gt/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://wa.link/mw5cov" target="_blank" rel="noopener">WhatsApp</a>
+    </div>
+    <p class="site-footer__copy">© 2026 EduKidsGt — Todos los derechos reservados.</p>
+  </div>
+</footer>
+<script>
+document.querySelector('[data-nav-toggle]')?.addEventListener('click', function () {
+  const nav = document.getElementById('site-nav');
+  const open = nav.classList.toggle('is-open');
+  this.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+</script>
+</body>
+</html>

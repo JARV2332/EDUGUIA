@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Home } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
@@ -40,7 +41,13 @@ function LoginForm() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/30 p-4">
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/30 p-4">
+      <Button variant="ghost" asChild className="absolute left-4 top-4 gap-2 text-muted-foreground hover:text-foreground">
+        <Link href="/">
+          <Home className="h-4 w-4" aria-hidden="true" />
+          Volver al inicio
+        </Link>
+      </Button>
       <div className="mb-8 flex items-center gap-3">
         <div className="relative h-12 w-12 overflow-hidden rounded-xl">
           <Image src="/logo.jpeg" alt="EDUGUIA" fill className="object-contain" priority />
@@ -109,7 +116,10 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/30 p-4">
+        <div className="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/30 p-4">
+          <Link href="/" className="absolute left-4 top-4 text-sm text-muted-foreground hover:text-foreground">
+            Volver al inicio
+          </Link>
           <div className="text-muted-foreground text-sm">Cargando…</div>
         </div>
       }
