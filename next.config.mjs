@@ -30,7 +30,10 @@ const nextConfig = {
   skipTrailingSlashRedirect: true,
   async rewrites() {
     return {
-      beforeFiles: landingRewrites,
+      beforeFiles: [
+        { source: "/favicon.ico", destination: "/assets/logo-edukids.png" },
+        ...landingRewrites,
+      ],
     };
   },
 };
