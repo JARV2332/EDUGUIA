@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { Suspense, useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import jsPDF from "jspdf";
 import { useLanguage } from "@/contexts/language-context";
 import { useStudents } from "@/contexts/students-context";
@@ -9,10 +10,12 @@ import { StudentSelector } from "@/components/progress/student-selector";
 import { ProgressTimeline } from "@/components/progress/progress-timeline";
 import { ProgressChart } from "@/components/progress/progress-chart";
 import { QuickLogDialog } from "@/components/progress/quick-log-dialog";
+import { StudentAgentPanel } from "@/components/progress/student-agent-panel";
+import { StudentReportView } from "@/components/progress/student-report-view";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, TrendingUp, Calendar, BarChart3, FileDown } from "lucide-react";
+import { Plus, TrendingUp, Calendar, BarChart3, FileDown, MessageSquare, FileText } from "lucide-react";
 import type { TimelineEntry, SubjectStrategiesStored } from "@/lib/student-store";
 
 export type { TimelineEntry };
@@ -45,7 +48,9 @@ function savedToStudent(saved: { id: string; name: string; age: string; complete
   };
 }
 
-export default function ProgressPage() {
+function ProgressPageContent() {
+  const searchParams = useSearchParams();
+  const studentFromUrl = searchParams.get("student");
   const { students: savedStudents, updateTimeline, refreshFromSupabase } = useStudents();
   const students: Student[] = useMemo(
     () => savedStudents.map((s) => savedToStudent(s)),
@@ -65,10 +70,13 @@ export default function ProgressPage() {
   }, [refreshFromSupabase]);
 
   useEffect(() => {
-    if (selectedStudent === null && students.length > 0) {
+    if (studentFromUrl && students.length > 0) {
+      const match = students.find((s) => s.id === studentFromUrl);
+      if (match) setSelectedStudent(match);
+    } else if (selectedStudent === null && students.length > 0) {
       setSelectedStudent(students[0]);
     }
-  }, [students.length, selectedStudent]);
+  }, [students.length, selectedStudent, studentFromUrl, students]);
 
   useEffect(() => {
     if (!effectiveStudent || !savedSelected) return;
@@ -79,6 +87,22 @@ export default function ProgressPage() {
     setSelectedStudent(student);
     const saved = savedStudents.find((s) => s.id === student.id);
     setTimeline(saved?.timeline ?? []);
+  };
+
+  const handleFollowUpSent = (userMessage: string) => {
+    if (!savedSelected) return;
+    const newEntry: TimelineEntry = {
+      id: timeline.length + 1,
+      date: new Date().toISOString().split("T")[0],
+      type: "intervention",
+      title: language === "es" ? "Seguimiento con EduGuIA" : "EduGuIA follow-up",
+      description:
+        userMessage.length > 200 ? `${userMessage.slice(0, 200)}…` : userMessage,
+      author: "EduGuIA",
+    };
+    const newTimeline = [newEntry, ...timeline];
+    setTimeline(newTimeline);
+    updateTimeline(savedSelected.id, newTimeline);
   };
 
   const handleAddLog = (entry: Omit<TimelineEntry, "id" | "date" | "author">) => {
@@ -560,10 +584,20 @@ export default function ProgressPage() {
           onSelectStudent={handleStudentChange}
         />
 
+        {effectiveStudent && savedSelected && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/dashboard/assessment?student=${effectiveStudent.id}`}>
+                {t("progress.newAssessment")}
+              </Link>
+            </Button>
+          </div>
+        )}
+
         <Tabs defaultValue="overview" className="mt-8 space-y-0">
           <Card className="overflow-hidden">
-            <div className="border-b bg-muted/30 px-2 pt-2 sm:px-4">
-              <TabsList className="h-11 w-full grid grid-cols-3 gap-1 rounded-lg bg-transparent p-0 shadow-none">
+            <div className="border-b bg-muted/30 px-2 pt-2 sm:px-4 overflow-x-auto">
+              <TabsList className="h-11 w-max min-w-full grid grid-cols-5 gap-1 rounded-lg bg-transparent p-0 shadow-none sm:w-full">
                 <TabsTrigger
                   value="overview"
                   className="flex items-center justify-center gap-2 rounded-md border-0 bg-transparent py-3 text-sm font-medium shadow-none transition-colors hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm"
@@ -580,10 +614,24 @@ export default function ProgressPage() {
                 </TabsTrigger>
                 <TabsTrigger
                   value="analytics"
-                  className="flex items-center justify-center gap-2 rounded-md border-0 bg-transparent py-3 text-sm font-medium shadow-none transition-colors hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                  className="flex items-center justify-center gap-1.5 rounded-md border-0 bg-transparent px-2 py-3 text-xs font-medium shadow-none transition-colors hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm sm:gap-2 sm:text-sm"
                 >
                   <BarChart3 className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  <span>{t("progress.charts")}</span>
+                  <span className="truncate">{t("progress.charts")}</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="chat"
+                  className="flex items-center justify-center gap-1.5 rounded-md border-0 bg-transparent px-2 py-3 text-xs font-medium shadow-none transition-colors hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm sm:gap-2 sm:text-sm"
+                >
+                  <MessageSquare className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span className="truncate">{t("progress.chatTab")}</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="report"
+                  className="flex items-center justify-center gap-1.5 rounded-md border-0 bg-transparent px-2 py-3 text-xs font-medium shadow-none transition-colors hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm sm:gap-2 sm:text-sm"
+                >
+                  <FileText className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span className="truncate">{t("progress.reportTab")}</span>
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -660,6 +708,30 @@ export default function ProgressPage() {
               )}
             </div>
           </TabsContent>
+
+          <TabsContent value="chat" className="mt-0 outline-none">
+            {savedSelected ? (
+              <StudentAgentPanel
+                key={savedSelected.id}
+                studentId={savedSelected.id}
+                assessmentData={savedSelected.assessmentData}
+                onFollowUpSent={(msg) => handleFollowUpSent(msg)}
+              />
+            ) : (
+              <p className="text-sm text-muted-foreground">{t("progress.selectPrompt")}</p>
+            )}
+          </TabsContent>
+
+          <TabsContent value="report" className="mt-0 outline-none">
+            {savedSelected ? (
+              <StudentReportView
+                studentName={savedSelected.name}
+                snapshot={savedSelected.reportSnapshot}
+              />
+            ) : (
+              <p className="text-sm text-muted-foreground">{t("progress.selectPrompt")}</p>
+            )}
+          </TabsContent>
             </div>
           </Card>
         </Tabs>
@@ -671,5 +743,20 @@ export default function ProgressPage() {
           onSubmit={handleAddLog}
         />
       </div>
+  );
+}
+
+export default function ProgressPage() {
+  const { t } = useLanguage();
+  return (
+    <Suspense
+      fallback={
+        <div className="p-6 lg:p-8">
+          <p className="text-muted-foreground">{t("progress.loadingChat")}</p>
+        </div>
+      }
+    >
+      <ProgressPageContent />
+    </Suspense>
   );
 }

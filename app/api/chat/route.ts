@@ -26,8 +26,10 @@ export async function POST(req: Request) {
     estudiante_id?: string;
     /** Turnos de chat evaluativo: refuerza una sola respuesta por llamada */
     adaptive_chat?: boolean;
+    /** Texto corto para guardar en planes_intervencion (seguimiento en Progreso) */
+    observacion_resumen?: string;
   };
-  const { prompt, estudiante_id, adaptive_chat } = body;
+  const { prompt, estudiante_id, adaptive_chat, observacion_resumen } = body;
 
   if (!prompt || typeof prompt !== "string") {
     return new Response(JSON.stringify({ error: "Missing prompt" }), {
@@ -144,10 +146,14 @@ export async function POST(req: Request) {
     }
 
     if (estudiante_id && docenteId && supabase) {
+      const observacion =
+        typeof observacion_resumen === "string" && observacion_resumen.trim()
+          ? observacion_resumen.trim()
+          : prompt.slice(0, 2000);
       await supabase.from("planes_intervencion").insert({
         estudiante_id,
         docente_id: docenteId,
-        observacion_docente: prompt,
+        observacion_docente: observacion,
         respuesta_ia: text,
       });
     }
