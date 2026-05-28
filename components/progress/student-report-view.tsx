@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useLanguage } from "@/contexts/language-context";
+import { GenerateFinalReport } from "@/components/progress/generate-final-report";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import type { ReportSnapshot } from "@/lib/student-store";
+import type { AssessmentData, ReportSnapshot } from "@/lib/student-store";
 
 const SUBJECT_KEYS = [
   { key: "numeracy" as const, es: "Área numérica", en: "Numeracy" },
@@ -16,12 +18,28 @@ const SUBJECT_KEYS = [
 ];
 
 interface StudentReportViewProps {
+  studentId: string;
   studentName: string;
+  assessmentData: AssessmentData;
   snapshot?: ReportSnapshot;
+  onSnapshotUpdated?: (snapshot: ReportSnapshot) => void;
 }
 
-export function StudentReportView({ studentName, snapshot }: StudentReportViewProps) {
+export function StudentReportView({
+  studentId,
+  studentName,
+  assessmentData,
+  snapshot: snapshotProp,
+  onSnapshotUpdated,
+}: StudentReportViewProps) {
   const { t, language } = useLanguage();
+  const [localSnapshot, setLocalSnapshot] = useState<ReportSnapshot | undefined>(snapshotProp);
+
+  const activeSnapshot = localSnapshot ?? snapshotProp;
+
+  useEffect(() => {
+    if (snapshotProp) setLocalSnapshot(snapshotProp);
+  }, [snapshotProp]);
 
   if (!snapshot?.report?.length) {
     return (
@@ -50,8 +68,15 @@ export function StudentReportView({ studentName, snapshot }: StudentReportViewPr
         <p className="text-sm text-muted-foreground">{t("progress.reportSaved")}</p>
       </div>
 
+      <GenerateFinalReport
+        studentId={studentId}
+        assessmentData={assessmentData}
+        currentSnapshot={activeSnapshot}
+        onGenerated={handleGenerated}
+      />
+
       <Accordion type="multiple" className="w-full space-y-2">
-        {snapshot.report.map((section) => (
+        {activeSnapshot.report.map((section) => (
           <AccordionItem key={section.id} value={section.id} className="rounded-lg border px-4">
             <AccordionTrigger className="hover:no-underline">
               <div className="flex flex-wrap items-center gap-2 text-left">
@@ -72,7 +97,7 @@ export function StudentReportView({ studentName, snapshot }: StudentReportViewPr
         ))}
       </Accordion>
 
-      {SUBJECT_KEYS.some(({ key }) => snapshot.subjectStrategies[key]?.length) && (
+      {SUBJECT_KEYS.some(({ key }) => activeSnapshot.subjectStrategies[key]?.length) && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
@@ -81,7 +106,7 @@ export function StudentReportView({ studentName, snapshot }: StudentReportViewPr
           </CardHeader>
           <CardContent className="space-y-4">
             {SUBJECT_KEYS.map(({ key, es, en }) => {
-              const items = snapshot.subjectStrategies[key];
+              const items = activeSnapshot.subjectStrategies[key];
               if (!items?.length) return null;
               return (
                 <div key={key}>
@@ -98,14 +123,14 @@ export function StudentReportView({ studentName, snapshot }: StudentReportViewPr
         </Card>
       )}
 
-      {snapshot.familySummaryKaqchikel?.length > 0 && (
+      {activeSnapshot.familySummaryKaqchikel?.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base">{t("progress.familyKaqchikel")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed">
-              {snapshot.familySummaryKaqchikel.map((line, i) => (
+              {activeSnapshot.familySummaryKaqchikel.map((line, i) => (
                 <li key={i}>{line}</li>
               ))}
             </ul>

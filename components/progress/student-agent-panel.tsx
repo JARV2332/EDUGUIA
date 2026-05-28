@@ -14,32 +14,25 @@ import type { AssessmentData } from "@/lib/student-store";
 import {
   assessmentChatToMessages,
   buildFollowUpPrompt,
+  filterFollowUpPlans,
   formatFollowUpObservation,
   interventionPlansToMessages,
-  isFollowUpObservation,
   type InterventionPlanRow,
 } from "@/lib/student-interventions";
-
-function filterFollowUpPlans(plans: InterventionPlanRow[]): InterventionPlanRow[] {
-  return plans.filter((p) => {
-    const obs = p.observacion_docente ?? "";
-    if (isFollowUpObservation(obs)) return true;
-    if (obs.length > 600) return false;
-    if (obs.includes("Eres EduGuIA") || obs.includes("evaluación adaptativa")) return false;
-    return obs.trim().length > 0;
-  });
-}
 
 interface StudentAgentPanelProps {
   studentId: string;
   assessmentData: AssessmentData;
   onFollowUpSent?: (userMessage: string, assistantReply: string) => void;
+  /** Persiste el intercambio en assessment_data (local + Supabase) */
+  onFollowUpSaved?: (userMessage: string, assistantReply: string) => void;
 }
 
 export function StudentAgentPanel({
   studentId,
   assessmentData,
   onFollowUpSent,
+  onFollowUpSaved,
 }: StudentAgentPanelProps) {
   const { language, t } = useLanguage();
   const { speakText, stopSpeaking, isSpeaking } = useAccessibility();
@@ -127,6 +120,7 @@ export function StudentAgentPanel({
       const reply = dataResp.reply.trim();
       setPendingFollowUp((prev) => [...prev, { role: "assistant", content: reply }]);
       onFollowUpSent?.(trimmed, reply);
+      onFollowUpSaved?.(trimmed, reply);
       await loadPlans();
       setPendingFollowUp([]);
     } catch (err) {
@@ -148,6 +142,7 @@ export function StudentAgentPanel({
 
   return (
     <div className="space-y-6">
+      <p className="text-xs text-muted-foreground">{t("progress.chatSaved")}</p>
       {hasAssessmentChat ? (
         <Card>
           <CardHeader className="pb-3">

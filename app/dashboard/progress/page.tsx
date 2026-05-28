@@ -16,7 +16,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, TrendingUp, Calendar, BarChart3, FileDown, MessageSquare, FileText } from "lucide-react";
-import type { TimelineEntry, SubjectStrategiesStored } from "@/lib/student-store";
+import type { TimelineEntry, SubjectStrategiesStored, ReportSnapshot } from "@/lib/student-store";
+import { createClient } from "@/lib/supabase/client";
+import { plansToFollowUpLog } from "@/lib/student-interventions";
 
 export type { TimelineEntry };
 
@@ -51,7 +53,8 @@ function savedToStudent(saved: { id: string; name: string; age: string; complete
 function ProgressPageContent() {
   const searchParams = useSearchParams();
   const studentFromUrl = searchParams.get("student");
-  const { students: savedStudents, updateTimeline, refreshFromSupabase } = useStudents();
+  const { students: savedStudents, updateTimeline, updateStudent, refreshFromSupabase } =
+    useStudents();
   const students: Student[] = useMemo(
     () => savedStudents.map((s) => savedToStudent(s)),
     [savedStudents]
@@ -83,10 +86,51 @@ function ProgressPageContent() {
     setTimeline(savedSelected.timeline);
   }, [effectiveStudent?.id]);
 
+  /** Migra seguimientos antiguos de planes_intervencion a followUpLog si aún no están guardados. */
+  useEffect(() => {
+    if (!savedSelected?.id) return;
+    if ((savedSelected.assessmentData.followUpLog?.length ?? 0) > 0) return;
+
+    let cancelled = false;
+    const hydrate = async () => {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("planes_intervencion")
+          .select("id, observacion_docente, respuesta_ia, created_at")
+          .eq("estudiante_id", savedSelected.id)
+          .order("created_at", { ascending: true });
+        if (cancelled || !data?.length) return;
+        const log = plansToFollowUpLog(data);
+        if (log.length === 0) return;
+        await updateStudent(savedSelected.id, {
+          assessmentData: { followUpLog: log },
+        });
+      } catch (e) {
+        console.error("Error hidratando seguimiento:", e);
+      }
+    };
+    void hydrate();
+    return () => {
+      cancelled = true;
+    };
+  }, [savedSelected?.id, savedSelected?.assessmentData.followUpLog?.length, updateStudent]);
+
   const handleStudentChange = (student: Student) => {
     setSelectedStudent(student);
     const saved = savedStudents.find((s) => s.id === student.id);
     setTimeline(saved?.timeline ?? []);
+  };
+
+  const handleFollowUpSaved = (userMessage: string, assistantReply: string) => {
+    if (!savedSelected) return;
+    void updateStudent(savedSelected.id, {
+      appendFollowUp: { user: userMessage, assistant: assistantReply },
+    });
+  };
+
+  const handleReportUpdated = (_snapshot: ReportSnapshot) => {
+    void refreshFromSupabase();
   };
 
   const handleFollowUpSent = (userMessage: string) => {
@@ -716,6 +760,7 @@ function ProgressPageContent() {
                 studentId={savedSelected.id}
                 assessmentData={savedSelected.assessmentData}
                 onFollowUpSent={(msg) => handleFollowUpSent(msg)}
+                onFollowUpSaved={handleFollowUpSaved}
               />
             ) : (
               <p className="text-sm text-muted-foreground">{t("progress.selectPrompt")}</p>
@@ -725,8 +770,11 @@ function ProgressPageContent() {
           <TabsContent value="report" className="mt-0 outline-none">
             {savedSelected ? (
               <StudentReportView
+                studentId={savedSelected.id}
                 studentName={savedSelected.name}
+                assessmentData={savedSelected.assessmentData}
                 snapshot={savedSelected.reportSnapshot}
+                onSnapshotUpdated={handleReportUpdated}
               />
             ) : (
               <p className="text-sm text-muted-foreground">{t("progress.selectPrompt")}</p>

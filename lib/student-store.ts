@@ -21,6 +21,68 @@ export interface AssessmentData {
     additionalNotes: string;
   };
   aiResponses: Array<{ question: string; answer: string }>;
+  /** Seguimiento posterior en Progreso (docente ↔ EduGuIA) */
+  followUpLog?: Array<{ user: string; assistant: string; at: string }>;
+}
+
+/** Extrae datos de evaluación e informe desde JSONB de Supabase. */
+export function parseAssessmentPayloadFromDb(json: unknown): {
+  assessmentData: AssessmentData;
+  reportSnapshot?: ReportSnapshot;
+} {
+  const defaults: AssessmentData = {
+    studentName: "",
+    studentAge: "",
+    sensorial: {
+      visualImpairment: "none",
+      hearingImpairment: "none",
+      motorSkills: "typical",
+      assistiveTech: [],
+    },
+    neurodivergence: {
+      attention: false,
+      hyperactivity: false,
+      socialInteraction: false,
+      anxiety: false,
+      sensoryOverload: false,
+      additionalNotes: "",
+    },
+    aiResponses: [],
+    followUpLog: [],
+  };
+  if (!json || typeof json !== "object") {
+    return { assessmentData: defaults };
+  }
+  const obj = json as Record<string, unknown>;
+  const { reportSnapshot, ...rest } = obj;
+  const assessmentData = {
+    ...defaults,
+    ...(rest as Partial<AssessmentData>),
+    aiResponses: Array.isArray(rest.aiResponses)
+      ? (rest.aiResponses as AssessmentData["aiResponses"])
+      : defaults.aiResponses,
+    followUpLog: Array.isArray(rest.followUpLog)
+      ? (rest.followUpLog as NonNullable<AssessmentData["followUpLog"]>)
+      : [],
+  };
+  return {
+    assessmentData,
+    reportSnapshot:
+      reportSnapshot && typeof reportSnapshot === "object"
+        ? (reportSnapshot as ReportSnapshot)
+        : undefined,
+  };
+}
+
+/** Payload para guardar en Supabase (assessment_data JSONB). */
+export function buildAssessmentPayloadForDb(
+  assessmentData: AssessmentData,
+  reportSnapshot?: ReportSnapshot
+): Record<string, unknown> {
+  return {
+    ...assessmentData,
+    ...(reportSnapshot ? { reportSnapshot } : {}),
+  };
 }
 
 export interface TimelineEntry {
@@ -145,6 +207,27 @@ export function updateStudentTimeline(studentId: string, timeline: TimelineEntry
   if (index === -1) return;
   students[index] = { ...students[index], timeline: [...timeline] };
   saveToStorage(students);
+}
+
+export function updateSavedStudent(
+  studentId: string,
+  patch: Partial<Pick<SavedStudent, "assessmentData" | "reportSnapshot" | "name" | "age">>
+): SavedStudent | undefined {
+  const students = loadFromStorage();
+  const index = students.findIndex((s) => s.id === studentId);
+  if (index === -1) return undefined;
+  const current = students[index];
+  students[index] = {
+    ...current,
+    ...(patch.name !== undefined && { name: patch.name }),
+    ...(patch.age !== undefined && { age: patch.age }),
+    ...(patch.assessmentData && {
+      assessmentData: { ...current.assessmentData, ...patch.assessmentData },
+    }),
+    ...(patch.reportSnapshot !== undefined && { reportSnapshot: patch.reportSnapshot }),
+  };
+  saveToStorage(students);
+  return students[index];
 }
 
 export function getSavedStudent(id: string): SavedStudent | undefined {

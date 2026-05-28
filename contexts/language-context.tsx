@@ -196,6 +196,13 @@ const translations: Record<Language, Record<string, string>> = {
     "progress.familyKaqchikel": "Family summary (Kaqchikel)",
     "progress.continueTreatment": "Continue with EduGuIA",
     "progress.newAssessment": "New assessment",
+    "progress.generateFinalReport": "Generate final report",
+    "progress.generateFinalReportHint": "Creates an updated report using the full AI conversation (assessment + follow-up). Saved to the cloud.",
+    "progress.generatingReport": "Generating report…",
+    "progress.reportGenerateError": "Could not generate the report. Try again.",
+    "progress.noConversationForReport": "There is no saved conversation yet. Complete the assessment or write in follow-up chat first.",
+    "progress.conversationTurns": "Conversation turns",
+    "progress.chatSaved": "Conversations are saved automatically (device and cloud when signed in).",
     
     // Quick Log
     "quickLog.title": "Quick Daily Log",
@@ -478,6 +485,13 @@ const translations: Record<Language, Record<string, string>> = {
     "progress.familyKaqchikel": "Resumen para la familia en Kaqchikel",
     "progress.continueTreatment": "Continuar con EduGuIA",
     "progress.newAssessment": "Nueva evaluación",
+    "progress.generateFinalReport": "Generar informe final",
+    "progress.generateFinalReportHint": "Crea un informe actualizado con toda la conversación con EduGuIA (evaluación + seguimiento). Se guarda en la nube.",
+    "progress.generatingReport": "Generando informe…",
+    "progress.reportGenerateError": "No se pudo generar el informe. Intenta de nuevo.",
+    "progress.noConversationForReport": "Aún no hay conversación guardada. Completa la evaluación o escribe en el chat de seguimiento primero.",
+    "progress.conversationTurns": "Turnos de conversación",
+    "progress.chatSaved": "Las conversaciones se guardan automáticamente (dispositivo y nube si iniciaste sesión).",
     
     // Quick Log
     "quickLog.title": "Registro Diario Rapido",

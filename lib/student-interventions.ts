@@ -68,3 +68,30 @@ export function buildFollowUpPrompt(
 export function formatFollowUpObservation(userMessage: string): string {
   return `${FOLLOW_UP_PREFIX} ${userMessage.trim()}`;
 }
+
+/** Reconstruye followUpLog desde planes ya guardados en Supabase. */
+export function plansToFollowUpLog(
+  plans: InterventionPlanRow[]
+): NonNullable<AssessmentData["followUpLog"]> {
+  return filterFollowUpPlans(plans)
+    .map((plan) => {
+      const user = followUpObservationToUserMessage(plan.observacion_docente ?? "");
+      if (!user) return null;
+      return {
+        user,
+        assistant: plan.respuesta_ia?.trim() ?? "",
+        at: plan.created_at?.split("T")[0] ?? new Date().toISOString().split("T")[0],
+      };
+    })
+    .filter((e): e is NonNullable<typeof e> => e !== null && e.assistant.length > 0);
+}
+
+export function filterFollowUpPlans(plans: InterventionPlanRow[]): InterventionPlanRow[] {
+  return plans.filter((p) => {
+    const obs = p.observacion_docente ?? "";
+    if (isFollowUpObservation(obs)) return true;
+    if (obs.length > 600) return false;
+    if (obs.includes("Eres EduGuIA") || obs.includes("evaluación adaptativa")) return false;
+    return obs.trim().length > 0;
+  });
+}
