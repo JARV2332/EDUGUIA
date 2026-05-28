@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { Suspense, useState, useCallback, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import type { ReportSnapshot } from "@/lib/student-store";
 import { useStudents } from "@/contexts/students-context";
 import { useLanguage } from "@/contexts/language-context";
@@ -56,15 +57,26 @@ const initialData: AssessmentData = {
   aiResponses: [],
 };
 
-export default function DashboardAssessmentPage() {
+function DashboardAssessmentPageContent() {
+  const searchParams = useSearchParams();
+  const preloadStudentId = searchParams.get("student");
   const [currentStep, setCurrentStep] = useState(1);
   const [data, setData] = useState<AssessmentData>(initialData);
   const [savedId, setSavedId] = useState<string | null>(null);
   const [draftEstudianteId, setDraftEstudianteId] = useState<string | null>(null);
   const [reportSnapshot, setReportSnapshot] = useState<ReportSnapshot | null>(null);
   const { t } = useLanguage();
-  const { addStudent, createDraftStudent } = useStudents();
+  const { addStudent, createDraftStudent, students } = useStudents();
   const handleReportSnapshotChange = useCallback((snapshot: ReportSnapshot) => setReportSnapshot(snapshot), []);
+
+  useEffect(() => {
+    if (!preloadStudentId || students.length === 0) return;
+    const saved = students.find((s) => s.id === preloadStudentId);
+    if (!saved) return;
+    setData(saved.assessmentData);
+    setDraftEstudianteId(saved.id);
+    if (saved.reportSnapshot) setReportSnapshot(saved.reportSnapshot);
+  }, [preloadStudentId, students]);
 
   // Al entrar al paso 4 (chat) o 5 (informe), crear borrador en Supabase para guardar planes_intervencion
   useEffect(() => {
@@ -234,5 +246,20 @@ export default function DashboardAssessmentPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function DashboardAssessmentPage() {
+  const { t } = useLanguage();
+  return (
+    <Suspense
+      fallback={
+        <div className="p-6 lg:p-8">
+          <p className="text-muted-foreground">{t("common.loading")}</p>
+        </div>
+      }
+    >
+      <DashboardAssessmentPageContent />
+    </Suspense>
   );
 }
