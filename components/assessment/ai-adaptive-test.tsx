@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import ReactMarkdown from "react-markdown";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ChatMessageList, type ChatMessage } from "@/components/chat/chat-message-list";
 import { useLanguage } from "@/contexts/language-context";
 import { useAccessibility } from "@/contexts/accessibility-context";
-import { Bot, User, Send, ArrowRight, Mic, Square, Volume2 } from "lucide-react";
+import { Bot, Send, ArrowRight, Mic, Square } from "lucide-react";
 import type { AssessmentData } from "@/app/assessment/page";
 
 interface AIAdaptiveTestProps {
@@ -19,13 +18,8 @@ interface AIAdaptiveTestProps {
   estudianteId?: string | null;
 }
 
-interface Message {
-  role: "assistant" | "user";
-  content: string;
-}
-
 export function AIAdaptiveTest({ data, updateData, onComplete, estudianteId }: AIAdaptiveTestProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -103,7 +97,7 @@ export function AIAdaptiveTest({ data, updateData, onComplete, estudianteId }: A
     }
   }, [messages]);
 
-  const buildPromptFromContext = (history: Message[]): string => {
+  const buildPromptFromContext = (history: ChatMessage[]): string => {
     const name = data.studentName || "el estudiante";
     const age = data.studentAge || "no especificada";
 
@@ -155,7 +149,7 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
     `.trim();
   };
 
-  const startConversation = async (history: Message[], signal?: AbortSignal) => {
+  const startConversation = async (history: ChatMessage[], signal?: AbortSignal) => {
     setIsTyping(true);
     try {
       const prompt = buildPromptFromContext(history);
@@ -270,7 +264,7 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
       ],
     });
 
-    const updatedHistory: Message[] = [
+    const updatedHistory: ChatMessage[] = [
       ...messages,
       { role: "user", content: userMessage },
     ];
@@ -280,112 +274,36 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
   };
 
   return (
-    <Card className="flex min-h-0 w-full max-w-full flex-col overflow-hidden rounded-xl border shadow-sm sm:h-[600px] sm:max-h-[min(600px,90vh)] h-[min(640px,calc(100dvh-9rem))]">
-      <CardHeader className="shrink-0 space-y-1 px-4 pb-2 pt-4 sm:px-6">
+    <Card className="flex min-h-0 w-full max-w-full flex-col overflow-hidden rounded-xl border border-border/80 bg-gradient-to-b from-card to-muted/20 shadow-md sm:h-[min(680px,90vh)] sm:max-h-[min(680px,90vh)] h-[min(720px,calc(100dvh-8rem))]">
+      <CardHeader className="shrink-0 space-y-1 border-b bg-muted/30 px-4 pb-3 pt-4 sm:px-6">
         <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-          <Bot className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary text-primary-foreground shadow-sm">
+            <Bot className="h-5 w-5" aria-hidden="true" />
+          </span>
           <span className="leading-tight">{t("aiTest.title")}</span>
         </CardTitle>
-        <CardDescription className="text-pretty text-sm leading-snug">
+        <CardDescription className="text-pretty pl-11 text-sm leading-snug sm:pl-11">
           {t("aiTest.subtitle")}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-0 px-4 pb-24 pt-0 sm:px-6 sm:pb-6">
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-0 px-3 pb-24 pt-3 sm:px-5 sm:pb-6 sm:pt-4">
         <div
           ref={scrollRef}
-          className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain pr-1 [-webkit-overflow-scrolling:touch] sm:pr-2"
+          className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain rounded-lg bg-muted/25 px-2 py-3 sm:px-3 sm:py-4 [-webkit-overflow-scrolling:touch]"
         >
-          <div className="w-full min-w-0 space-y-4 pb-2">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex w-full min-w-0 gap-2 sm:gap-3 ${
-                  message.role === "user" ? "flex-row-reverse" : "flex-row"
-                }`}
-              >
-                <Avatar className="mt-0.5 h-8 w-8 shrink-0">
-                  <AvatarFallback
-                    className={
-                      message.role === "assistant"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
-                    }
-                  >
-                    {message.role === "assistant" ? (
-                      <Bot className="h-4 w-4" />
-                    ) : (
-                      <User className="h-4 w-4" />
-                    )}
-                  </AvatarFallback>
-                </Avatar>
-                <div
-                  className={`min-w-0 flex-1 rounded-xl px-3 py-2.5 sm:max-w-[min(100%,42rem)] sm:px-4 ${
-                    message.role === "user" ? "max-w-[min(100%,85%)]" : ""
-                  } ${
-                    message.role === "assistant"
-                      ? "bg-muted/90 text-foreground"
-                      : "bg-primary text-primary-foreground"
-                  }`}
-                  role={message.role === "assistant" ? "status" : undefined}
-                  aria-live={message.role === "assistant" ? "polite" : undefined}
-                >
-                  {message.role === "assistant" ? (
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
-                      <div
-                        className="prose prose-sm min-w-0 max-w-none text-[15px] leading-relaxed text-foreground dark:prose-invert
-                          prose-p:my-2 prose-p:break-words first:prose-p:mt-0 last:prose-p:mb-0
-                          prose-headings:mb-2 prose-headings:mt-3 prose-headings:text-base prose-headings:font-semibold first:prose-headings:mt-0
-                          prose-ul:my-2 prose-li:my-0.5 prose-strong:text-foreground"
-                      >
-                        <ReactMarkdown>{message.content}</ReactMarkdown>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="-mr-1 h-9 w-9 shrink-0 self-end sm:self-start sm:-mt-0.5"
-                        onClick={() => {
-                          const plain = message.content
-                            .replace(/\*\*?/g, "")
-                            .replace(/#+\s?/g, "")
-                            .replace(/\n/g, " ")
-                            .trim();
-                          if (plain) {
-                            if (isSpeaking) stopSpeaking();
-                            else speakText(plain);
-                          }
-                        }}
-                        aria-label={t("results.readAloud")}
-                        title={t("results.readAloud")}
-                      >
-                        <Volume2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <p className="text-[15px] leading-relaxed break-words whitespace-pre-wrap">
-                      {message.content}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-            {isTyping && (
-              <div className="flex w-full min-w-0 gap-2 sm:gap-3">
-                <Avatar className="h-8 w-8 shrink-0">
-                  <AvatarFallback className="bg-primary text-primary-foreground">
-                    <Bot className="h-4 w-4" />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0 flex-1 rounded-xl bg-muted/90 px-4 py-3">
-                  <div className="flex gap-1">
-                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.3s]" />
-                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.15s]" />
-                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground" />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          <ChatMessageList
+            messages={messages}
+            isTyping={isTyping}
+            thinkingLabel={t("aiTest.thinking")}
+            assistantLabel="EduGuIA"
+            userLabel={t("aiTest.you")}
+            readAloudLabel={t("results.readAloud")}
+            isSpeaking={isSpeaking}
+            onReadAloud={(plain) => {
+              if (isSpeaking) stopSpeaking();
+              else speakText(plain);
+            }}
+          />
         </div>
 
         <div className="mt-3 shrink-0 space-y-3 border-t pt-3">
