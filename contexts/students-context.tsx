@@ -64,21 +64,26 @@ export function StudentsProvider({ children }: { children: ReactNode }) {
 
   const syncStudentToSupabase = useCallback(async (student: SavedStudent) => {
     if (!isSupabaseUuid(student.id)) return;
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
 
-    await supabase
-      .from("estudiantes")
-      .update({
-        nombre: student.name,
-        edad: student.age?.trim() || null,
-        assessment_data: buildAssessmentPayloadForDb(
-          student.assessmentData,
-          student.reportSnapshot
-        ),
-      })
-      .eq("id", student.id);
+    try {
+      const res = await fetch(`/api/students/${student.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          nombre: student.name,
+          edad: student.age?.trim() || null,
+          assessment_data: student.assessmentData,
+          report_snapshot: student.reportSnapshot,
+        }),
+      });
+      if (!res.ok) {
+        const err = (await res.json().catch(() => ({}))) as { error?: string };
+        console.error("Error sincronizando estudiante:", err.error ?? res.status);
+      }
+    } catch (e) {
+      console.error("Error sincronizando estudiante:", e);
+    }
   }, []);
 
   const createDraftStudent = useCallback(async (data: AssessmentData): Promise<string | null> => {

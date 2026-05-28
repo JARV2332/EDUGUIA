@@ -41,17 +41,29 @@ export function StudentReportView({
     if (snapshotProp) setLocalSnapshot(snapshotProp);
   }, [snapshotProp]);
 
-  if (!snapshot?.report?.length) {
+  const handleGenerated = (next: ReportSnapshot) => {
+    setLocalSnapshot(next);
+    onSnapshotUpdated?.(next);
+  };
+
+  if (!activeSnapshot?.report?.length) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("progress.reportTab")}</CardTitle>
-          <CardDescription>{t("progress.noReport")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">{t("progress.noReportHint")}</p>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("progress.reportTab")}</CardTitle>
+            <CardDescription>{t("progress.noReport")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">{t("progress.noReportHint")}</p>
+          </CardContent>
+        </Card>
+        <GenerateFinalReport
+          studentId={studentId}
+          assessmentData={assessmentData}
+          onGenerated={handleGenerated}
+        />
+      </div>
     );
   }
 
