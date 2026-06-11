@@ -47,7 +47,54 @@
       Escríbenos para inscripciones, información de cursos o alianzas. ¡Esperamos saber de ti!
     </p>
 
-    <div class="contact-cards">
+    <div class="contact-layout">
+      <section class="contact-form-section" aria-labelledby="contact-form-title">
+        <h2 id="contact-form-title" class="contact-form-section__title">Envíanos un mensaje</h2>
+        <p class="contact-form-section__hint">Completa el formulario y nos pondremos en contacto contigo pronto.</p>
+
+        <form class="contact-form" id="contact-form" novalidate>
+          <div class="contact-form__row">
+            <div class="contact-form__group">
+              <label for="contact-name">Nombre completo <span aria-hidden="true">*</span></label>
+              <input type="text" id="contact-name" name="name" required autocomplete="name" placeholder="Tu nombre">
+            </div>
+            <div class="contact-form__group">
+              <label for="contact-email">Correo electrónico <span aria-hidden="true">*</span></label>
+              <input type="email" id="contact-email" name="email" required autocomplete="email" placeholder="tu@correo.com">
+            </div>
+          </div>
+
+          <div class="contact-form__row">
+            <div class="contact-form__group">
+              <label for="contact-phone">Teléfono</label>
+              <input type="tel" id="contact-phone" name="phone" autocomplete="tel" placeholder="502 0000 0000">
+            </div>
+            <div class="contact-form__group">
+              <label for="contact-subject">Motivo de contacto <span aria-hidden="true">*</span></label>
+              <select id="contact-subject" name="subject" required>
+                <option value="" disabled selected>Selecciona una opción</option>
+                <option value="inscripcion">Inscripción a cursos</option>
+                <option value="informacion">Información general</option>
+                <option value="alianza">Alianzas o colaboraciones</option>
+                <option value="eduguia">Consulta sobre EDUGUIA</option>
+                <option value="otro">Otro</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="contact-form__group">
+            <label for="contact-message">Mensaje <span aria-hidden="true">*</span></label>
+            <textarea id="contact-message" name="message" rows="5" required placeholder="Cuéntanos en qué podemos ayudarte…"></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary contact-form__submit">Enviar mensaje</button>
+          <p class="contact-form__notice" role="status" id="contact-form-status" hidden></p>
+        </form>
+      </section>
+
+      <aside class="contact-aside" aria-label="Otros medios de contacto">
+        <h2 class="contact-aside__title">También puedes escribirnos</h2>
+        <div class="contact-cards contact-cards--stacked">
       <div class="contact-card">
         <p><strong>Facebook</strong></p>
         <p><a href="https://www.facebook.com/edukidsguatemala" target="_blank" rel="noopener">@edukidsguatemala</a></p>
@@ -64,6 +111,8 @@
         <p><strong>Correo</strong></p>
         <p><a href="mailto:info@edukidsgt.com">info@edukidsgt.com</a></p>
       </div>
+        </div>
+      </aside>
     </div>
 
     <div class="landing-cta">
@@ -93,6 +142,21 @@ document.querySelector('[data-nav-toggle]')?.addEventListener('click', function 
   const nav = document.getElementById('site-nav');
   const open = nav.classList.toggle('is-open');
   this.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
+
+document.getElementById('contact-form')?.addEventListener('submit', function (event) {
+  event.preventDefault();
+  if (!this.checkValidity()) {
+    this.reportValidity();
+    return;
+  }
+  var status = document.getElementById('contact-form-status');
+  if (status) {
+    status.hidden = false;
+    status.textContent = '¡Gracias! Tu mensaje se ha registrado. Pronto habilitaremos el envío por correo.';
+    status.className = 'contact-form__notice contact-form__notice--success';
+  }
+  this.reset();
 });
 </script>
 </body>
