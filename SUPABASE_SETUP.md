@@ -32,7 +32,18 @@ La contraseña de la base de datos la ves en: Dashboard → Project Settings →
 
 ---
 
-## Comprobar que todo está bien
+## Recuperación de contraseña
+
+1. En **Authentication → URL Configuration** agrega estas **Redirect URLs**:
+   - `http://localhost:3000/auth/callback`
+   - `https://TU-DOMINIO.vercel.app/auth/callback` (producción)
+2. El flujo usa `/forgot-password` → correo de Supabase → `/auth/callback` → `/reset-password`.
+
+## Línea de tiempo (timeline)
+
+Las entradas de seguimiento diario se guardan en Supabase dentro del campo JSONB `assessment_data.timeline` de cada estudiante. Al iniciar sesión en otro navegador, se cargan automáticamente desde la nube.
+
+---
 
 - En el Dashboard → **Table Editor** deberías ver: `docentes`, `estudiantes`, `sesiones_chat`, `planes_intervencion`.
 - Al registrarte en la app, en `docentes` debería crearse una fila automáticamente (trigger `handle_new_user`).

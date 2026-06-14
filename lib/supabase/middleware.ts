@@ -23,7 +23,7 @@ export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
   const path = request.nextUrl.pathname;
 
-  if (isLandingPath(path)) {
+  if (isLandingPath(path) || path.startsWith("/auth/")) {
     return response;
   }
 
@@ -51,7 +51,8 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const isDashboard = path.startsWith("/dashboard");
-  const isAuthPage = path === "/login" || path === "/register";
+  const isAuthPage = path === "/login" || path === "/register" || path === "/forgot-password";
+  const isPasswordRecovery = path === "/reset-password";
 
   if (isDashboard && !user) {
     const redirect = new URL("/login", request.url);
@@ -60,6 +61,9 @@ export async function updateSession(request: NextRequest) {
   }
   if (isAuthPage && user) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+  if (isPasswordRecovery && !user) {
+    return response;
   }
 
   return response;

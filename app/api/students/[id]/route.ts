@@ -1,8 +1,8 @@
 export const runtime = "nodejs";
 
 import { createClient } from "@/lib/supabase/route-handler";
-import { buildAssessmentPayloadForDb } from "@/lib/student-store";
-import type { AssessmentData, ReportSnapshot } from "@/lib/student-store";
+import { buildAssessmentPayloadForDb, parseAssessmentPayloadFromDb } from "@/lib/student-store";
+import type { AssessmentData, ReportSnapshot, TimelineEntry } from "@/lib/student-store";
 
 export async function PATCH(
   req: Request,
@@ -28,6 +28,7 @@ export async function PATCH(
     edad?: string | null;
     assessment_data?: AssessmentData;
     report_snapshot?: ReportSnapshot;
+    timeline?: TimelineEntry[];
   };
 
   const { data: docente } = await supabase
@@ -51,9 +52,28 @@ export async function PATCH(
   }
 
   const assessmentData = body.assessment_data;
-  const payload = assessmentData
-    ? buildAssessmentPayloadForDb(assessmentData, body.report_snapshot)
-    : undefined;
+  const timeline = body.timeline;
+
+  let payload: Record<string, unknown> | undefined;
+  if (assessmentData || body.report_snapshot !== undefined || timeline !== undefined) {
+    let baseData = assessmentData;
+    let reportSnapshot = body.report_snapshot;
+
+    if (!baseData || reportSnapshot === undefined) {
+      const { data: row } = await supabase
+        .from("estudiantes")
+        .select("assessment_data")
+        .eq("id", id)
+        .single();
+      const parsed = parseAssessmentPayloadFromDb(row?.assessment_data);
+      baseData = baseData ?? parsed.assessmentData;
+      if (reportSnapshot === undefined) {
+        reportSnapshot = parsed.reportSnapshot;
+      }
+    }
+
+    payload = buildAssessmentPayloadForDb(baseData!, reportSnapshot, timeline);
+  }
 
   const { error } = await supabase
     .from("estudiantes")

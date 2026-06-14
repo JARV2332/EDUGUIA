@@ -25,10 +25,26 @@ export interface AssessmentData {
   followUpLog?: Array<{ user: string; assistant: string; at: string }>;
 }
 
-/** Extrae datos de evaluación e informe desde JSONB de Supabase. */
+export function defaultTimeline(completedAt?: string): TimelineEntry[] {
+  const date = completedAt ?? new Date().toISOString().split("T")[0];
+  return [
+    {
+      id: 1,
+      date,
+      type: "assessment",
+      title: "Evaluación inicial completada",
+      description: "Perfil de inclusión y recomendaciones generados.",
+      author: "EDUGUIA",
+    },
+  ];
+}
+
+/** Extrae datos de evaluación, informe y timeline desde JSONB de Supabase. */
 export function parseAssessmentPayloadFromDb(json: unknown): {
   assessmentData: AssessmentData;
   reportSnapshot?: ReportSnapshot;
+  timeline?: TimelineEntry[];
+  hasTimelineInDb: boolean;
 } {
   const defaults: AssessmentData = {
     studentName: "",
@@ -51,10 +67,10 @@ export function parseAssessmentPayloadFromDb(json: unknown): {
     followUpLog: [],
   };
   if (!json || typeof json !== "object") {
-    return { assessmentData: defaults };
+    return { assessmentData: defaults, hasTimelineInDb: false };
   }
   const obj = json as Record<string, unknown>;
-  const { reportSnapshot, ...rest } = obj;
+  const { reportSnapshot, timeline, ...rest } = obj;
   const assessmentData = {
     ...defaults,
     ...(rest as Partial<AssessmentData>),
@@ -71,17 +87,21 @@ export function parseAssessmentPayloadFromDb(json: unknown): {
       reportSnapshot && typeof reportSnapshot === "object"
         ? (reportSnapshot as ReportSnapshot)
         : undefined,
+    timeline: Array.isArray(timeline) ? (timeline as TimelineEntry[]) : undefined,
+    hasTimelineInDb: Object.prototype.hasOwnProperty.call(obj, "timeline"),
   };
 }
 
 /** Payload para guardar en Supabase (assessment_data JSONB). */
 export function buildAssessmentPayloadForDb(
   assessmentData: AssessmentData,
-  reportSnapshot?: ReportSnapshot
+  reportSnapshot?: ReportSnapshot,
+  timeline?: TimelineEntry[]
 ): Record<string, unknown> {
   return {
     ...assessmentData,
     ...(reportSnapshot ? { reportSnapshot } : {}),
+    ...(timeline !== undefined ? { timeline } : {}),
   };
 }
 
@@ -185,16 +205,7 @@ export function addSavedStudent(
     age,
     assessmentData: { ...assessmentData },
     completedAt,
-    timeline: [
-      {
-        id: 1,
-        date: completedAt,
-        type: "assessment",
-        title: "Evaluación inicial completada",
-        description: "Perfil de inclusión y recomendaciones generados.",
-        author: "EDUGUIA",
-      },
-    ],
+    timeline: defaultTimeline(completedAt),
     ...(reportSnapshot && { reportSnapshot }),
   };
 

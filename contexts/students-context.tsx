@@ -16,6 +16,7 @@ import {
   setSavedStudents,
   buildAssessmentPayloadForDb,
   parseAssessmentPayloadFromDb,
+  defaultTimeline,
   type SavedStudent,
   type AssessmentData,
   type TimelineEntry,
@@ -35,7 +36,7 @@ interface StudentsContextType {
     existingEstudianteId?: string
   ) => Promise<SavedStudent>;
   createDraftStudent: (data: AssessmentData) => Promise<string | null>;
-  updateTimeline: (studentId: string, timeline: TimelineEntry[]) => void;
+  updateTimeline: (studentId: string, timeline: TimelineEntry[]) => Promise<void>;
   /** Actualiza datos locales y sincroniza con Supabase si el id es de la nube. */
   updateStudent: (
     studentId: string,
@@ -75,6 +76,7 @@ export function StudentsProvider({ children }: { children: ReactNode }) {
           edad: student.age?.trim() || null,
           assessment_data: student.assessmentData,
           report_snapshot: student.reportSnapshot,
+          timeline: student.timeline,
         }),
       });
       if (!res.ok) {
@@ -103,7 +105,7 @@ export function StudentsProvider({ children }: { children: ReactNode }) {
         docente_id: docente.id,
         nombre: (data.studentName || "Sin nombre").trim(),
         edad: data.studentAge?.trim() || null,
-        assessment_data: buildAssessmentPayloadForDb(data),
+        assessment_data: buildAssessmentPayloadForDb(data, undefined, defaultTimeline(completedAt)),
         completed_at: completedAt,
       })
       .select("id")
@@ -190,7 +192,11 @@ export function StudentsProvider({ children }: { children: ReactNode }) {
               docente_id: docente.id,
               nombre: (data.studentName || "Sin nombre").trim(),
               edad: data.studentAge?.trim() || null,
-              assessment_data: buildAssessmentPayloadForDb(data, reportSnapshot),
+              assessment_data: buildAssessmentPayloadForDb(
+                data,
+                reportSnapshot,
+                defaultTimeline(completedAt)
+              ),
               completed_at: completedAt,
             })
             .select("id")
@@ -198,6 +204,7 @@ export function StudentsProvider({ children }: { children: ReactNode }) {
           if (!error && inserted?.id) {
             const saved = addSavedStudent(data, reportSnapshot, inserted.id);
             setStudents((prev) => [saved, ...prev]);
+            await syncStudentToSupabase(saved);
             return saved;
           }
         }
@@ -231,47 +238,65 @@ export function StudentsProvider({ children }: { children: ReactNode }) {
       .select("id, nombre, edad, assessment_data, completed_at")
       .eq("docente_id", docente.id)
       .order("completed_at", { ascending: false });
-    const defaultTimeline: TimelineEntry[] = [
-      {
-        id: 1,
-        date: new Date().toISOString().split("T")[0],
-        type: "assessment",
-        title: "Evaluación inicial completada",
-        description: "Perfil de inclusión y recomendaciones generados.",
-        author: "EDUGUIA",
-      },
-    ];
+
     const fromSupabase: SavedStudent[] = (rows ?? []).map((r) => {
       const existing = local.find((s) => s.id === r.id);
-      const { assessmentData, reportSnapshot: fromDb } = parseAssessmentPayloadFromDb(
-        r.assessment_data
-      );
+      const completedAt = r.completed_at ?? new Date().toISOString().split("T")[0];
+      const { assessmentData, reportSnapshot: fromDb, timeline: timelineFromDb, hasTimelineInDb } =
+        parseAssessmentPayloadFromDb(r.assessment_data);
       if (!assessmentData.studentName && r.nombre) {
         assessmentData.studentName = r.nombre;
       }
       if (!assessmentData.studentAge && r.edad) {
         assessmentData.studentAge = r.edad;
       }
+
+      const initialTimeline = defaultTimeline(completedAt);
+
+      const timeline = hasTimelineInDb
+        ? (timelineFromDb ?? [])
+        : existing?.timeline?.length
+          ? existing.timeline
+          : initialTimeline;
+
       return {
         id: r.id,
         name: (r.nombre ?? assessmentData.studentName ?? "Sin nombre").trim(),
         age: (r.edad ?? assessmentData.studentAge ?? "").trim(),
         assessmentData,
-        completedAt: r.completed_at ?? new Date().toISOString().split("T")[0],
-        timeline: existing?.timeline ?? defaultTimeline,
+        completedAt,
+        timeline,
         reportSnapshot: fromDb ?? existing?.reportSnapshot,
       };
     });
+
     const localOnly = local.filter((s) => !fromSupabase.some((f) => f.id === s.id));
     const merged = [...fromSupabase, ...localOnly];
     setSavedStudents(merged);
     setStudents(merged);
-  }, []);
 
-  const updateTimeline = useCallback((studentId: string, timeline: TimelineEntry[]) => {
-    updateStudentTimeline(studentId, timeline);
-    setStudents((prev) => prev.map((s) => (s.id === studentId ? { ...s, timeline } : s)));
-  }, []);
+    for (const student of fromSupabase) {
+      const existing = local.find((s) => s.id === student.id);
+      const { hasTimelineInDb } = parseAssessmentPayloadFromDb(
+        rows?.find((row) => row.id === student.id)?.assessment_data
+      );
+      if (!hasTimelineInDb && existing?.timeline?.length) {
+        await syncStudentToSupabase(student);
+      }
+    }
+  }, [syncStudentToSupabase]);
+
+  const updateTimeline = useCallback(
+    async (studentId: string, timeline: TimelineEntry[]) => {
+      updateStudentTimeline(studentId, timeline);
+      setStudents((prev) => prev.map((s) => (s.id === studentId ? { ...s, timeline } : s)));
+      const student = getSavedStudents().find((s) => s.id === studentId);
+      if (student) {
+        await syncStudentToSupabase({ ...student, timeline });
+      }
+    },
+    [syncStudentToSupabase]
+  );
 
   return (
     <StudentsContext.Provider
