@@ -1,0 +1,141 @@
+export const dynamic = "force-dynamic";
+
+import Link from "next/link";
+import { getPublicCursos } from "@/lib/lms/get-public-cursos";
+import { PublicCursoCardView } from "@/components/landing/public-curso-card";
+
+export default async function ServiciosPage() {
+  const cursosPublicados = await getPublicCursos();
+  const showStaticFallback = cursosPublicados.length === 0;
+
+  return (
+    <>
+      <header className="site-header" role="banner">
+        <div className="site-header__bar">
+          <Link className="site-logo" href="/" aria-label="EduKids - Inicio">
+            <img src="/assets/logo-edukids.png" alt="EduKids" width={140} height={64} loading="eager" />
+          </Link>
+          <button className="site-nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" data-nav-toggle>
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <nav className="site-nav" id="site-nav" aria-label="Principal">
+            <Link href="/">Inicio</Link>
+            <Link href="/servicios/" aria-current="page">
+              Servicios
+            </Link>
+            <Link href="/galeria/">Galería</Link>
+            <Link href="/preguntas-frecuentes/">FAQ</Link>
+            <Link href="/comunicate-con-nosotros/">Contacto</Link>
+          </nav>
+          <Link className="site-header__cta" href="/login">
+            EDUGUIA
+          </Link>
+        </div>
+      </header>
+
+      <main className="site-main">
+        <header className="page-hero">
+          <div className="page-hero__inner">
+            <h1>Cursos y talleres</h1>
+            <p>Robótica educativa, programación y STEAM para que cada niño pase de consumidor a creador de tecnología.</p>
+          </div>
+        </header>
+
+        <div className="landing-content">
+          <p className="page-intro">
+            En <strong>EduKids</strong> contamos con profesores apasionados por la cultura maker. Nuestro método se basa en el método científico: motivamos al alumno a mejorar su <strong>autonomía y pensamiento crítico</strong>, dejando que ellos marquen los objetivos de cada proyecto.
+          </p>
+
+          <h2 className="section-title">Lo que puedes aprender en nuestros cursos</h2>
+
+          <div className="courses-grid">
+            {cursosPublicados.map((curso) => (
+              <PublicCursoCardView key={curso.id} curso={curso} />
+            ))}
+
+            {showStaticFallback && (
+              <>
+                <article className="course-card">
+                  <div className="course-card__image">
+                    <img src="/wp-content/uploads/2020/08/CodingCritters-LearningResources-scaled.jpg" alt="Robótica preescolar" loading="lazy" />
+                  </div>
+                  <div className="course-card__body">
+                    <h3 className="course-card__title">Robótica preescolar</h3>
+                    <p className="course-card__meta"><strong>Dirigido a:</strong> Niños y niñas desde 3 años</p>
+                    <p className="course-card__meta"><strong>Duración:</strong> 6 clases</p>
+                    <p className="course-card__desc">Desarrollo de habilidades motrices finas, espaciales y lógicas mediante programación desde casa.</p>
+                  </div>
+                </article>
+                <article className="course-card">
+                  <div className="course-card__image">
+                    <img src="/wp-content/uploads/2020/08/STEAMlogo_1024x1024.png" alt="Ingeniería preescolar" loading="lazy" />
+                  </div>
+                  <div className="course-card__body">
+                    <h3 className="course-card__title">Ingeniería en preescolar</h3>
+                    <p className="course-card__meta"><strong>Dirigido a:</strong> 4 a 6 años</p>
+                    <p className="course-card__meta"><strong>Inversión:</strong> Q225 · 10 clases virtuales</p>
+                    <p className="course-card__desc">Fortalecimiento de habilidades motoras y cognitivas con nuestros kits y proyectos STEAM.</p>
+                  </div>
+                </article>
+              </>
+            )}
+          </div>
+
+          <section className="features-band" aria-labelledby="talleres-heading">
+            <h2 id="talleres-heading" className="section-title">
+              ¿Qué aprenden en nuestros talleres?
+            </h2>
+            <p className="page-intro" style={{ marginTop: 0, marginBottom: 32 }}>
+              Abordamos la tecnología de forma recreativa y práctica.
+            </p>
+            <div className="features-grid">
+              <div className="feature-item">
+                <img src="/wp-content/uploads/2020/03/robotica-5.png" alt="Robótica" loading="lazy" />
+                <p>Diseñar, crear, armar y programar robots con componentes electrónicos.</p>
+              </div>
+              <div className="feature-item">
+                <img src="/wp-content/uploads/2020/03/crop-0-0-200-200-0-talleres-videojuegos.png" alt="Videojuegos" loading="lazy" />
+                <p>Programar y jugar con los videojuegos que ellos mismos diseñen.</p>
+              </div>
+              <div className="feature-item">
+                <img src="/wp-content/uploads/2020/03/icono-scratch.jpg" alt="Scratch" loading="lazy" />
+                <p>Aprender programación con Scratch y proyectos STEAM integrados.</p>
+              </div>
+            </div>
+          </section>
+
+          <div className="landing-cta">
+            <h3>¿Listo para inscribir a tu hijo o hija?</h3>
+            <p>Escríbenos y te orientamos sobre el curso ideal.</p>
+            <Link className="btn-primary" href="/comunicate-con-nosotros/">
+              Comunícate con nosotros
+            </Link>
+          </div>
+        </div>
+      </main>
+
+      <footer className="site-footer" role="contentinfo">
+        <div className="site-footer__inner">
+          <div className="site-footer__brand">
+            <img src="/assets/logo-edukids.png" alt="EduKids" width={120} height={72} loading="lazy" />
+            <p>Educación en robótica y STEAM para niños y jóvenes en Guatemala.</p>
+          </div>
+          <div className="site-footer__links">
+            <a href="https://www.facebook.com/edukidsguatemala/" target="_blank" rel="noopener noreferrer">
+              Facebook
+            </a>
+            <a href="https://www.instagram.com/edukids_gt/" target="_blank" rel="noopener noreferrer">
+              Instagram
+            </a>
+            <a href="https://wa.link/mw5cov" target="_blank" rel="noopener noreferrer">
+              WhatsApp
+            </a>
+          </div>
+          <p className="site-footer__copy">© 2026 EduKidsGt — Todos los derechos reservados.</p>
+        </div>
+      </footer>
+    </>
+  );
+}
