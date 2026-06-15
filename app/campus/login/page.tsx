@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
+import { resolveCampusLoginEmail } from "@/lib/auth/campus-username";
 import { getCampusHomeForRole, getLmsUserRole } from "@/lib/auth/get-lms-user-role";
 import { getLmsRoleLabel, isLmsRole } from "@/lib/auth/lms-roles";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ function CampusLoginForm() {
   const searchParams = useSearchParams();
   const roleHint = searchParams.get("role");
   const redirectParam = searchParams.get("redirect");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,15 +29,16 @@ function CampusLoginForm() {
     setLoading(true);
     try {
       const supabase = createClient();
+      const email = resolveCampusLoginEmail(username);
       const { data: { user }, error: err } = await supabase.auth.signInWithPassword({ email, password });
       if (err || !user) {
-        setError(err?.message ?? "No se pudo iniciar sesión");
+        setError(err?.message ?? "Usuario o contraseña incorrectos");
         setLoading(false);
         return;
       }
       const role = await getLmsUserRole(supabase, user.id);
       if (!role) {
-        setError("Esta cuenta no pertenece al campus EduKids. Usa el login de EDUGUIA si eres docente de inclusión.");
+        setError("Esta cuenta no pertenece al campus EduKids.");
         await supabase.auth.signOut();
         setLoading(false);
         return;
@@ -70,9 +72,9 @@ function CampusLoginForm() {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Campus EduKids</CardTitle>
           <CardDescription>
-            {roleHint && isLmsRole(roleHint)
-              ? `Acceso como ${getLmsRoleLabel(roleHint)}`
-              : "Inicia sesión en el área de aprendizaje virtual."}
+            {roleHint && isLmsRole(roleHint === "docente" ? "lms_docente" : roleHint)
+              ? `Acceso como ${getLmsRoleLabel(roleHint === "docente" ? "lms_docente" : roleHint)}`
+              : "Ingresa el usuario y contraseña que te dio el administrador."}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -81,22 +83,33 @@ function CampusLoginForm() {
               <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">Correo</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <Label htmlFor="username">Usuario</Label>
+              <Input
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="ej. maria.garcia"
+                autoComplete="username"
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Contraseña</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Entrando…" : "Entrar al campus"}
             </Button>
           </form>
           <p className="mt-4 text-center text-sm text-muted-foreground">
-            ¿No tienes cuenta?{" "}
-            <Link href={`/campus/register${roleHint ? `?role=${roleHint}` : ""}`} className="text-primary underline">
-              Regístrate
-            </Link>
+            ¿No tienes cuenta? Pide al administrador del campus que te cree una.
           </p>
         </CardContent>
       </Card>

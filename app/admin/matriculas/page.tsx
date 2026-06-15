@@ -12,6 +12,7 @@ interface AlumnoRow {
   id: string;
   nombre: string | null;
   user_id: string;
+  username?: string | null;
 }
 
 export default function AdminMatriculasPage() {
@@ -24,12 +25,19 @@ export default function AdminMatriculasPage() {
   useEffect(() => {
     const load = async () => {
       const supabase = createClient();
-      const [{ data: c }, { data: a }] = await Promise.all([
+      const [{ data: c }, { data: a }, { data: profiles }] = await Promise.all([
         supabase.from("cursos").select("id, titulo, slug, publicado").order("titulo"),
         supabase.from("alumnos").select("id, nombre, user_id").order("nombre"),
+        supabase.from("profiles").select("id, username").eq("role", "estudiante"),
       ]);
+      const usernameByUserId = new Map((profiles ?? []).map((p) => [p.id, p.username]));
       setCursos((c as Curso[]) ?? []);
-      setAlumnos((a as AlumnoRow[]) ?? []);
+      setAlumnos(
+        ((a as AlumnoRow[]) ?? []).map((row) => ({
+          ...row,
+          username: usernameByUserId.get(row.user_id) ?? null,
+        }))
+      );
     };
     void load();
   }, []);
@@ -84,7 +92,7 @@ export default function AdminMatriculasPage() {
                 <SelectContent>
                   {alumnos.map((a) => (
                     <SelectItem key={a.id} value={a.id}>
-                      {a.nombre || a.user_id}
+                      {a.username ? `@${a.username}` : a.nombre || a.user_id}
                     </SelectItem>
                   ))}
                 </SelectContent>

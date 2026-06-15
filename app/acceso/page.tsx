@@ -8,27 +8,24 @@ const roles = [
   {
     id: "estudiante",
     title: "Estudiante",
-    description: "Accede a tus cursos, clases grabadas, materiales y actividades asignadas.",
+    description: "Accede con el usuario y contraseña que te dio el administrador.",
     href: "/campus/login?role=estudiante",
-    registerHref: "/campus/register?role=estudiante",
     icon: GraduationCap,
     accent: "border-secondary/30 bg-secondary/5",
   },
   {
     id: "lms_docente",
     title: "Docente EduKids",
-    description: "Gestiona cursos del campus: sube materiales, clases grabadas y tareas.",
+    description: "Gestiona cursos del campus con las credenciales asignadas por el admin.",
     href: "/campus/login?role=lms_docente",
-    registerHref: "/campus/register?role=lms_docente",
     icon: UserCog,
     accent: "border-primary/30 bg-primary/5",
   },
   {
     id: "admin",
     title: "Administrador",
-    description: "Crea cursos, asigna docentes e inscribe estudiantes en el campus virtual.",
+    description: "Crea usuarios, cursos y matrículas del campus virtual.",
     href: "/campus/login?role=admin",
-    registerHref: null,
     icon: Shield,
     accent: "border-amber-500/30 bg-amber-500/5",
   },
@@ -55,7 +52,7 @@ export default function AccesoPage() {
             Área de aprendizaje EduKids
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-            Entorno virtual para cursos de robótica y STEAM. Esto es independiente de EDUGUIA (plataforma de inclusión docente).
+            Entorno virtual para cursos de robótica y STEAM. Las cuentas las crea el administrador; no se usa correo para registrarse.
           </p>
         </div>
 
@@ -69,15 +66,10 @@ export default function AccesoPage() {
                 <CardTitle>{role.title}</CardTitle>
                 <CardDescription>{role.description}</CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-col gap-2">
+              <CardContent>
                 <Button asChild className="w-full">
                   <Link href={role.href}>Iniciar sesión</Link>
                 </Button>
-                {role.registerHref && (
-                  <Button asChild variant="outline" className="w-full">
-                    <Link href={role.registerHref}>Crear cuenta</Link>
-                  </Button>
-                )}
               </CardContent>
             </Card>
           ))}
@@ -88,7 +80,6 @@ export default function AccesoPage() {
           <Link href="/login" className="text-primary underline">
             Entrar a EDUGUIA
           </Link>
-          . Las cuentas de administrador las crea el equipo EduKids en Supabase.
         </p>
       </main>
     </div>

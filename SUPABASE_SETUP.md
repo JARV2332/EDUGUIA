@@ -80,6 +80,16 @@ ON CONFLICT (id) DO UPDATE SET role = 'admin';
 
 Hub del campus: **`/acceso`**. La landing en `/` enlaza campus y EDUGUIA por separado.
 
+### Crear estudiantes y docentes desde el admin (sin correo)
+
+1. Ejecuta **`supabase/migrations/005_campus_usernames.sql`** (columna `username` en `profiles`).
+2. En Vercel / `.env.local` agrega **`SUPABASE_SERVICE_ROLE_KEY`** (Dashboard → Settings → API → `service_role`, solo servidor).
+3. Entra como admin en **`/admin/usuarios`**.
+4. Crea la cuenta con **nombre**, **usuario** (ej. `maria.garcia`) y **contraseña**.
+5. El estudiante o docente entra en **`/campus/login`** con ese usuario y contraseña (no se envía correo de verificación).
+
+Los usuarios internos usan correo técnico `usuario@campus.edukids.local`; el login acepta solo el nombre de usuario.
+
 ---
 
 ## Recuperación de contraseña

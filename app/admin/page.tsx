@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, Plus, Users } from "lucide-react";
+import { BookOpen, Plus, UserPlus, Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -15,7 +15,19 @@ export default function AdminHomePage() {
         </p>
       </header>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <UserPlus className="mb-2 h-8 w-8 text-primary" />
+            <CardTitle>Usuarios</CardTitle>
+            <CardDescription>Crea estudiantes y docentes con usuario y contraseña.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild>
+              <Link href="/admin/usuarios">Gestionar usuarios</Link>
+            </Button>
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader>
             <BookOpen className="mb-2 h-8 w-8 text-primary" />
