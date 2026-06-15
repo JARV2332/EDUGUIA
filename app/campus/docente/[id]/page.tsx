@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export default function DocenteCursoLmsPage() {
+export default function CampusDocenteCursoPage() {
   const params = useParams();
   const cursoId = params.id as string;
   const [curso, setCurso] = useState<Curso | null>(null);
@@ -93,7 +93,7 @@ export default function DocenteCursoLmsPage() {
   return (
     <div className="p-6 lg:p-8">
       <Button variant="ghost" asChild className="mb-4">
-        <Link href="/dashboard/lms">
+        <Link href="/campus/docente">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Mis cursos
         </Link>

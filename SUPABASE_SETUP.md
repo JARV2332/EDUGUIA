@@ -45,15 +45,22 @@ En **Storage → Policies** debe permitir que cada docente suba solo a su carpet
 
 Ejecuta **`supabase/migrations/003_lms_mvp.sql`** para:
 
-- Tabla `profiles` con roles: `admin`, `docente`, `estudiante`
+- Tabla `profiles` con roles: `admin`, `docente`, `estudiante`, `lms_docente`
 - Tabla `alumnos` (cuentas de estudiantes del LMS)
 - Tablas `cursos`, `modulos`, `materiales`, `tareas`, `matriculas`, `entregas`
 - Bucket Storage `course-materials` para archivos de curso
 
-### Crear un administrador
+Ejecuta **`supabase/migrations/004_lms_eduguia_separation.sql`** para separar cuentas:
+
+- **EDUGUIA** (`app: "eduguia"` en registro) → tabla `docentes`, panel `/dashboard`
+- **Campus EduKids** (`app: "edukids_lms"`) → roles `estudiante`, `lms_docente`, `admin`
+- Tabla `instructores` para docentes del LMS (no mezclar con `docentes` de EDUGUIA)
+- Columna `cursos.instructor_id` para asignar cursos a docentes del campus
+
+### Crear un administrador del campus
 
 1. En Supabase → **Authentication → Users** crea un usuario o edita uno existente.
-2. En **User Metadata** agrega: `{ "role": "admin", "nombre": "Tu nombre" }`
+2. En **User Metadata** agrega: `{ "app": "edukids_lms", "role": "admin", "nombre": "Tu nombre" }`
 3. Si el usuario ya existía, ejecuta en SQL Editor:
 
 ```sql
@@ -62,15 +69,16 @@ SELECT id, 'admin', email FROM auth.users WHERE email = 'admin@tudominio.com'
 ON CONFLICT (id) DO UPDATE SET role = 'admin';
 ```
 
-### Flujo del campus
+### Flujo del campus (separado de EDUGUIA)
 
-| Rol | Registro | Panel |
-|-----|----------|-------|
-| Estudiante | `/register?role=estudiante` | `/alumno` |
-| Docente | `/register?role=docente` | `/dashboard` + `/dashboard/lms` |
-| Admin | Solo manual en Supabase | `/admin` |
+| Producto | Login | Registro | Panel |
+|----------|-------|----------|-------|
+| **EDUGUIA** (inclusión docente) | `/login` | `/register` | `/dashboard` |
+| Estudiante campus | `/campus/login?role=estudiante` | `/campus/register?role=estudiante` | `/alumno` |
+| Docente campus | `/campus/login?role=lms_docente` | `/campus/register?role=lms_docente` | `/campus/docente` |
+| Admin campus | `/campus/login?role=admin` | Solo manual en Supabase | `/admin` |
 
-Landing: sección **Área de aprendizaje** en `/` y hub en `/acceso`.
+Hub del campus: **`/acceso`**. La landing en `/` enlaza campus y EDUGUIA por separado.
 
 ---
 

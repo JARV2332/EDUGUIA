@@ -11,11 +11,11 @@ export default function AdminHomePage() {
       <header className="mb-8">
         <h1 className="text-3xl font-bold">Panel administrador</h1>
         <p className="mt-2 text-muted-foreground">
-          Gestiona el campus virtual EduKids: cursos, docentes y matrículas.
+          Gestiona el campus virtual EduKids: cursos, docentes e inscripciones.
         </p>
       </header>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
             <BookOpen className="mb-2 h-8 w-8 text-primary" />
@@ -40,17 +40,6 @@ export default function AdminHomePage() {
           <CardContent>
             <Button asChild variant="secondary">
               <Link href="/admin/matriculas">Ver matrículas</Link>
-            </Button>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>EDUGUIA</CardTitle>
-            <CardDescription>Herramientas de inclusión para docentes (módulo separado).</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild variant="outline">
-              <Link href="/dashboard">Ir a EDUGUIA</Link>
             </Button>
           </CardContent>
         </Card>

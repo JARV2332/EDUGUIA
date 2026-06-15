@@ -16,6 +16,7 @@ export default function AlumnoLayout({ children }: { children: React.ReactNode }
       brandTitle="EduKids"
       brandSubtitle="Área de aprendizaje"
       brandLogo="/assets/logo-edukids.png"
+      logoutPath="/campus/login"
     >
       {children}
     </AppShell>

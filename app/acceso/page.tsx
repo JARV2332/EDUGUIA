@@ -9,25 +9,25 @@ const roles = [
     id: "estudiante",
     title: "Estudiante",
     description: "Accede a tus cursos, clases grabadas, materiales y actividades asignadas.",
-    href: "/login?role=estudiante",
-    registerHref: "/register?role=estudiante",
+    href: "/campus/login?role=estudiante",
+    registerHref: "/campus/register?role=estudiante",
     icon: GraduationCap,
     accent: "border-secondary/30 bg-secondary/5",
   },
   {
-    id: "docente",
-    title: "Docente",
-    description: "Gestiona cursos, sube materiales, crea tareas y usa EDUGUIA para inclusión.",
-    href: "/login?role=docente",
-    registerHref: "/register?role=docente",
+    id: "lms_docente",
+    title: "Docente EduKids",
+    description: "Gestiona cursos del campus: sube materiales, clases grabadas y tareas.",
+    href: "/campus/login?role=lms_docente",
+    registerHref: "/campus/register?role=lms_docente",
     icon: UserCog,
     accent: "border-primary/30 bg-primary/5",
   },
   {
     id: "admin",
     title: "Administrador",
-    description: "Crea cursos, asigna docentes y matricula estudiantes en el campus virtual.",
-    href: "/login?role=admin",
+    description: "Crea cursos, asigna docentes e inscribe estudiantes en el campus virtual.",
+    href: "/campus/login?role=admin",
     registerHref: null,
     icon: Shield,
     accent: "border-amber-500/30 bg-amber-500/5",
@@ -55,8 +55,7 @@ export default function AccesoPage() {
             Área de aprendizaje EduKids
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-            Entorno virtual para cursos de robótica y STEAM: clases grabadas, materiales, actividades y seguimiento
-            docente con EDUGUIA.
+            Entorno virtual para cursos de robótica y STEAM. Esto es independiente de EDUGUIA (plataforma de inclusión docente).
           </p>
         </div>
 
@@ -85,7 +84,11 @@ export default function AccesoPage() {
         </div>
 
         <p className="mt-10 text-center text-sm text-muted-foreground">
-          Las cuentas de administrador las crea el equipo EduKids en Supabase (rol <code>admin</code>).
+          ¿Buscas EDUGUIA (inclusión educativa)?{" "}
+          <Link href="/login" className="text-primary underline">
+            Entrar a EDUGUIA
+          </Link>
+          . Las cuentas de administrador las crea el equipo EduKids en Supabase.
         </p>
       </main>
     </div>

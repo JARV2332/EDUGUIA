@@ -1,4 +1,6 @@
-import { getHomePathForRole, getUserRole } from "@/lib/auth/get-user-role";
+import { getEduguiaHomePath } from "@/lib/auth/roles";
+import { getEduguiaUserRole } from "@/lib/auth/get-user-role";
+import { getCampusHomeForRole, getLmsUserRole } from "@/lib/auth/get-lms-user-role";
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -24,7 +26,14 @@ export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
   const path = request.nextUrl.pathname;
 
-  if (isLandingPath(path) || path.startsWith("/auth/") || path === "/acceso") {
+  const isPublic =
+    isLandingPath(path) ||
+    path.startsWith("/auth/") ||
+    path === "/acceso" ||
+    path === "/campus/login" ||
+    path === "/campus/register";
+
+  if (isPublic) {
     return response;
   }
 
@@ -51,35 +60,54 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isDashboard = path.startsWith("/dashboard");
+  const isEduguiaDashboard = path.startsWith("/dashboard");
+  const isCampusDocente = path.startsWith("/campus/docente");
   const isAdmin = path.startsWith("/admin");
   const isAlumno = path.startsWith("/alumno");
-  const isAuthPage =
+  const isEduguiaAuth =
     path === "/login" || path === "/register" || path === "/forgot-password";
   const isPasswordRecovery = path === "/reset-password";
 
-  const role = user ? await getUserRole(supabase, user.id) : null;
-  const home = role ? getHomePathForRole(role) : "/login";
+  const eduguiaRole = user ? await getEduguiaUserRole(supabase, user.id) : null;
+  const lmsRole = user ? await getLmsUserRole(supabase, user.id) : null;
+  const eduguiaHome = getEduguiaHomePath();
+  const campusHome = lmsRole ? getCampusHomeForRole(lmsRole) : "/campus/login";
 
-  if ((isDashboard || isAdmin || isAlumno) && !user) {
+  if (isEduguiaDashboard && !user) {
     const redirect = new URL("/login", request.url);
     redirect.searchParams.set("redirect", path);
     return NextResponse.redirect(redirect);
   }
 
-  if (user && role) {
-    if (isAdmin && role !== "admin") {
-      return NextResponse.redirect(new URL(home, request.url));
+  if (isEduguiaDashboard && user && !eduguiaRole) {
+    return NextResponse.redirect(new URL(campusHome, request.url));
+  }
+
+  const isCampusProtected = isCampusDocente || isAdmin || isAlumno;
+  if (isCampusProtected && !user) {
+    const redirect = new URL("/campus/login", request.url);
+    redirect.searchParams.set("redirect", path);
+    return NextResponse.redirect(redirect);
+  }
+
+  if (user && lmsRole) {
+    if (isAdmin && lmsRole !== "admin") {
+      return NextResponse.redirect(new URL(campusHome, request.url));
     }
-    if (isDashboard && role !== "docente") {
-      return NextResponse.redirect(new URL(home, request.url));
+    if (isAlumno && lmsRole !== "estudiante") {
+      return NextResponse.redirect(new URL(campusHome, request.url));
     }
-    if (isAlumno && role !== "estudiante") {
-      return NextResponse.redirect(new URL(home, request.url));
+    if (isCampusDocente && lmsRole !== "lms_docente") {
+      return NextResponse.redirect(new URL(campusHome, request.url));
     }
-    if (isAuthPage) {
-      return NextResponse.redirect(new URL(home, request.url));
-    }
+  }
+
+  if (isCampusProtected && user && !lmsRole) {
+    return NextResponse.redirect(new URL(eduguiaHome, request.url));
+  }
+
+  if (user && eduguiaRole && isEduguiaAuth) {
+    return NextResponse.redirect(new URL(eduguiaHome, request.url));
   }
 
   if (isPasswordRecovery && !user) {

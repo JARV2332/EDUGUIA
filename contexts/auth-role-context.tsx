@@ -9,11 +9,11 @@ import {
   type ReactNode,
 } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { getUserRole } from "@/lib/auth/get-user-role";
-import type { UserRole } from "@/lib/auth/roles";
+import { getEduguiaUserRole } from "@/lib/auth/get-user-role";
+import type { EduguiaRole } from "@/lib/auth/roles";
 
 interface AuthRoleContextType {
-  role: UserRole | null;
+  role: EduguiaRole | null;
   loading: boolean;
   refreshRole: () => Promise<void>;
 }
@@ -21,7 +21,7 @@ interface AuthRoleContextType {
 const AuthRoleContext = createContext<AuthRoleContextType | undefined>(undefined);
 
 export function AuthRoleProvider({ children }: { children: ReactNode }) {
-  const [role, setRole] = useState<UserRole | null>(null);
+  const [role, setRole] = useState<EduguiaRole | null>(null);
   const [loading, setLoading] = useState(true);
 
   const refreshRole = useCallback(async () => {
@@ -35,7 +35,7 @@ export function AuthRoleProvider({ children }: { children: ReactNode }) {
         setRole(null);
         return;
       }
-      const userRole = await getUserRole(supabase, user.id);
+      const userRole = await getEduguiaUserRole(supabase, user.id);
       setRole(userRole);
     } catch {
       setRole(null);

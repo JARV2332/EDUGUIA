@@ -17,6 +17,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       brandTitle="EduKids Admin"
       brandSubtitle="Campus virtual"
       brandLogo="/assets/logo-edukids.png"
+      logoutPath="/campus/login"
     >
       {children}
     </AppShell>

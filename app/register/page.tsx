@@ -1,23 +1,17 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { getHomePathForRole, getUserRole } from "@/lib/auth/get-user-role";
-import { getRoleLabel, isUserRole, type UserRole } from "@/lib/auth/roles";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-function RegisterForm() {
+export default function RegisterPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const initialRole = isUserRole(searchParams.get("role")) ? searchParams.get("role")! : "estudiante";
-  const [role, setRole] = useState<UserRole>(initialRole as UserRole);
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,10 +25,16 @@ function RegisterForm() {
     setLoading(true);
     try {
       const supabase = createClient();
-      const { data, error: err } = await supabase.auth.signUp({
+      const { error: err } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { nombre: nombre || undefined, role } },
+        options: {
+          data: {
+            nombre: nombre || undefined,
+            app: "eduguia",
+            role: "docente",
+          },
+        },
       });
       if (err) {
         setError(err.message);
@@ -44,10 +44,7 @@ function RegisterForm() {
       setSuccess(true);
       setLoading(false);
       router.refresh();
-      if (data.user) {
-        const userRole = await getUserRole(supabase, data.user.id);
-        setTimeout(() => router.push(getHomePathForRole(userRole)), 1500);
-      }
+      setTimeout(() => router.push("/dashboard"), 1500);
     } catch {
       setError("Error al registrarse");
       setLoading(false);
@@ -59,7 +56,7 @@ function RegisterForm() {
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/30 p-4">
         <Card className="w-full max-w-md text-center">
           <CardContent className="pt-6">
-            <p className="text-muted-foreground">Cuenta creada. Redirigiendo…</p>
+            <p className="text-muted-foreground">Cuenta creada. Redirigiendo al panel EDUGUIA…</p>
           </CardContent>
         </Card>
       </div>
@@ -70,24 +67,16 @@ function RegisterForm() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/30 p-4">
       <div className="mb-8 flex items-center gap-3">
         <div className="relative h-12 w-12 overflow-hidden rounded-xl">
-          <Image src="/assets/logo-edukids.png" alt="EduKids" fill className="object-contain" priority />
+          <Image src="/logo.jpeg" alt="EDUGUIA" fill className="object-contain" priority />
         </div>
-        <span className="text-2xl font-bold text-foreground">EduKids LMS</span>
+        <span className="text-2xl font-bold text-foreground">EDUGUIA</span>
       </div>
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl">Crear cuenta</CardTitle>
-          <CardDescription>
-            Regístrate como {getRoleLabel(role, "es").toLowerCase()} en el entorno virtual.
-          </CardDescription>
+          <CardDescription>Regístrate como docente para usar la plataforma de inclusión EDUGUIA.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs value={role} onValueChange={(v) => isUserRole(v) && setRole(v)} className="mb-4">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="estudiante">Estudiante</TabsTrigger>
-              <TabsTrigger value="docente">Docente</TabsTrigger>
-            </TabsList>
-          </Tabs>
           <form onSubmit={handleRegister} className="space-y-4">
             {error && (
               <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -95,7 +84,7 @@ function RegisterForm() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="nombre">Nombre</Label>
+              <Label htmlFor="nombre">Nombre (opcional)</Label>
               <Input
                 id="nombre"
                 type="text"
@@ -136,34 +125,17 @@ function RegisterForm() {
               />
             </div>
             <Button type="submit" className="w-full h-11" disabled={loading}>
-              {loading ? "Creando cuenta…" : "Registrarme"}
+              {loading ? "Creando cuenta…" : "Registrarme en EDUGUIA"}
             </Button>
           </form>
           <p className="mt-4 text-center text-sm text-muted-foreground">
             ¿Ya tienes cuenta?{" "}
-            <Link
-              href={`/login?role=${role}`}
-              className="font-medium text-primary underline underline-offset-4 hover:no-underline"
-            >
+            <Link href="/login" className="font-medium text-primary underline underline-offset-4 hover:no-underline">
               Inicia sesión
-            </Link>
-          </p>
-          <p className="mt-2 text-center text-xs text-muted-foreground">
-            ¿Eres administrador?{" "}
-            <Link href="/login?role=admin" className="underline hover:no-underline">
-              Acceso administrador
             </Link>
           </p>
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-export default function RegisterPage() {
-  return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center text-sm">Cargando…</div>}>
-      <RegisterForm />
-    </Suspense>
   );
 }

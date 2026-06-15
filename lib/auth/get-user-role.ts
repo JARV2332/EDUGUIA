@@ -1,19 +1,14 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { getHomePathForRole, isUserRole, type UserRole } from "@/lib/auth/roles";
+import { type EduguiaRole } from "@/lib/auth/roles";
+import { getLmsUserRole } from "@/lib/auth/get-lms-user-role";
 
-export async function getUserRole(
+/** ¿Tiene acceso a EDUGUIA? Solo docentes de inclusión, no cuentas del campus EduKids. */
+export async function getEduguiaUserRole(
   supabase: SupabaseClient,
   userId: string
-): Promise<UserRole> {
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", userId)
-    .maybeSingle();
-
-  if (profile?.role && isUserRole(profile.role)) {
-    return profile.role;
-  }
+): Promise<EduguiaRole | null> {
+  const lmsRole = await getLmsUserRole(supabase, userId);
+  if (lmsRole) return null;
 
   const { data: docente } = await supabase
     .from("docentes")
@@ -22,14 +17,12 @@ export async function getUserRole(
     .maybeSingle();
   if (docente) return "docente";
 
-  const { data: alumno } = await supabase
-    .from("alumnos")
-    .select("id")
-    .eq("user_id", userId)
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", userId)
     .maybeSingle();
-  if (alumno) return "estudiante";
+  if (profile?.role === "docente") return "docente";
 
-  return "docente";
+  return null;
 }
-
-export { getHomePathForRole };

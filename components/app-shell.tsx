@@ -19,7 +19,6 @@ import {
   ChevronLeft,
   LogOut,
   User,
-  BookOpen,
   type LucideIcon,
 } from "lucide-react";
 
@@ -37,6 +36,8 @@ interface AppShellProps {
   brandTitle?: string;
   brandSubtitle?: string;
   brandLogo?: string;
+  /** Tras cerrar sesión (EDUGUIA: /login, campus: /campus/login). */
+  logoutPath?: string;
 }
 
 export function AppShell({
@@ -59,7 +60,7 @@ export function AppShell({
     try {
       const supabase = createClient();
       await supabase.auth.signOut();
-      router.push("/login");
+      router.push(logoutPath);
       router.refresh();
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
@@ -73,7 +74,6 @@ export function AppShell({
       { name: t("nav.dashboard"), href: basePath || "/", icon: LayoutDashboard },
       { name: t("nav.assessment"), href: basePath ? `${basePath}/assessment` : "/assessment", icon: ClipboardList },
       { name: t("nav.progress"), href: basePath ? `${basePath}/progress` : "/progress", icon: TrendingUp },
-      { name: t("nav.lms"), href: basePath ? `${basePath}/lms` : "/lms", icon: BookOpen },
       { name: t("nav.toolkit"), href: basePath ? `${basePath}/toolkit` : "/toolkit", icon: Wrench },
       ...(basePath
         ? [{ name: t("nav.profile"), href: `${basePath}/profile`, icon: User }]

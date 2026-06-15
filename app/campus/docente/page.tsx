@@ -8,26 +8,36 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-export default function DocenteLmsPage() {
+export default function CampusDocentePage() {
   const [cursos, setCursos] = useState<Curso[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
-      const { data: docente } = await supabase.from("docentes").select("id").eq("user_id", user.id).single();
-      if (!docente?.id) {
+
+      const { data: instructor } = await supabase
+        .from("instructores")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (!instructor?.id) {
         setLoading(false);
         return;
       }
-      const { data } = await supabase
+
+      const { data: byInstructor } = await supabase
         .from("cursos")
         .select("*")
-        .eq("docente_id", docente.id)
+        .eq("instructor_id", instructor.id)
         .order("titulo");
-      setCursos((data as Curso[]) ?? []);
+
+      setCursos((byInstructor as Curso[]) ?? []);
       setLoading(false);
     };
     void load();
@@ -36,9 +46,9 @@ export default function DocenteLmsPage() {
   return (
     <div className="p-6 lg:p-8">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold">Mis cursos LMS</h1>
+        <h1 className="text-3xl font-bold">Mis cursos</h1>
         <p className="mt-2 text-muted-foreground">
-          Cursos asignados donde puedes subir materiales, clases grabadas y tareas.
+          Campus EduKids: sube materiales, clases grabadas y tareas para tus alumnos.
         </p>
       </header>
 
@@ -47,7 +57,7 @@ export default function DocenteLmsPage() {
       ) : cursos.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center text-muted-foreground">
-            No tienes cursos asignados. El administrador debe asignarte un curso.
+            No tienes cursos asignados. El administrador del campus debe asignarte un curso.
           </CardContent>
         </Card>
       ) : (
@@ -65,7 +75,7 @@ export default function DocenteLmsPage() {
               </CardHeader>
               <CardContent>
                 <Button asChild>
-                  <Link href={`/dashboard/lms/${curso.id}`}>Gestionar contenido</Link>
+                  <Link href={`/campus/docente/${curso.id}`}>Gestionar contenido</Link>
                 </Button>
               </CardContent>
             </Card>

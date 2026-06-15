@@ -5,8 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { getHomePathForRole, getUserRole } from "@/lib/auth/get-user-role";
-import { getRoleLabel, isUserRole, type UserRole } from "@/lib/auth/roles";
+import { getEduguiaUserRole } from "@/lib/auth/get-user-role";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,8 +15,7 @@ import { Home } from "lucide-react";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const roleHint = searchParams.get("role");
-  const redirectParam = searchParams.get("redirect");
+  const redirect = searchParams.get("redirect") ?? "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,25 +27,20 @@ function LoginForm() {
     setLoading(true);
     try {
       const supabase = createClient();
-      const {
-        data: { user },
-        error: err,
-      } = await supabase.auth.signInWithPassword({ email, password });
-      if (err) {
-        setError(err.message);
+      const { data: { user }, error: err } = await supabase.auth.signInWithPassword({ email, password });
+      if (err || !user) {
+        setError(err?.message ?? "No se pudo iniciar sesión");
         setLoading(false);
         return;
       }
-      if (!user) {
-        setError("No se pudo iniciar sesión");
+      const eduguiaRole = await getEduguiaUserRole(supabase, user.id);
+      if (!eduguiaRole) {
+        setError("Esta cuenta es del campus EduKids, no de EDUGUIA. Usa /campus/login para el área de aprendizaje.");
+        await supabase.auth.signOut();
         setLoading(false);
         return;
       }
-      const role = await getUserRole(supabase, user.id);
-      const home = getHomePathForRole(role);
-      const destination =
-        redirectParam && redirectParam.startsWith("/") ? redirectParam : home;
-      router.push(destination);
+      router.push(redirect.startsWith("/dashboard") ? redirect : "/dashboard");
       router.refresh();
     } catch {
       setError("Error al iniciar sesión");
@@ -73,9 +66,7 @@ function LoginForm() {
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl">Iniciar sesión</CardTitle>
           <CardDescription>
-            {roleHint && isUserRole(roleHint)
-              ? `Acceso como ${getRoleLabel(roleHint, "es")}`
-              : "Ingresa tu correo y contraseña para acceder."}
+            Plataforma de inclusión educativa para docentes. Ingresa tu correo y contraseña.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -122,21 +113,13 @@ function LoginForm() {
               />
             </div>
             <Button type="submit" className="w-full h-11" disabled={loading}>
-              {loading ? "Entrando…" : "Entrar"}
+              {loading ? "Entrando…" : "Entrar a EDUGUIA"}
             </Button>
           </form>
           <p className="mt-4 text-center text-sm text-muted-foreground">
             ¿No tienes cuenta?{" "}
-            <Link
-              href={roleHint && isUserRole(roleHint) ? `/register?role=${roleHint}` : "/register"}
-              className="font-medium text-primary underline underline-offset-4 hover:no-underline"
-            >
+            <Link href="/register" className="font-medium text-primary underline underline-offset-4 hover:no-underline">
               Regístrate
-            </Link>
-          </p>
-          <p className="mt-2 text-center text-sm text-muted-foreground">
-            <Link href="/acceso" className="hover:underline">
-              Elegir otro tipo de acceso
             </Link>
           </p>
         </CardContent>
@@ -150,9 +133,6 @@ export default function LoginPage() {
     <Suspense
       fallback={
         <div className="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-background to-muted/30 p-4">
-          <Link href="/" className="absolute left-4 top-4 text-sm text-muted-foreground hover:text-foreground">
-            Volver al inicio
-          </Link>
           <div className="text-muted-foreground text-sm">Cargando…</div>
         </div>
       }
