@@ -1,13 +1,12 @@
 import { createClient } from "@/lib/supabase/route-handler";
 import { getLmsUserRole } from "@/lib/auth/get-lms-user-role";
-import type { SupabaseClient } from "@supabase/supabase-js";
 
 type AdminResult =
-  | { supabase: SupabaseClient; user: { id: string } }
+  | { supabase: NonNullable<Awaited<ReturnType<typeof createClient>>>; user: { id: string } }
   | { error: Response };
 
-export async function requireLmsAdmin(request: Request): Promise<AdminResult> {
-  const supabase = createClient(request);
+export async function requireLmsAdmin(_request: Request): Promise<AdminResult> {
+  const supabase = await createClient();
   if (!supabase) {
     return { error: Response.json({ error: "Supabase no configurado" }, { status: 500 }) };
   }

@@ -9,7 +9,7 @@ export async function PATCH(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
-  const supabase = createClient(req);
+  const supabase = await createClient();
 
   if (!supabase) {
     return Response.json({ error: "Supabase not configured" }, { status: 500 });

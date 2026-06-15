@@ -48,7 +48,7 @@ export async function POST(req: Request) {
 
   let historialContext = "";
   let docenteId: string | null = null;
-  const supabase = createClient(req);
+  const supabase = await createClient();
 
   if (estudiante_id && typeof estudiante_id === "string" && supabase) {
     const { data: { user } } = await supabase.auth.getUser();
