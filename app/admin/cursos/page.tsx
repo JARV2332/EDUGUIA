@@ -3,9 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, Plus } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import type { Curso } from "@/lib/lms/types";
-import { slugify } from "@/lib/lms/types";
 import { formatEdadPublico, formatInversionLine } from "@/lib/lms/format-catalog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -109,6 +107,11 @@ function CatalogFormFields({
   );
 }
 
+async function readApiError(res: Response) {
+  const data = (await res.json().catch(() => ({}))) as { error?: string };
+  return data.error ?? `Error ${res.status}`;
+}
+
 export default function AdminCursosPage() {
   const [cursos, setCursos] = useState<Curso[]>([]);
   const [loading, setLoading] = useState(true);
@@ -121,9 +124,15 @@ export default function AdminCursosPage() {
 
   const load = async () => {
     setLoading(true);
-    const supabase = createClient();
-    const { data } = await supabase.from("cursos").select("*").order("created_at", { ascending: false });
-    setCursos((data as Curso[]) ?? []);
+    const res = await fetch("/api/admin/cursos");
+    if (!res.ok) {
+      setError(await readApiError(res));
+      setCursos([]);
+      setLoading(false);
+      return;
+    }
+    const data = (await res.json()) as { cursos?: Curso[] };
+    setCursos(data.cursos ?? []);
     setLoading(false);
   };
 
@@ -131,55 +140,26 @@ export default function AdminCursosPage() {
     void load();
   }, []);
 
-  const parseOptionalNumber = (value: string) => {
-    const trimmed = value.trim();
-    if (!trimmed) return null;
-    const n = Number(trimmed);
-    return Number.isNaN(n) ? null : n;
-  };
-
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!createForm.titulo.trim()) return;
     setSaving(true);
-    const supabase = createClient();
-    const slug = `${slugify(createForm.titulo)}-${Date.now().toString(36)}`;
-    const basePayload = {
-      slug,
-      titulo: createForm.titulo.trim(),
-      descripcion: createForm.descripcion.trim() || null,
-      publicado: false,
-    };
-    const catalogPayload = {
-      edad_min: parseOptionalNumber(createForm.edad_min),
-      edad_max: parseOptionalNumber(createForm.edad_max),
-      edad_publico: createForm.edad_publico.trim() || null,
-      precio: parseOptionalNumber(createForm.precio),
-      duracion: createForm.duracion.trim() || null,
-      modalidad: createForm.modalidad.trim() || null,
-      imagen_url: createForm.imagen_url.trim() || null,
-      orden_servicios: parseOptionalNumber(createForm.orden_servicios) ?? 0,
-    };
+    setError(null);
 
-    let insertError = (
-      await supabase.from("cursos").insert({ ...basePayload, ...catalogPayload })
-    ).error;
-    let successMessage = "Curso creado correctamente.";
+    const res = await fetch("/api/admin/cursos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(createForm),
+    });
 
-    if (insertError?.message?.includes("column")) {
-      insertError = (await supabase.from("cursos").insert(basePayload)).error;
-      if (!insertError) {
-        successMessage = "Curso creado. Ejecuta la migración 006 en Supabase para precio, duración e imagen.";
-      }
-    }
-
-    if (insertError) {
-      setError(insertError.message);
+    const data = (await res.json()) as { warning?: string; error?: string };
+    if (!res.ok) {
+      setError(data.error ?? (await readApiError(res)));
       setSaving(false);
       return;
     }
-    setMessage(successMessage);
-    setError(null);
+
+    setMessage(data.warning ?? "Curso creado correctamente.");
     setCreateForm(emptyCatalog);
     setSaving(false);
     await load();
@@ -188,15 +168,19 @@ export default function AdminCursosPage() {
   const togglePublicado = async (curso: Curso) => {
     setError(null);
     setMessage(null);
-    const supabase = createClient();
-    const { error: updateError } = await supabase
-      .from("cursos")
-      .update({ publicado: !curso.publicado })
-      .eq("id", curso.id);
-    if (updateError) {
-      setError(updateError.message);
+
+    const res = await fetch(`/api/admin/cursos/${curso.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ publicado: !curso.publicado }),
+    });
+
+    const data = (await res.json()) as { error?: string };
+    if (!res.ok) {
+      setError(data.error ?? (await readApiError(res)));
       return;
     }
+
     setMessage(
       !curso.publicado
         ? `"${curso.titulo}" publicado — visible en /servicios`
@@ -224,29 +208,22 @@ export default function AdminCursosPage() {
   const saveCatalog = async () => {
     if (!editCurso) return;
     setSaving(true);
-    const supabase = createClient();
-    const { error: updateError } = await supabase
-      .from("cursos")
-      .update({
-        titulo: editForm.titulo.trim(),
-        descripcion: editForm.descripcion.trim() || null,
-        edad_min: parseOptionalNumber(editForm.edad_min),
-        edad_max: parseOptionalNumber(editForm.edad_max),
-        edad_publico: editForm.edad_publico.trim() || null,
-        precio: parseOptionalNumber(editForm.precio),
-        duracion: editForm.duracion.trim() || null,
-        modalidad: editForm.modalidad.trim() || null,
-        imagen_url: editForm.imagen_url.trim() || null,
-        orden_servicios: parseOptionalNumber(editForm.orden_servicios) ?? 0,
-      })
-      .eq("id", editCurso.id);
-    if (updateError) {
-      setError(updateError.message);
+    setError(null);
+
+    const res = await fetch(`/api/admin/cursos/${editCurso.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(editForm),
+    });
+
+    const data = (await res.json()) as { error?: string };
+    if (!res.ok) {
+      setError(data.error ?? (await readApiError(res)));
       setSaving(false);
       return;
     }
+
     setMessage("Catálogo actualizado.");
-    setError(null);
     setSaving(false);
     setEditCurso(null);
     await load();
