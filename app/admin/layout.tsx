@@ -1,13 +1,14 @@
 "use client";
 
 import { AppShell } from "@/components/app-shell";
-import { BookOpen, LayoutDashboard, UserPlus, Users } from "lucide-react";
+import { BookOpen, Inbox, LayoutDashboard, UserPlus, Users } from "lucide-react";
 
 const adminNav = [
   { name: "Panel", href: "/admin", icon: LayoutDashboard },
   { name: "Usuarios", href: "/admin/usuarios", icon: UserPlus },
   { name: "Cursos", href: "/admin/cursos", icon: BookOpen },
   { name: "Matrículas", href: "/admin/matriculas", icon: Users },
+  { name: "Contacto", href: "/admin/contactos", icon: Inbox },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

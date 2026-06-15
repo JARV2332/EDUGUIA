@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, Plus, UserPlus, Users } from "lucide-react";
+import { BookOpen, Inbox, Plus, UserPlus, Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -15,7 +15,7 @@ export default function AdminHomePage() {
         </p>
       </header>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Card>
           <CardHeader>
             <UserPlus className="mb-2 h-8 w-8 text-primary" />
@@ -52,6 +52,18 @@ export default function AdminHomePage() {
           <CardContent>
             <Button asChild variant="secondary">
               <Link href="/admin/matriculas">Ver matrículas</Link>
+            </Button>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <Inbox className="mb-2 h-8 w-8 text-primary" />
+            <CardTitle>Contacto web</CardTitle>
+            <CardDescription>Mensajes del formulario de la landing.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild variant="outline">
+              <Link href="/admin/contactos">Ver mensajes</Link>
             </Button>
           </CardContent>
         </Card>

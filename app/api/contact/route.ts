@@ -1,7 +1,8 @@
 export const runtime = "nodejs";
 
-import { formatContactoNotificacion, validateContactForm, type ContactFormPayload } from "@/lib/landing/contact-form";
-import { sendContactWhatsAppNotification } from "@/lib/landing/send-contact-whatsapp";
+import { validateContactForm, type ContactFormPayload } from "@/lib/landing/contact-form";
+import { saveContacto } from "@/lib/landing/save-contacto";
+import { sendContactEmailNotification } from "@/lib/landing/send-contact-email";
 
 export async function POST(req: Request) {
   let body: Partial<ContactFormPayload>;
@@ -25,15 +26,18 @@ export async function POST(req: Request) {
     return Response.json({ error: validationError }, { status: 400 });
   }
 
-  const text = formatContactoNotificacion(payload);
-  const result = await sendContactWhatsAppNotification(text);
-
-  if (!result.ok) {
-    console.error("[contact]", result.error);
+  const saved = await saveContacto(payload);
+  if (!saved.ok) {
+    console.error("[contact]", saved.error);
     return Response.json(
-      { error: "No pudimos enviar tu mensaje en este momento. Escríbenos directo por WhatsApp al 5988 6915." },
+      { error: "No pudimos guardar tu mensaje. Intenta de nuevo o escríbenos por WhatsApp al 5988 6915." },
       { status: 503 }
     );
+  }
+
+  const emailed = await sendContactEmailNotification(payload);
+  if (!emailed.ok && !emailed.skipped) {
+    console.warn("[contact] email:", emailed.error);
   }
 
   return Response.json({ ok: true });
