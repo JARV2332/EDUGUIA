@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import jsPDF from "jspdf";
 import { useLanguage } from "@/contexts/language-context";
 import { useStudents } from "@/contexts/students-context";
+import { useTeacherProfile } from "@/contexts/teacher-profile-context";
 import { StudentSelector } from "@/components/progress/student-selector";
 import { ProgressTimeline } from "@/components/progress/progress-timeline";
 import { ProgressChart } from "@/components/progress/progress-chart";
@@ -25,6 +26,7 @@ import {
   renderTimelineSection,
   type ConversationPdfLabels,
 } from "@/lib/progress-report-pdf";
+import { getTeacherPdfLines, toTeacherProfilePdf } from "@/lib/teacher-profile";
 
 export type { TimelineEntry };
 
@@ -61,6 +63,8 @@ function ProgressPageContent() {
   const studentFromUrl = searchParams.get("student");
   const { students: savedStudents, updateTimeline, updateStudent, refreshFromSupabase } =
     useStudents();
+  const { profile } = useTeacherProfile();
+  const teacherPdf = toTeacherProfilePdf(profile);
   const students: Student[] = useMemo(
     () => savedStudents.map((s) => savedToStudent(s)),
     [savedStudents]
@@ -263,11 +267,6 @@ function ProgressPageContent() {
 
       const labels = PROGRESS_PDF_LABELS[language === "es" ? "es" : "en"];
 
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(16);
-      doc.text(`${labels.title} - ${effectiveStudent.name}`, marginLeft, cursorY);
-      cursorY += lineHeight + 3;
-
       const drawLines = (lines: string[]) => {
         for (const line of lines) {
           maybeNewPage(lineHeight);
@@ -280,6 +279,12 @@ function ProgressPageContent() {
           });
         }
       };
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text(`${labels.title} - ${effectiveStudent.name}`, marginLeft, cursorY);
+      cursorY += lineHeight + 3;
+      drawLines(getTeacherPdfLines(teacherPdf, language === "es"));
 
       const addSectionTitle = (text: string) => {
         maybeNewPage(8);
@@ -532,6 +537,9 @@ function ProgressPageContent() {
 
       addTitle(pdfTitleByLang);
       addSubtitle(`${labels.student}: ${studentName}`);
+      for (const line of getTeacherPdfLines(teacherPdf, language === "es")) {
+        addSubtitle(line);
+      }
       cursorY += 2;
 
       addSectionTitle(labels.profile);

@@ -32,7 +32,16 @@ La contraseña de la base de datos la ves en: Dashboard → Project Settings →
 
 ---
 
-## Recuperación de contraseña
+## Perfil docente y avatares
+
+Ejecuta también **`supabase/migrations/002_teacher_profile.sql`** (o el bloque equivalente en `schema.sql`):
+
+- Columna `escuela` en `docentes`
+- Bucket Storage `teacher-avatars` para fotos de perfil
+
+En **Storage → Policies** debe permitir que cada docente suba solo a su carpeta (`auth.uid()`).
+
+---
 
 1. En **Authentication → URL Configuration** agrega estas **Redirect URLs**:
    - `http://localhost:3000/auth/callback`

@@ -18,6 +18,7 @@ import {
   Menu,
   ChevronLeft,
   LogOut,
+  User,
 } from "lucide-react";
 
 interface AppShellProps {
@@ -52,6 +53,9 @@ export function AppShell({ children, basePath = "/dashboard" }: AppShellProps) {
     { name: t("nav.assessment"), href: basePath ? `${basePath}/assessment` : "/assessment", icon: ClipboardList },
     { name: t("nav.progress"), href: basePath ? `${basePath}/progress` : "/progress", icon: TrendingUp },
     { name: t("nav.toolkit"), href: basePath ? `${basePath}/toolkit` : "/toolkit", icon: Wrench },
+    ...(basePath
+      ? [{ name: t("nav.profile"), href: `${basePath}/profile`, icon: User }]
+      : []),
   ];
 
   const NavContent = ({ mobile = false }: { mobile?: boolean }) => (

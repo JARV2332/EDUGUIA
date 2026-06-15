@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { FileDown, FileText, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { useStudents } from "@/contexts/students-context";
+import { useTeacherProfile } from "@/contexts/teacher-profile-context";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { AssessmentData, ReportSnapshot } from "@/lib/student-store";
 import { buildConversationSummary } from "@/lib/generate-report";
 import { downloadFinalReportPdf } from "@/lib/final-report-pdf";
+import { toTeacherProfilePdf } from "@/lib/teacher-profile";
 
 interface GenerateFinalReportProps {
   studentId: string;
@@ -27,6 +29,7 @@ export function GenerateFinalReport({
 }: GenerateFinalReportProps) {
   const { t, language } = useLanguage();
   const { updateStudent } = useStudents();
+  const { profile } = useTeacherProfile();
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -119,6 +122,7 @@ export function GenerateFinalReport({
         assessmentData,
         snapshot: snapshotToDownload,
         uiLanguage: language === "es" ? "es" : "en",
+        teacherProfile: toTeacherProfilePdf(profile),
       });
     } catch (err) {
       console.error(err);

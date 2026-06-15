@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import { useAccessibility } from "@/contexts/accessibility-context";
 import { useLanguage } from "@/contexts/language-context";
+import { useTeacherProfile } from "@/contexts/teacher-profile-context";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -21,6 +22,7 @@ import {
 } from "lucide-react";
 import type { AssessmentData } from "@/app/assessment/page";
 import type { ReportSnapshot } from "@/lib/student-store";
+import { getTeacherPdfLines, toTeacherProfilePdf } from "@/lib/teacher-profile";
 
 interface AssessmentResultsProps {
   data: AssessmentData;
@@ -121,6 +123,8 @@ const PDF_LABELS = {
 
 export function AssessmentResults({ data, onReportSnapshotChange, onPdfExported, estudianteId }: AssessmentResultsProps) {
   const { t, language } = useLanguage();
+  const { profile } = useTeacherProfile();
+  const teacherPdf = toTeacherProfilePdf(profile);
 
   const generateReport = (reportLang: ReportLanguage = "es"): ReportSection[] => {
     const sections: ReportSection[] = [];
@@ -859,6 +863,9 @@ Devuelve ÚNICAMENTE un objeto JSON válido (sin comentarios, sin texto fuera de
 
       const labels = PDF_LABELS[reportLanguage];
       addSubtitle(`${labels.student}: ${studentName}`);
+      for (const line of getTeacherPdfLines(teacherPdf, language === "es")) {
+        addSubtitle(line);
+      }
 
       addSpacer(2);
 
