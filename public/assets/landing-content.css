@@ -885,3 +885,102 @@
     padding: 32px 20px;
   }
 }
+
+/* —— Campus virtual / LMS —— */
+.home-section--lms {
+  background: linear-gradient(180deg, #fff 0%, var(--eduguia-bg) 100%);
+}
+
+.lms-access-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.lms-access-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid rgba(26, 77, 122, 0.12);
+  border-radius: var(--eduguia-radius);
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 4px 20px rgba(26, 77, 122, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.lms-access-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(45, 143, 143, 0.35);
+  box-shadow: 0 8px 28px rgba(45, 143, 143, 0.15);
+}
+
+.lms-access-card h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--eduguia-primary);
+}
+
+.lms-access-card p {
+  margin: 0;
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--eduguia-muted);
+  line-height: 1.5;
+}
+
+.lms-access-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(26, 77, 122, 0.08);
+  color: var(--eduguia-primary);
+  font-size: 1.25rem;
+}
+
+.lms-access-card__link {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--eduguia-secondary);
+}
+
+.lms-access-card--admin {
+  border-color: rgba(217, 119, 6, 0.2);
+}
+
+.lms-access-card--admin .lms-access-card__icon {
+  background: rgba(217, 119, 6, 0.1);
+  color: #b45309;
+}
+
+.lms-access-note {
+  font-size: 0.95rem;
+  color: var(--eduguia-muted);
+}
+
+.lms-access-note a {
+  color: var(--eduguia-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.lms-access-note a:hover {
+  text-decoration: underline;
+}
+
+.site-header__cta--secondary {
+  background: #fff !important;
+  color: var(--eduguia-primary) !important;
+  border: 2px solid var(--eduguia-primary);
+  box-shadow: none !important;
+}
+
+.site-header__cta--secondary:hover {
+  background: rgba(26, 77, 122, 0.06) !important;
+}

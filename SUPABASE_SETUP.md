@@ -41,7 +41,40 @@ Ejecuta también **`supabase/migrations/002_teacher_profile.sql`** (o el bloque 
 
 En **Storage → Policies** debe permitir que cada docente suba solo a su carpeta (`auth.uid()`).
 
+## Campus virtual (LMS EduKids)
+
+Ejecuta **`supabase/migrations/003_lms_mvp.sql`** para:
+
+- Tabla `profiles` con roles: `admin`, `docente`, `estudiante`
+- Tabla `alumnos` (cuentas de estudiantes del LMS)
+- Tablas `cursos`, `modulos`, `materiales`, `tareas`, `matriculas`, `entregas`
+- Bucket Storage `course-materials` para archivos de curso
+
+### Crear un administrador
+
+1. En Supabase → **Authentication → Users** crea un usuario o edita uno existente.
+2. En **User Metadata** agrega: `{ "role": "admin", "nombre": "Tu nombre" }`
+3. Si el usuario ya existía, ejecuta en SQL Editor:
+
+```sql
+INSERT INTO public.profiles (id, role, nombre)
+SELECT id, 'admin', email FROM auth.users WHERE email = 'admin@tudominio.com'
+ON CONFLICT (id) DO UPDATE SET role = 'admin';
+```
+
+### Flujo del campus
+
+| Rol | Registro | Panel |
+|-----|----------|-------|
+| Estudiante | `/register?role=estudiante` | `/alumno` |
+| Docente | `/register?role=docente` | `/dashboard` + `/dashboard/lms` |
+| Admin | Solo manual en Supabase | `/admin` |
+
+Landing: sección **Área de aprendizaje** en `/` y hub en `/acceso`.
+
 ---
+
+## Recuperación de contraseña
 
 1. En **Authentication → URL Configuration** agrega estas **Redirect URLs**:
    - `http://localhost:3000/auth/callback`

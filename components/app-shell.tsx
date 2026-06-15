@@ -19,15 +19,34 @@ import {
   ChevronLeft,
   LogOut,
   User,
+  BookOpen,
+  type LucideIcon,
 } from "lucide-react";
+
+interface NavItem {
+  name: string;
+  href: string;
+  icon: LucideIcon;
+}
 
 interface AppShellProps {
   children: React.ReactNode;
   /** Prefijo para rutas (ej. "/dashboard" para área protegida). */
   basePath?: string;
+  navigation?: NavItem[];
+  brandTitle?: string;
+  brandSubtitle?: string;
+  brandLogo?: string;
 }
 
-export function AppShell({ children, basePath = "/dashboard" }: AppShellProps) {
+export function AppShell({
+  children,
+  basePath = "/dashboard",
+  navigation: navigationOverride,
+  brandTitle = "EDUGUIA",
+  brandSubtitle = "Plataforma de Inclusión",
+  brandLogo = "/logo.jpeg",
+}: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
@@ -48,15 +67,18 @@ export function AppShell({ children, basePath = "/dashboard" }: AppShellProps) {
     }
   };
 
-  const navigation = [
-    { name: t("nav.dashboard"), href: basePath || "/", icon: LayoutDashboard },
-    { name: t("nav.assessment"), href: basePath ? `${basePath}/assessment` : "/assessment", icon: ClipboardList },
-    { name: t("nav.progress"), href: basePath ? `${basePath}/progress` : "/progress", icon: TrendingUp },
-    { name: t("nav.toolkit"), href: basePath ? `${basePath}/toolkit` : "/toolkit", icon: Wrench },
-    ...(basePath
-      ? [{ name: t("nav.profile"), href: `${basePath}/profile`, icon: User }]
-      : []),
-  ];
+  const navigation =
+    navigationOverride ??
+    [
+      { name: t("nav.dashboard"), href: basePath || "/", icon: LayoutDashboard },
+      { name: t("nav.assessment"), href: basePath ? `${basePath}/assessment` : "/assessment", icon: ClipboardList },
+      { name: t("nav.progress"), href: basePath ? `${basePath}/progress` : "/progress", icon: TrendingUp },
+      { name: t("nav.lms"), href: basePath ? `${basePath}/lms` : "/lms", icon: BookOpen },
+      { name: t("nav.toolkit"), href: basePath ? `${basePath}/toolkit` : "/toolkit", icon: Wrench },
+      ...(basePath
+        ? [{ name: t("nav.profile"), href: `${basePath}/profile`, icon: User }]
+        : []),
+    ];
 
   const NavContent = ({ mobile = false }: { mobile?: boolean }) => (
     <div className="flex h-full flex-col">
@@ -65,12 +87,12 @@ export function AppShell({ children, basePath = "/dashboard" }: AppShellProps) {
         collapsed && !mobile && "justify-center px-2"
       )}>
         <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-sidebar-primary">
-          <Image src="/logo.jpeg" alt="EDUGUIA" fill className="object-contain p-0.5" sizes="40px" priority />
+          <Image src={brandLogo} alt={brandTitle} fill className="object-contain p-0.5" sizes="40px" priority />
         </div>
         {(!collapsed || mobile) && (
           <div className="min-w-0">
-            <h1 className="font-semibold text-sidebar-foreground">EDUGUIA</h1>
-            <p className="text-xs text-sidebar-foreground/70">Plataforma de Inclusión</p>
+            <h1 className="font-semibold text-sidebar-foreground">{brandTitle}</h1>
+            <p className="text-xs text-sidebar-foreground/70">{brandSubtitle}</p>
           </div>
         )}
       </div>
@@ -169,9 +191,9 @@ export function AppShell({ children, basePath = "/dashboard" }: AppShellProps) {
             </SheetTrigger>
             <div className="flex items-center gap-2">
               <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded">
-                <Image src="/logo.jpeg" alt="EDUGUIA" fill className="object-contain" sizes="32px" priority />
+                <Image src={brandLogo} alt={brandTitle} fill className="object-contain" sizes="32px" priority />
               </div>
-              <span className="font-semibold">EDUGUIA</span>
+              <span className="font-semibold">{brandTitle}</span>
             </div>
           </header>
 

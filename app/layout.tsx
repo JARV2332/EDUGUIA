@@ -5,6 +5,7 @@ import { AccessibilityProvider } from '@/contexts/accessibility-context'
 import { LanguageProvider } from '@/contexts/language-context'
 import { StudentsProvider } from '@/contexts/students-context'
 import { TeacherProfileProvider } from '@/contexts/teacher-profile-context'
+import { AuthRoleProvider } from '@/contexts/auth-role-context'
 import { AccessibilityMenu } from '@/components/accessibility-menu'
 import './globals.css'
 
@@ -36,11 +37,13 @@ export default function RootLayout({
           <AccessibilityProvider>
             <StudentsProvider>
             <TeacherProfileProvider>
+            <AuthRoleProvider>
             <a href="#main-content" className="skip-link">
               Skip to main content
             </a>
             {children}
             <AccessibilityMenu />
+            </AuthRoleProvider>
             </TeacherProfileProvider>
             </StudentsProvider>
           </AccessibilityProvider>

@@ -30,8 +30,10 @@
       <a href="/galeria/">Galería</a>
       <a href="/preguntas-frecuentes/">FAQ</a>
       <a href="/comunicate-con-nosotros/">Contacto</a>
+      <a href="/acceso">Aprendizaje</a>
     </nav>
-    <a class="site-header__cta" href="/login">EDUGUIA</a>
+    <a class="site-header__cta site-header__cta--secondary" href="/acceso">Campus virtual</a>
+    <a class="site-header__cta" href="/login?role=docente">EDUGUIA</a>
   </div>
 </header>
 
@@ -102,6 +104,41 @@
     </div>
   </section>
 
+  <!-- Área de aprendizaje virtual -->
+  <section id="aprendizaje" class="home-section home-section--lms">
+    <div class="landing-content">
+      <span class="home-label">Campus virtual</span>
+      <h2 class="section-title" style="text-align:left;margin-bottom:12px">Área de aprendizaje EduKids</h2>
+      <p class="page-intro" style="margin-top:0;margin-bottom:28px">
+        Entorno en línea para cursos de robótica y STEAM: clases grabadas, materiales, actividades y seguimiento docente.
+      </p>
+      <div class="lms-access-grid">
+        <a class="lms-access-card" href="/login?role=estudiante">
+          <span class="lms-access-card__icon" aria-hidden="true"><i class="fas fa-user-graduate"></i></span>
+          <h3>Estudiante</h3>
+          <p>Ver mis cursos, clases y tareas.</p>
+          <span class="lms-access-card__link">Iniciar sesión <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+        </a>
+        <a class="lms-access-card" href="/login?role=docente">
+          <span class="lms-access-card__icon" aria-hidden="true"><i class="fas fa-chalkboard-teacher"></i></span>
+          <h3>Docente</h3>
+          <p>Subir materiales, tareas y usar EDUGUIA.</p>
+          <span class="lms-access-card__link">Iniciar sesión <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+        </a>
+        <a class="lms-access-card lms-access-card--admin" href="/login?role=admin">
+          <span class="lms-access-card__icon" aria-hidden="true"><i class="fas fa-shield-alt"></i></span>
+          <h3>Administrador</h3>
+          <p>Crear cursos y matricular alumnos.</p>
+          <span class="lms-access-card__link">Acceso admin <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+        </a>
+      </div>
+      <p class="lms-access-note">
+        ¿Primera vez? <a href="/register?role=estudiante">Regístrate como estudiante</a> o
+        <a href="/acceso">elige tu tipo de acceso</a>.
+      </p>
+    </div>
+  </section>
+
   <!-- EDUGUIA docentes -->
   <section class="home-section home-section--eduguia">
     <div class="landing-content">
@@ -109,7 +146,7 @@
         <div class="home-eduguia-card__text">
           <h2>Actualización docente</h2>
           <p>Los docentes se enfrentan cada día a nuevos retos. Por eso deben contar con herramientas y métodos vanguardistas para acompañar a sus estudiantes.</p>
-          <a class="btn-primary" href="/login">EDUGUIA</a>
+          <a class="btn-primary" href="/login?role=docente">EDUGUIA</a>
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { getHomePathForRole, getUserRole } from "@/lib/auth/get-user-role";
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -23,7 +24,7 @@ export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
   const path = request.nextUrl.pathname;
 
-  if (isLandingPath(path) || path.startsWith("/auth/")) {
+  if (isLandingPath(path) || path.startsWith("/auth/") || path === "/acceso") {
     return response;
   }
 
@@ -51,17 +52,36 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const isDashboard = path.startsWith("/dashboard");
-  const isAuthPage = path === "/login" || path === "/register" || path === "/forgot-password";
+  const isAdmin = path.startsWith("/admin");
+  const isAlumno = path.startsWith("/alumno");
+  const isAuthPage =
+    path === "/login" || path === "/register" || path === "/forgot-password";
   const isPasswordRecovery = path === "/reset-password";
 
-  if (isDashboard && !user) {
+  const role = user ? await getUserRole(supabase, user.id) : null;
+  const home = role ? getHomePathForRole(role) : "/login";
+
+  if ((isDashboard || isAdmin || isAlumno) && !user) {
     const redirect = new URL("/login", request.url);
     redirect.searchParams.set("redirect", path);
     return NextResponse.redirect(redirect);
   }
-  if (isAuthPage && user) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+
+  if (user && role) {
+    if (isAdmin && role !== "admin") {
+      return NextResponse.redirect(new URL(home, request.url));
+    }
+    if (isDashboard && role !== "docente") {
+      return NextResponse.redirect(new URL(home, request.url));
+    }
+    if (isAlumno && role !== "estudiante") {
+      return NextResponse.redirect(new URL(home, request.url));
+    }
+    if (isAuthPage) {
+      return NextResponse.redirect(new URL(home, request.url));
+    }
   }
+
   if (isPasswordRecovery && !user) {
     return response;
   }
