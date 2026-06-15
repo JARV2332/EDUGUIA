@@ -560,6 +560,12 @@
   border: 1px solid rgba(45, 143, 143, 0.25);
 }
 
+.contact-form__notice--error {
+  background: rgba(180, 50, 50, 0.08);
+  color: #8b2020;
+  border: 1px solid rgba(180, 50, 50, 0.2);
+}
+
 .contact-aside__title {
   margin: 0 0 16px;
   font-size: 1.1rem;

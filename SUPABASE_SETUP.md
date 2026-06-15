@@ -96,6 +96,20 @@ Ejecuta **`supabase/migrations/006_cursos_catalogo_servicios.sql`** y **`007_cur
 
 En **`/admin/cursos`**, completa el catálogo (precio, duración, edades, imagen) y activa **Publicar**. El curso aparece automáticamente en [https://eduguia.vercel.app/servicios/](https://eduguia.vercel.app/servicios/) vía la API pública `/api/public/cursos`. Si hay cursos publicados, reemplazan el listado estático de la página.
 
+### Formulario de contacto → WhatsApp (invisible al visitante)
+
+Cuando alguien envía el formulario en **`/comunicate-con-nosotros`**, el servidor reenvía los datos a tu WhatsApp **+502 5988 6915** sin abrir WhatsApp en el navegador del visitante.
+
+1. Desde el WhatsApp del **5988 6915**, agrega el contacto **+34 684 61 95 07** (CallMeBot).
+2. Envíale este mensaje exacto: `I allow callmebot to send me messages`
+3. CallMeBot te responderá con tu **apikey** personal.
+4. En Vercel → **Settings → Environment Variables** agrega:
+   - `CALLMEBOT_API_KEY` = la apikey que te dio CallMeBot
+   - (opcional) `EDUKIDS_WHATSAPP_PHONE` = `50259886915` si usas otro número
+5. Redespliega la app en Vercel.
+
+El visitante solo ve “¡Gracias! Recibimos tu mensaje”; tú recibes el WhatsApp con nombre, correo, teléfono, motivo y mensaje.
+
 ---
 
 ## Recuperación de contraseña

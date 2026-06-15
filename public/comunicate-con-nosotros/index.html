@@ -105,7 +105,7 @@
       </div>
       <div class="contact-card">
         <p><strong>WhatsApp</strong></p>
-        <p><a href="https://wa.link/mw5cov" target="_blank" rel="noopener">5988 6915</a></p>
+        <p><a href="https://wa.me/50259886915" target="_blank" rel="noopener">5988 6915</a></p>
       </div>
       <div class="contact-card">
         <p><strong>Correo</strong></p>
@@ -132,31 +132,17 @@
     <div class="site-footer__links">
       <a href="https://www.facebook.com/edukidsguatemala/" target="_blank" rel="noopener">Facebook</a>
       <a href="https://www.instagram.com/edukids_gt/" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://wa.link/mw5cov" target="_blank" rel="noopener">WhatsApp</a>
+      <a href="https://wa.me/50259886915" target="_blank" rel="noopener">WhatsApp</a>
     </div>
     <p class="site-footer__copy">© 2026 EduKidsGt — Todos los derechos reservados.</p>
   </div>
 </footer>
+<script src="/assets/contacto-whatsapp.js" defer></script>
 <script>
 document.querySelector('[data-nav-toggle]')?.addEventListener('click', function () {
   const nav = document.getElementById('site-nav');
   const open = nav.classList.toggle('is-open');
   this.setAttribute('aria-expanded', open ? 'true' : 'false');
-});
-
-document.getElementById('contact-form')?.addEventListener('submit', function (event) {
-  event.preventDefault();
-  if (!this.checkValidity()) {
-    this.reportValidity();
-    return;
-  }
-  var status = document.getElementById('contact-form-status');
-  if (status) {
-    status.hidden = false;
-    status.textContent = '¡Gracias! Tu mensaje se ha registrado. Pronto habilitaremos el envío por correo.';
-    status.className = 'contact-form__notice contact-form__notice--success';
-  }
-  this.reset();
 });
 </script>
 </body>
