@@ -1,6 +1,9 @@
 import type { PublicCursoCard } from "@/lib/lms/get-public-cursos";
+import { buildComprarCursoWhatsAppUrl } from "@/lib/landing/whatsapp-compra";
 
 export function PublicCursoCardView({ curso }: { curso: PublicCursoCard }) {
+  const whatsappUrl = buildComprarCursoWhatsAppUrl(curso);
+
   return (
     <article className="course-card">
       <div className="course-card__image">
@@ -28,6 +31,16 @@ export function PublicCursoCardView({ curso }: { curso: PublicCursoCard }) {
           </p>
         )}
         {curso.descripcion && <p className="course-card__desc">{curso.descripcion}</p>}
+        <a
+          className="btn-primary course-card__cta"
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Comprar curso ${curso.titulo} por WhatsApp`}
+        >
+          <i className="fab fa-whatsapp" aria-hidden="true"></i>
+          Comprar curso
+        </a>
       </div>
     </article>
   );
