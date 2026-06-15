@@ -8,34 +8,35 @@ export async function GET() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !anonKey) {
-    return Response.json({ cursos: [] });
+    return Response.json({ cursos: [], error: "Supabase no configurado" }, { status: 503 });
   }
 
   const supabase = createClient(url, anonKey);
-  const { data, error } = await supabase
-    .from("cursos")
-    .select(
-      "id, slug, titulo, descripcion, edad_min, edad_max, edad_publico, imagen_url, precio, precio_moneda, duracion, modalidad, orden_servicios, publicado"
-    )
-    .eq("publicado", true)
-    .order("orden_servicios", { ascending: true })
-    .order("titulo", { ascending: true });
+  const { data, error } = await supabase.from("cursos").select("*").eq("publicado", true);
 
   if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ error: error.message, cursos: [] }, { status: 500 });
   }
 
-  const cursos = ((data as Curso[]) ?? []).map((curso) => ({
+  const rows = (data as Curso[]) ?? [];
+  const sorted = [...rows].sort((a, b) => {
+    const orderA = a.orden_servicios ?? 0;
+    const orderB = b.orden_servicios ?? 0;
+    if (orderA !== orderB) return orderA - orderB;
+    return (a.titulo ?? "").localeCompare(b.titulo ?? "", "es");
+  });
+
+  const cursos = sorted.map((curso) => ({
     id: curso.id,
     slug: curso.slug,
     titulo: curso.titulo,
     descripcion: curso.descripcion,
     edad: formatEdadPublico(curso),
     inversion: formatInversionLine(curso),
-    duracion: curso.duracion,
-    precio: curso.precio,
-    precio_moneda: curso.precio_moneda,
-    modalidad: curso.modalidad,
+    duracion: curso.duracion ?? null,
+    precio: curso.precio ?? null,
+    precio_moneda: curso.precio_moneda ?? "GTQ",
+    modalidad: curso.modalidad ?? null,
     imagen_url: curso.imagen_url || cursoImagenDefault(),
   }));
 
@@ -43,7 +44,7 @@ export async function GET() {
     { cursos },
     {
       headers: {
-        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120",
       },
     }
   );

@@ -92,7 +92,7 @@ Los usuarios internos usan correo técnico `usuario@campus.edukids.local`; el lo
 
 ### Cursos publicados en /servicios
 
-Ejecuta **`supabase/migrations/006_cursos_catalogo_servicios.sql`** (precio, duración, modalidad, etc.).
+Ejecuta **`supabase/migrations/006_cursos_catalogo_servicios.sql`** y **`007_cursos_public_read.sql`** (precio, duración y lectura pública en /servicios).
 
 En **`/admin/cursos`**, completa el catálogo (precio, duración, edades, imagen) y activa **Publicar**. El curso aparece automáticamente en [https://eduguia.vercel.app/servicios/](https://eduguia.vercel.app/servicios/) vía la API pública `/api/public/cursos`. Si hay cursos publicados, reemplazan el listado estático de la página.
 

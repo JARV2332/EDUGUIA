@@ -113,6 +113,8 @@ export default function AdminCursosPage() {
   const [cursos, setCursos] = useState<Curso[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [createForm, setCreateForm] = useState(emptyCatalog);
   const [editCurso, setEditCurso] = useState<Curso | null>(null);
   const [editForm, setEditForm] = useState(emptyCatalog);
@@ -142,10 +144,13 @@ export default function AdminCursosPage() {
     setSaving(true);
     const supabase = createClient();
     const slug = `${slugify(createForm.titulo)}-${Date.now().toString(36)}`;
-    await supabase.from("cursos").insert({
+    const basePayload = {
       slug,
       titulo: createForm.titulo.trim(),
       descripcion: createForm.descripcion.trim() || null,
+      publicado: false,
+    };
+    const catalogPayload = {
       edad_min: parseOptionalNumber(createForm.edad_min),
       edad_max: parseOptionalNumber(createForm.edad_max),
       edad_publico: createForm.edad_publico.trim() || null,
@@ -154,16 +159,49 @@ export default function AdminCursosPage() {
       modalidad: createForm.modalidad.trim() || null,
       imagen_url: createForm.imagen_url.trim() || null,
       orden_servicios: parseOptionalNumber(createForm.orden_servicios) ?? 0,
-      publicado: false,
-    });
+    };
+
+    let insertError = (
+      await supabase.from("cursos").insert({ ...basePayload, ...catalogPayload })
+    ).error;
+    let successMessage = "Curso creado correctamente.";
+
+    if (insertError?.message?.includes("column")) {
+      insertError = (await supabase.from("cursos").insert(basePayload)).error;
+      if (!insertError) {
+        successMessage = "Curso creado. Ejecuta la migración 006 en Supabase para precio, duración e imagen.";
+      }
+    }
+
+    if (insertError) {
+      setError(insertError.message);
+      setSaving(false);
+      return;
+    }
+    setMessage(successMessage);
+    setError(null);
     setCreateForm(emptyCatalog);
     setSaving(false);
     await load();
   };
 
   const togglePublicado = async (curso: Curso) => {
+    setError(null);
+    setMessage(null);
     const supabase = createClient();
-    await supabase.from("cursos").update({ publicado: !curso.publicado }).eq("id", curso.id);
+    const { error: updateError } = await supabase
+      .from("cursos")
+      .update({ publicado: !curso.publicado })
+      .eq("id", curso.id);
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+    setMessage(
+      !curso.publicado
+        ? `"${curso.titulo}" publicado — visible en /servicios`
+        : `"${curso.titulo}" despublicado`
+    );
     await load();
   };
 
@@ -187,7 +225,7 @@ export default function AdminCursosPage() {
     if (!editCurso) return;
     setSaving(true);
     const supabase = createClient();
-    await supabase
+    const { error: updateError } = await supabase
       .from("cursos")
       .update({
         titulo: editForm.titulo.trim(),
@@ -202,6 +240,13 @@ export default function AdminCursosPage() {
         orden_servicios: parseOptionalNumber(editForm.orden_servicios) ?? 0,
       })
       .eq("id", editCurso.id);
+    if (updateError) {
+      setError(updateError.message);
+      setSaving(false);
+      return;
+    }
+    setMessage("Catálogo actualizado.");
+    setError(null);
     setSaving(false);
     setEditCurso(null);
     await load();
@@ -221,6 +266,16 @@ export default function AdminCursosPage() {
           </p>
         </div>
       </header>
+
+      {(error || message) && (
+        <div
+          className={`mb-6 rounded-lg border px-4 py-3 text-sm ${
+            error ? "border-destructive/30 bg-destructive/10 text-destructive" : "border-primary/20 bg-primary/5 text-foreground"
+          }`}
+        >
+          {error || message}
+        </div>
+      )}
 
       <Card className="mb-8">
         <CardHeader>

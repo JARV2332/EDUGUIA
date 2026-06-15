@@ -45,20 +45,23 @@
     );
   }
 
-  var dinamicos = document.getElementById("cursos-dinamicos");
-  var estaticos = document.getElementById("cursos-estaticos");
-  if (!dinamicos) return;
+  var grid = document.getElementById("courses-grid");
+  if (!grid) return;
 
   fetch("/api/public/cursos")
     .then(function (res) {
+      if (!res.ok) throw new Error("API error");
       return res.json();
     })
     .then(function (data) {
       var cursos = data && data.cursos ? data.cursos : [];
       if (!cursos.length) return;
 
-      dinamicos.innerHTML = cursos.map(renderCurso).join("");
-      if (estaticos) estaticos.hidden = true;
+      grid.insertAdjacentHTML("afterbegin", cursos.map(renderCurso).join(""));
+
+      grid.querySelectorAll(".course-card--static").forEach(function (el) {
+        el.hidden = true;
+      });
     })
     .catch(function () {
       /* Mantener catálogo estático si falla la API */
