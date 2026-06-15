@@ -90,6 +90,12 @@ Hub del campus: **`/acceso`**. La landing en `/` enlaza campus y EDUGUIA por sep
 
 Los usuarios internos usan correo técnico `usuario@campus.edukids.local`; el login acepta solo el nombre de usuario.
 
+### Cursos publicados en /servicios
+
+Ejecuta **`supabase/migrations/006_cursos_catalogo_servicios.sql`** (precio, duración, modalidad, etc.).
+
+En **`/admin/cursos`**, completa el catálogo (precio, duración, edades, imagen) y activa **Publicar**. El curso aparece automáticamente en [https://eduguia.vercel.app/servicios/](https://eduguia.vercel.app/servicios/) vía la API pública `/api/public/cursos`. Si hay cursos publicados, reemplazan el listado estático de la página.
+
 ---
 
 ## Recuperación de contraseña

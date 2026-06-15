@@ -5,8 +5,15 @@ export interface Curso {
   descripcion: string | null;
   edad_min: number | null;
   edad_max: number | null;
+  edad_publico: string | null;
   imagen_url: string | null;
   docente_id: string | null;
+  instructor_id?: string | null;
+  precio: number | null;
+  precio_moneda: string;
+  duracion: string | null;
+  modalidad: string | null;
+  orden_servicios: number;
   publicado: boolean;
   created_at: string;
 }
