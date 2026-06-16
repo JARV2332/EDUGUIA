@@ -15,6 +15,7 @@ export default function ServiciosLayout({ children }: { children: React.ReactNod
       <link rel="stylesheet" href="/assets/eduguia-theme.css" />
       <link rel="stylesheet" href="/assets/landing-content.css" />
       {children}
+      <Script src="/assets/landing-whatsapp.js" strategy="afterInteractive" />
       <Script id="servicios-nav-toggle" strategy="afterInteractive">{`
         document.querySelector('[data-nav-toggle]')?.addEventListener('click', function () {
           var nav = document.getElementById('site-nav');

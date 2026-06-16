@@ -26,6 +26,7 @@ export default async function ServiciosPage() {
               Servicios
             </Link>
             <Link href="/galeria/">Galería</Link>
+            <Link href="/portafolio/">Portafolio</Link>
             <Link href="/preguntas-frecuentes/">FAQ</Link>
             <Link href="/comunicate-con-nosotros/">Contacto</Link>
           </nav>
