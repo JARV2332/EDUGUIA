@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
+import { loadChatSessionMessages } from "@/lib/chat-sessions";
 import type { AssessmentData } from "@/lib/student-store";
 import {
   assessmentChatToMessages,
@@ -36,43 +37,53 @@ export function StudentAgentPanel({
   const lang = language === "es" ? "es" : "en";
 
   const [followUpPlans, setFollowUpPlans] = useState<InterventionPlanRow[]>([]);
+  const [sessionAssessmentMessages, setSessionAssessmentMessages] = useState<ChatMessage[]>([]);
+  const [sessionFollowUpMessages, setSessionFollowUpMessages] = useState<ChatMessage[]>([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [pendingFollowUp, setPendingFollowUp] = useState<ChatMessage[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const assessmentMessages = useMemo(
-    () => assessmentChatToMessages(assessmentData.aiResponses ?? []),
-    [assessmentData.aiResponses]
-  );
+  const assessmentMessages = useMemo(() => {
+    if (sessionAssessmentMessages.length > 0) return sessionAssessmentMessages;
+    return assessmentChatToMessages(assessmentData.aiResponses ?? []);
+  }, [sessionAssessmentMessages, assessmentData.aiResponses]);
 
-  const savedFollowUpMessages = useMemo(
-    () => interventionPlansToMessages(followUpPlans),
-    [followUpPlans]
-  );
+  const savedFollowUpMessages = useMemo(() => {
+    if (sessionFollowUpMessages.length > 0) return sessionFollowUpMessages;
+    return interventionPlansToMessages(followUpPlans);
+  }, [sessionFollowUpMessages, followUpPlans]);
 
   const followUpMessages = useMemo(
     () => [...savedFollowUpMessages, ...pendingFollowUp],
     [savedFollowUpMessages, pendingFollowUp]
   );
 
-  const loadPlans = useCallback(async () => {
+  const loadHistory = useCallback(async () => {
     if (!studentId) return;
     setLoadingPlans(true);
     try {
       const supabase = createClient();
-      const { data, error } = await supabase
-        .from("planes_intervencion")
-        .select("id, observacion_docente, respuesta_ia, created_at")
-        .eq("estudiante_id", studentId)
-        .order("created_at", { ascending: true });
+      const [plansResult, assessmentSession, followUpSession] = await Promise.all([
+        supabase
+          .from("planes_intervencion")
+          .select("id, observacion_docente, respuesta_ia, created_at")
+          .eq("estudiante_id", studentId)
+          .order("created_at", { ascending: true }),
+        loadChatSessionMessages(supabase, studentId, "assessment"),
+        loadChatSessionMessages(supabase, studentId, "followup"),
+      ]);
 
-      if (error) throw error;
-      setFollowUpPlans(filterFollowUpPlans((data ?? []) as InterventionPlanRow[]));
+      if (plansResult.error) throw plansResult.error;
+      setFollowUpPlans(filterFollowUpPlans((plansResult.data ?? []) as InterventionPlanRow[]));
+      setSessionAssessmentMessages(assessmentSession);
+      setSessionFollowUpMessages(followUpSession);
     } catch (err) {
-      console.error("Error cargando planes de intervención:", err);
+      console.error("Error cargando historial de chat:", err);
       setFollowUpPlans([]);
+      setSessionAssessmentMessages([]);
+      setSessionFollowUpMessages([]);
     } finally {
       setLoadingPlans(false);
     }
@@ -81,8 +92,8 @@ export function StudentAgentPanel({
   useEffect(() => {
     setPendingFollowUp([]);
     setInput("");
-    void loadPlans();
-  }, [loadPlans, studentId]);
+    void loadHistory();
+  }, [loadHistory, studentId]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -105,6 +116,8 @@ export function StudentAgentPanel({
           prompt,
           estudiante_id: studentId,
           adaptive_chat: true,
+          session_tipo: "followup",
+          chat_user_message: trimmed,
           observacion_resumen: formatFollowUpObservation(trimmed),
         }),
       });
@@ -117,18 +130,12 @@ export function StudentAgentPanel({
       const reply = dataResp.reply.trim();
       setPendingFollowUp((prev) => [...prev, { role: "assistant", content: reply }]);
       onFollowUpSent?.(trimmed, reply);
-      await loadPlans();
+      await loadHistory();
       setPendingFollowUp([]);
     } catch (err) {
       console.error(err);
       const message = err instanceof Error ? err.message : t("progress.chatError");
-      setPendingFollowUp((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: message,
-        },
-      ]);
+      setPendingFollowUp((prev) => [...prev, { role: "assistant", content: message }]);
     } finally {
       setIsTyping(false);
     }
@@ -138,7 +145,7 @@ export function StudentAgentPanel({
 
   return (
     <div className="space-y-6">
-      <p className="text-xs text-muted-foreground">{t("progress.chatSaved")}</p>
+      <p className="text-xs text-muted-foreground">{t("progress.chatSavedCloud")}</p>
       {hasAssessmentChat ? (
         <Card>
           <CardHeader className="pb-3">
@@ -146,10 +153,7 @@ export function StudentAgentPanel({
             <CardDescription>{t("progress.assessmentChatHint")}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div
-              ref={hasAssessmentChat ? undefined : scrollRef}
-              className="max-h-[min(50vh,28rem)] overflow-y-auto rounded-lg border bg-muted/20 p-4"
-            >
+            <div className="max-h-[min(50vh,28rem)] overflow-y-auto rounded-lg border bg-muted/20 p-4">
               <ChatMessageList
                 messages={assessmentMessages}
                 assistantLabel="EduGuIA"

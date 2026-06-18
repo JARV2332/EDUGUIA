@@ -28,8 +28,10 @@ export async function POST(req: Request) {
     adaptive_chat?: boolean;
     /** Texto corto para guardar en planes_intervencion (seguimiento en Progreso) */
     observacion_resumen?: string;
+    session_tipo?: "assessment" | "followup";
+    chat_user_message?: string;
   };
-  const { prompt, estudiante_id, adaptive_chat, observacion_resumen } = body;
+  const { prompt, estudiante_id, adaptive_chat, observacion_resumen, session_tipo, chat_user_message } = body;
 
   if (!prompt || typeof prompt !== "string") {
     return new Response(JSON.stringify({ error: "Missing prompt" }), {
@@ -155,6 +157,29 @@ export async function POST(req: Request) {
         docente_id: docenteId,
         observacion_docente: observacion,
         respuesta_ia: text,
+      });
+
+      const tipo =
+        session_tipo === "assessment" || session_tipo === "followup"
+          ? session_tipo
+          : adaptive_chat
+            ? "followup"
+            : "assessment";
+
+      const userMsg =
+        typeof chat_user_message === "string" && chat_user_message.trim()
+          ? chat_user_message.trim()
+          : tipo === "followup" && typeof observacion_resumen === "string"
+            ? observacion_resumen.replace(/^Seguimiento EDUGUIA:\s*/i, "").trim()
+            : undefined;
+
+      const { appendChatTurn } = await import("@/lib/chat-sessions");
+      await appendChatTurn(supabase, {
+        estudianteId: estudiante_id,
+        docenteId,
+        tipo,
+        userMessage: userMsg,
+        assistantMessage: text,
       });
     }
 

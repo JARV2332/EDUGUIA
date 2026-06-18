@@ -29,6 +29,7 @@ export async function updateSession(request: NextRequest) {
   const isPublic =
     isLandingPath(path) ||
     path.startsWith("/auth/") ||
+    path.startsWith("/share/") ||
     path === "/acceso" ||
     path === "/campus/login" ||
     path === "/campus/register";

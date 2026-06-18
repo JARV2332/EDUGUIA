@@ -127,6 +127,14 @@ El visitante solo ve “¡Gracias! Recibimos tu mensaje”. Tú revisas **`/admi
    - `https://TU-DOMINIO.vercel.app/auth/callback` (producción)
 2. El flujo usa `/forgot-password` → correo de Supabase → `/auth/callback` → `/reset-password`.
 
+## Compartir informe con la familia
+
+Ejecuta **`supabase/migrations/009_share_and_chat.sql`**. En Progreso → pestaña Informe, el docente puede **Crear enlace para familia**. La familia abre `/share/[token]` (público, 30 días) con resumen en español y bloque Kaqchikel.
+
+## Historial de chat (`sesiones_chat`)
+
+La misma migración **`009_share_and_chat.sql`** añade `tipo` y `mensajes` a `sesiones_chat`. Cada turno del chat con EduGuIA (evaluación y seguimiento) se guarda ahí automáticamente.
+
 ## Línea de tiempo (timeline)
 
 Las entradas de seguimiento diario se guardan en Supabase dentro del campo JSONB `assessment_data.timeline` de cada estudiante. Al iniciar sesión en otro navegador, se cargan automáticamente desde la nube.

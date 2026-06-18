@@ -7,10 +7,12 @@ import { useStudents } from "@/contexts/students-context";
 import { useTeacherProfile } from "@/contexts/teacher-profile-context";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import type { AssessmentData, ReportSnapshot } from "@/lib/student-store";
+import type { AssessmentData, ReportLanguageStored, ReportSnapshot } from "@/lib/student-store";
 import { buildConversationSummary } from "@/lib/generate-report";
 import { downloadFinalReportPdf } from "@/lib/final-report-pdf";
 import { toTeacherProfilePdf } from "@/lib/teacher-profile";
+import { ShareFamilyReport } from "@/components/progress/share-family-report";
+import { Label } from "@/components/ui/label";
 
 interface GenerateFinalReportProps {
   studentId: string;
@@ -34,9 +36,15 @@ export function GenerateFinalReport({
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastSnapshot, setLastSnapshot] = useState<ReportSnapshot | undefined>(currentSnapshot);
+  const [reportLanguage, setReportLanguage] = useState<ReportLanguageStored>(
+    currentSnapshot?.reportLanguage ?? (language === "es" ? "es" : "en")
+  );
 
   useEffect(() => {
-    if (currentSnapshot) setLastSnapshot(currentSnapshot);
+    if (currentSnapshot) {
+      setLastSnapshot(currentSnapshot);
+      setReportLanguage(currentSnapshot.reportLanguage);
+    }
   }, [currentSnapshot]);
 
   const snapshotToDownload = lastSnapshot ?? currentSnapshot;
@@ -56,8 +64,6 @@ export function GenerateFinalReport({
     setError(null);
 
     try {
-      const reportLanguage = currentSnapshot?.reportLanguage ?? (language === "es" ? "es" : "en");
-
       const response = await fetch("/api/report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -152,6 +158,21 @@ export function GenerateFinalReport({
         </Alert>
       )}
 
+      <div className="space-y-2">
+        <Label htmlFor="report-language">{t("progress.reportLanguage")}</Label>
+        <select
+          id="report-language"
+          value={reportLanguage}
+          onChange={(e) => setReportLanguage(e.target.value as ReportLanguageStored)}
+          className="flex h-10 w-full max-w-xs rounded-md border border-input bg-background px-3 py-2 text-sm"
+          disabled={loading}
+        >
+          <option value="es">Español</option>
+          <option value="en">English</option>
+          <option value="kaqchikel">Kaqchikel</option>
+        </select>
+      </div>
+
       <div className="flex flex-wrap gap-2">
         <Button onClick={() => void handleGenerate()} disabled={loading || !hasConversation}>
           {loading ? (
@@ -176,6 +197,8 @@ export function GenerateFinalReport({
           {downloading ? t("progress.downloadingPdf") : t("progress.downloadFinalReportPdf")}
         </Button>
       </div>
+
+      <ShareFamilyReport studentId={studentId} snapshot={snapshotToDownload} />
     </div>
   );
 }

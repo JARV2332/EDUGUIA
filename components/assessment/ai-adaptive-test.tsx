@@ -149,7 +149,11 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
     `.trim();
   };
 
-  const startConversation = async (history: ChatMessage[], signal?: AbortSignal) => {
+  const startConversation = async (
+    history: ChatMessage[],
+    lastUserMessage?: string,
+    signal?: AbortSignal
+  ) => {
     setIsTyping(true);
     try {
       const prompt = buildPromptFromContext(history);
@@ -162,6 +166,8 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
           prompt,
           estudiante_id: estudianteId ?? undefined,
           adaptive_chat: true,
+          session_tipo: "assessment",
+          chat_user_message: lastUserMessage,
         }),
         signal,
       });
@@ -215,6 +221,7 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
             prompt,
             estudiante_id: estudianteId ?? undefined,
             adaptive_chat: true,
+            session_tipo: "assessment",
           }),
           signal: ac.signal,
         });
@@ -270,7 +277,7 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
     ];
     setMessages(updatedHistory);
 
-    await startConversation(updatedHistory);
+    await startConversation(updatedHistory, userMessage);
   };
 
   return (
