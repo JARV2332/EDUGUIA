@@ -57,6 +57,7 @@ export function LandingHeader({ current }: { current?: NavKey }) {
           {link("portafolio", "/portafolio/", "Portafolio")}
           {link("faq", "/preguntas-frecuentes/", "FAQ")}
           {link("contacto", "/comunicate-con-nosotros/", "Contacto")}
+          {current === "inicio" && link("inicio", "/acceso", "Aprendizaje")}
         </nav>
         {current === "inicio" && (
           <>

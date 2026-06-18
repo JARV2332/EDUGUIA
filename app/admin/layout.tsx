@@ -5,7 +5,7 @@ import { BookOpen, Globe, Inbox, LayoutDashboard, UserPlus, Users } from "lucide
 
 const adminNav = [
   { name: "Panel", href: "/admin", icon: LayoutDashboard },
-  { name: "Sitio web", href: "/admin/sitio/galeria", icon: Globe },
+  { name: "Sitio web", href: "/admin/sitio/inicio", icon: Globe },
   { name: "Usuarios", href: "/admin/usuarios", icon: UserPlus },
   { name: "Cursos", href: "/admin/cursos", icon: BookOpen },
   { name: "Matrículas", href: "/admin/matriculas", icon: Users },

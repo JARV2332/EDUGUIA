@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const landingRewrites = [
-  "/",
   "/preguntas-frecuentes",
   "/comunicate-con-nosotros",
   "/portafolio",
