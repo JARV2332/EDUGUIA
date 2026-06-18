@@ -170,6 +170,15 @@ export default function AdminSitioInicioPage() {
           <Link href="/admin/sitio/galeria" className="underline">
             Galería
           </Link>
+          <Link href="/admin/sitio/portafolio" className="underline">
+            Portafolio
+          </Link>
+          <Link href="/admin/sitio/faq" className="underline">
+            FAQ
+          </Link>
+          <Link href="/admin/sitio/contacto" className="underline">
+            Redes y footer
+          </Link>
         </div>
       </header>
 

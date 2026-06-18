@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Script from "next/script";
 import type { ReactNode } from "react";
+import { getPublicContacto } from "@/lib/landing/get-contacto";
 
 type NavKey = "inicio" | "servicios" | "galeria" | "portafolio" | "faq" | "contacto";
 
@@ -79,26 +80,28 @@ export function LandingHeader({ current }: { current?: NavKey }) {
   );
 }
 
-export function LandingFooter() {
+export async function LandingFooter() {
+  const contacto = await getPublicContacto();
+
   return (
     <footer className="site-footer" role="contentinfo">
       <div className="site-footer__inner">
         <div className="site-footer__brand">
           <img src="/assets/logo-edukids.png" alt="EduKids" width={120} height={72} loading="lazy" />
-          <p>Educación en robótica y STEAM para niños y jóvenes en Guatemala.</p>
+          <p>{contacto.footer_text}</p>
         </div>
         <div className="site-footer__links">
-          <a href="https://www.facebook.com/edukidsguatemala/" target="_blank" rel="noopener noreferrer">
+          <a href={contacto.facebook_url} target="_blank" rel="noopener noreferrer">
             Facebook
           </a>
-          <a href="https://www.instagram.com/edukids_gt/" target="_blank" rel="noopener noreferrer">
+          <a href={contacto.instagram_url} target="_blank" rel="noopener noreferrer">
             Instagram
           </a>
-          <a href="https://wa.me/50259886915" target="_blank" rel="noopener noreferrer">
+          <a href={contacto.whatsapp_url} target="_blank" rel="noopener noreferrer">
             WhatsApp
           </a>
         </div>
-        <p className="site-footer__copy">© 2026 EduKidsGt — Todos los derechos reservados.</p>
+        <p className="site-footer__copy">{contacto.copyright_text}</p>
       </div>
     </footer>
   );

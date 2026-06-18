@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { getPublicCursos } from "@/lib/lms/get-public-cursos";
 import { PublicCursoCardView } from "@/components/landing/public-curso-card";
+import { LandingFooter } from "@/components/landing/landing-shell";
 
 export default async function ServiciosPage() {
   const cursosPublicados = await getPublicCursos();
@@ -117,26 +118,7 @@ export default async function ServiciosPage() {
         </div>
       </main>
 
-      <footer className="site-footer" role="contentinfo">
-        <div className="site-footer__inner">
-          <div className="site-footer__brand">
-            <img src="/assets/logo-edukids.png" alt="EduKids" width={120} height={72} loading="lazy" />
-            <p>Educación en robótica y STEAM para niños y jóvenes en Guatemala.</p>
-          </div>
-          <div className="site-footer__links">
-            <a href="https://www.facebook.com/edukidsguatemala/" target="_blank" rel="noopener noreferrer">
-              Facebook
-            </a>
-            <a href="https://www.instagram.com/edukids_gt/" target="_blank" rel="noopener noreferrer">
-              Instagram
-            </a>
-            <a href="https://wa.link/mw5cov" target="_blank" rel="noopener noreferrer">
-              WhatsApp
-            </a>
-          </div>
-          <p className="site-footer__copy">© 2026 EduKidsGt — Todos los derechos reservados.</p>
-        </div>
-      </footer>
+      <LandingFooter />
     </>
   );
 }
