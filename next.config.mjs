@@ -2,7 +2,6 @@
 const landingRewrites = [
   "/preguntas-frecuentes",
   "/comunicate-con-nosotros",
-  "/portafolio",
   "/pestana",
 ].flatMap((path) => {
   const base = path === "/" ? "" : path;
