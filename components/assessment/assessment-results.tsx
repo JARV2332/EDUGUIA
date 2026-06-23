@@ -627,90 +627,73 @@ Devuelve ÚNICAMENTE un objeto JSON válido (sin comentarios, sin texto fuera de
       const fallbackSections = generateReport(reportLanguage);
       const fallbackSubjects = buildSubjectStrategiesFallback();
 
+      const applyFallback = (message: string) => {
+        setReport(fallbackSections);
+        setSubjectStrategies(fallbackSubjects);
+        setFamilySummaryKaqchikel([
+          "Tz'etel ala' pa ruq'a' ruk'u'x, xa jun chi q'ij.",
+          "Taqa' to'ob'äl pa jay ruma ri ala'.",
+          "Titzijonïk pa tinamit chuqa' pa jay richin ri ala' nuk'äm.",
+        ]);
+        setError(message);
+      };
+
+      const iconsBySection: Record<string, React.ElementType> = {
+        classroom: School,
+        home: Home,
+        referrals: Stethoscope,
+      };
+
       try {
-        const prompt = buildResultsPrompt();
-        const response = await fetch("/api/chat", {
+        const response = await fetch("/api/report", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ prompt, estudiante_id: estudianteId ?? undefined }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            assessmentData: data,
+            reportLanguage,
+            language: language === "es" ? "es" : "en",
+          }),
         });
 
-        const dataResp = (await response.json()) as { reply?: string; error?: string };
+        const dataResp = (await response.json()) as { snapshot?: ReportSnapshot; error?: string };
 
-        if (!response.ok) {
-          const serverError = dataResp.error;
+        if (!response.ok || !dataResp.snapshot) {
           const friendly =
-            typeof serverError === "string" && serverError.length > 0
-              ? serverError
+            typeof dataResp.error === "string" && dataResp.error.length > 0
+              ? dataResp.error
               : language === "es"
-              ? "No se pudo generar el informe automático con IA en este momento. Se muestra una versión estándar basada en las respuestas."
-              : "Could not generate the automatic AI report right now. Showing a standard version based on the responses.";
-
-          if (!cancelled) {
-            setReport(fallbackSections);
-            setSubjectStrategies(fallbackSubjects);
-            setFamilySummaryKaqchikel([
-              "Tz'etel ala' pa ruq'a' ruk'u'x, xa jun chi q'ij.",
-              "Taqa' to'ob'äl pa jay ruma ri ala'.",
-              "Titzijonïk pa tinamit chuqa' pa jay richin ri ala' nuk'äm.",
-            ]);
-            setError(friendly);
-          }
+                ? "No se pudo generar el informe automático con IA en este momento. Se muestra una versión estándar basada en las respuestas."
+                : "Could not generate the automatic AI report right now. Showing a standard version based on the responses.";
+          if (!cancelled) applyFallback(friendly);
           return;
         }
-        const raw = dataResp.reply?.trim();
 
-        if (!raw) {
-          throw new Error("Empty AI response");
-        }
-
-        let parsed: AIResultsResponse | null = null;
-
-        try {
-          parsed = JSON.parse(raw);
-        } catch {
-          const match = raw.match(/\{[\s\S]*\}$/m);
-          if (match) {
-            parsed = JSON.parse(match[0]);
-          }
-        }
-
-        if (!parsed) {
-          if (!cancelled) {
-            setReport(fallbackSections);
-            setSubjectStrategies(fallbackSubjects);
-            setFamilySummaryKaqchikel([
-              "Tz'etel ala' pa ruq'a' ruk'u'x, xa jun chi q'ij.",
-              "Taqa' to'ob'äl pa jay ruma ri ala'.",
-              "Titzijonïk pa tinamit chuqa' pa jay richin ri ala' nuk'äm.",
-            ]);
-            setError(
-              language === "es"
-                ? "No se pudo interpretar el informe de IA. Se muestra una versión estándar basada en las respuestas."
-                : "Could not interpret the AI report. Showing a standard version based on the responses."
-            );
-          }
-        } else {
-          if (!cancelled) {
-            const { sections, subjects, kaqchikel } = buildSectionsFromAI(parsed);
-            setReport(sections);
-            setSubjectStrategies(subjects);
-            setFamilySummaryKaqchikel(kaqchikel);
-          }
+        const snapshot = dataResp.snapshot;
+        if (!cancelled) {
+          setReport(
+            snapshot.report.map((section) => ({
+              id: section.id,
+              title: section.title,
+              content: section.content,
+              priority: section.priority,
+              icon: iconsBySection[section.id] ?? School,
+            }))
+          );
+          setSubjectStrategies({
+            numeracy: snapshot.subjectStrategies.numeracy ?? [],
+            language: snapshot.subjectStrategies.language ?? [],
+            foreignLanguage: snapshot.subjectStrategies.foreignLanguage ?? [],
+            arts: snapshot.subjectStrategies.arts ?? [],
+            ict: snapshot.subjectStrategies.ict ?? [],
+            other: snapshot.subjectStrategies.other ?? [],
+          });
+          setFamilySummaryKaqchikel(snapshot.familySummaryKaqchikel ?? []);
+          setError(null);
         }
       } catch (e) {
         console.error(e);
         if (!cancelled) {
-          setReport(fallbackSections);
-          setSubjectStrategies(fallbackSubjects);
-          setFamilySummaryKaqchikel([
-            "Tz'etel ala' pa ruq'a' ruk'u'x, xa jun chi q'ij.",
-            "Taqa' to'ob'äl pa jay ruma ri ala'.",
-            "Titzijonïk pa tinamit chuqa' pa jay richin ri ala' nuk'äm.",
-          ]);
-          setError(
+          applyFallback(
             language === "es"
               ? "No se pudo generar el informe automático con IA. Se muestra una versión estándar basada en las respuestas."
               : "Could not generate the automatic AI report. Showing a standard version based on the responses."

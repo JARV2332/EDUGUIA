@@ -26,12 +26,14 @@ export async function POST(req: Request) {
     estudiante_id?: string;
     /** Turnos de chat evaluativo: refuerza una sola respuesta por llamada */
     adaptive_chat?: boolean;
+    /** Si true, no convertir JSON de informe a markdown legible */
+    expect_json?: boolean;
     /** Texto corto para guardar en planes_intervencion (seguimiento en Progreso) */
     observacion_resumen?: string;
     session_tipo?: "assessment" | "followup";
     chat_user_message?: string;
   };
-  const { prompt, estudiante_id, adaptive_chat, observacion_resumen, session_tipo, chat_user_message } = body;
+  const { prompt, estudiante_id, adaptive_chat, expect_json, observacion_resumen, session_tipo, chat_user_message } = body;
 
   if (!prompt || typeof prompt !== "string") {
     return new Response(JSON.stringify({ error: "Missing prompt" }), {
@@ -148,7 +150,8 @@ export async function POST(req: Request) {
     }
 
     const { formatAssistantChatContent } = await import("@/lib/format-chat-content");
-    const replyText = formatAssistantChatContent(text, "es");
+    const replyText =
+      expect_json === true ? text : formatAssistantChatContent(text, "es");
 
     if (estudiante_id && docenteId && supabase) {
       const observacion =

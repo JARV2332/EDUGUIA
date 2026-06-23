@@ -139,17 +139,39 @@ Devuelve ÚNICAMENTE un objeto JSON válido (sin markdown) con esta estructura:
 }
 
 export function parseAIResultsJson(raw: string): AIResultsResponse | null {
-  try {
-    return JSON.parse(raw) as AIResultsResponse;
-  } catch {
-    const match = raw.match(/\{[\s\S]*\}$/m);
-    if (!match) return null;
+  let text = raw.trim();
+  if (!text) return null;
+
+  const fenceMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fenceMatch?.[1]) {
+    text = fenceMatch[1].trim();
+  }
+
+  const tryParse = (candidate: string): AIResultsResponse | null => {
     try {
-      return JSON.parse(match[0]) as AIResultsResponse;
+      const parsed = JSON.parse(candidate) as AIResultsResponse;
+      if (
+        parsed &&
+        (parsed.classroom_strategy?.length ||
+          parsed.home_plan?.length ||
+          parsed.professional_referrals?.length ||
+          parsed.subject_strategies ||
+          parsed.family_summary_kaqchikel?.length)
+      ) {
+        return parsed;
+      }
     } catch {
       return null;
     }
-  }
+    return null;
+  };
+
+  const direct = tryParse(text);
+  if (direct) return direct;
+
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) return null;
+  return tryParse(match[0]);
 }
 
 export function aiResultsToReportSnapshot(
