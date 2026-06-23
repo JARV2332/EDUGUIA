@@ -161,19 +161,19 @@ export default function AssessmentPage() {
 
   return (
     <AppShell>
-      <div className="p-6 lg:p-8">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+      <div className={currentStep === 4 ? "min-w-0 overflow-x-hidden p-3 sm:p-6 lg:p-8" : "p-6 lg:p-8"}>
+        <header className={currentStep === 4 ? "mb-4 sm:mb-6" : "mb-8"}>
+          <h1 className={currentStep === 4 ? "text-xl font-bold tracking-tight text-foreground sm:text-3xl" : "text-3xl font-bold tracking-tight text-foreground"}>
             {t("assessment.title")}
           </h1>
-          <p className="mt-2 text-muted-foreground">
-            {t("assessment.subtitle")}
-          </p>
+          {currentStep !== 4 && (
+            <p className="mt-2 text-muted-foreground">{t("assessment.subtitle")}</p>
+          )}
         </header>
 
         <AssessmentStepper steps={steps} currentStep={currentStep} />
 
-        <div className="mt-8">{renderStepContent()}</div>
+        <div className={currentStep === 4 ? "mt-4 min-w-0 sm:mt-8" : "mt-8"}>{renderStepContent()}</div>
 
         {currentStep !== 4 && currentStep !== 5 && (
           <div className="mt-8 flex justify-between">

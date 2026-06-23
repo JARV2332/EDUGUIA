@@ -18,7 +18,7 @@ export function AccessibilityMenu() {
     <>
       <Button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-24 right-4 z-50 h-12 w-12 rounded-full shadow-lg sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"
+        className="fixed bottom-4 left-4 z-50 h-11 w-11 rounded-full shadow-lg sm:bottom-6 sm:left-auto sm:right-6 sm:h-14 sm:w-14"
         size="icon"
         aria-label={isOpen ? t("common.close") : t("a11y.title")}
         aria-expanded={isOpen}
@@ -27,7 +27,7 @@ export function AccessibilityMenu() {
       </Button>
 
       {isOpen && (
-        <Card className="fixed bottom-40 right-4 z-50 w-[min(20rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] shadow-xl sm:bottom-24 sm:right-6 sm:w-80" role="dialog" aria-label={t("a11y.title")}>
+        <Card className="fixed bottom-20 left-4 z-50 w-[min(20rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] shadow-xl sm:bottom-24 sm:left-auto sm:right-6 sm:w-80" role="dialog" aria-label={t("a11y.title")}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Accessibility className="h-5 w-5" />

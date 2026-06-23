@@ -15,7 +15,6 @@ interface AIAdaptiveTestProps {
   data: AssessmentData;
   updateData: (updates: Partial<AssessmentData>) => void;
   onComplete: () => void;
-  /** ID del estudiante en Supabase; si se envía, se usa historial y se guarda en planes_intervencion */
   estudianteId?: string | null;
 }
 
@@ -27,8 +26,9 @@ export function AIAdaptiveTest({ data, updateData, onComplete, estudianteId }: A
   const [speechError, setSpeechError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { speakText, stopSpeaking, isSpeaking } = useAccessibility();
+  const lang = language === "es" ? "es" : "en";
 
   const toggleMic = () => {
     const SpeechRecognitionAPI =
@@ -86,17 +86,15 @@ export function AIAdaptiveTest({ data, updateData, onComplete, estudianteId }: A
       recognition.start();
       recognitionRef.current = recognition;
       setIsListening(true);
-    } catch (err) {
+    } catch {
       setSpeechError("No se pudo iniciar el micrófono. Comprueba el permiso.");
       setIsListening(false);
     }
   };
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages, isTyping]);
 
   const buildPromptFromContext = (history: ChatMessage[]): string => {
     const name = data.studentName || "el estudiante";
@@ -160,9 +158,7 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
       const prompt = buildPromptFromContext(history);
       const response = await fetch("/api/chat", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt,
           estudiante_id: estudianteId ?? undefined,
@@ -176,35 +172,22 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
       const dataResp = (await response.json()) as { reply?: string; error?: string };
 
       if (!response.ok || !dataResp.reply) {
-        const friendlyError =
+        throw new Error(
           dataResp.error ??
-          "Hubo un problema al conectar con la IA. Intenta enviar de nuevo tu respuesta en unos momentos.";
-
-        throw new Error(friendlyError);
+            "Hubo un problema al conectar con la IA. Intenta enviar de nuevo tu respuesta en unos momentos."
+        );
       }
-      const reply = formatAssistantChatContent(
-        dataResp.reply?.trim() ?? "",
-        language === "es" ? "es" : "en"
-      );
 
+      const reply = formatAssistantChatContent(dataResp.reply.trim(), lang);
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
     } catch (error) {
-      if (error instanceof Error && error.name === "AbortError") {
-        return;
-      }
+      if (error instanceof Error && error.name === "AbortError") return;
       console.error(error);
       const message =
         error instanceof Error
           ? error.message
           : "Hubo un problema al conectar con la IA. Intenta enviar de nuevo tu respuesta en unos momentos.";
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: message,
-        },
-      ]);
+      setMessages((prev) => [...prev, { role: "assistant", content: message }]);
     } finally {
       setIsTyping(false);
     }
@@ -232,23 +215,15 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
         const dataResp = (await response.json()) as { reply?: string; error?: string };
         if (cancelled) return;
         if (!response.ok || !dataResp.reply) {
-          throw new Error(
-            dataResp.error ??
-              "Hubo un problema al conectar con la IA. Intenta recargar el paso."
-          );
+          throw new Error(dataResp.error ?? "Hubo un problema al conectar con la IA. Intenta recargar el paso.");
         }
-        const reply = formatAssistantChatContent(
-          dataResp.reply.trim(),
-          language === "es" ? "es" : "en"
-        );
+        const reply = formatAssistantChatContent(dataResp.reply.trim(), lang);
         setMessages([{ role: "assistant", content: reply }]);
       } catch (e) {
         if (e instanceof Error && e.name === "AbortError") return;
         if (cancelled) return;
         const msg =
-          e instanceof Error
-            ? e.message
-            : "Hubo un problema al conectar con la IA. Intenta recargar el paso.";
+          e instanceof Error ? e.message : "Hubo un problema al conectar con la IA. Intenta recargar el paso.";
         setMessages([{ role: "assistant", content: msg }]);
       } finally {
         if (!cancelled) setIsTyping(false);
@@ -260,7 +235,7 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
       cancelled = true;
       ac.abort();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- solo al montar el paso 4; datos ya están en el primer render
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- solo al montar el paso 4
   }, []);
 
   const handleSubmit = async () => {
@@ -272,38 +247,32 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
     const lastAssistantMessage =
       [...messages].reverse().find((m) => m.role === "assistant")?.content || "";
     updateData({
-      aiResponses: [
-        ...data.aiResponses,
-        { question: lastAssistantMessage, answer: userMessage },
-      ],
+      aiResponses: [...data.aiResponses, { question: lastAssistantMessage, answer: userMessage }],
     });
 
-    const updatedHistory: ChatMessage[] = [
-      ...messages,
-      { role: "user", content: userMessage },
-    ];
+    const updatedHistory: ChatMessage[] = [...messages, { role: "user", content: userMessage }];
     setMessages(updatedHistory);
-
     await startConversation(updatedHistory, userMessage);
   };
 
   return (
-    <Card className="flex min-h-0 w-full max-w-full flex-col overflow-hidden rounded-xl border border-border/80 bg-gradient-to-b from-card to-muted/20 shadow-md sm:h-[min(680px,90vh)] sm:max-h-[min(680px,90vh)] h-[min(720px,calc(100dvh-8rem))]">
-      <CardHeader className="shrink-0 space-y-1 border-b bg-muted/30 px-4 pb-3 pt-4 sm:px-6">
-        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary text-primary-foreground shadow-sm">
-            <Bot className="h-5 w-5" aria-hidden="true" />
+    <Card className="flex w-full min-w-0 max-w-full flex-col overflow-hidden rounded-xl border border-border/80 bg-gradient-to-b from-card to-muted/20 shadow-md sm:h-[min(680px,90vh)] sm:max-h-[min(680px,90vh)]">
+      <CardHeader className="shrink-0 space-y-1 border-b bg-muted/30 px-3 pb-2 pt-3 sm:px-6 sm:pb-3 sm:pt-4">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-xl">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-secondary text-primary-foreground shadow-sm sm:h-9 sm:w-9">
+            <Bot className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
           </span>
           <span className="leading-tight">{t("aiTest.title")}</span>
         </CardTitle>
-        <CardDescription className="text-pretty pl-11 text-sm leading-snug sm:pl-11">
+        <CardDescription className="hidden text-pretty text-sm leading-snug sm:block sm:pl-11">
           {t("aiTest.subtitle")}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-0 px-3 pb-24 pt-3 sm:px-5 sm:pb-6 sm:pt-4">
+
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-0 p-0 sm:flex sm:flex-col">
         <div
           ref={scrollRef}
-          className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain rounded-lg bg-muted/25 px-2 py-3 sm:px-3 sm:py-4 [-webkit-overflow-scrolling:touch]"
+          className="min-h-[min(42dvh,320px)] max-h-[min(52dvh,420px)] shrink-0 overflow-y-auto overflow-x-hidden overscroll-contain border-b bg-muted/20 px-3 py-3 sm:min-h-0 sm:max-h-none sm:flex-1 sm:border-0 sm:px-5 sm:py-4 [-webkit-overflow-scrolling:touch]"
         >
           <ChatMessageList
             messages={messages}
@@ -320,56 +289,46 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
           />
         </div>
 
-        <div className="mt-3 shrink-0 space-y-3 border-t pt-3">
+        <div className="shrink-0 space-y-3 border-t bg-background/95 px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-5 sm:py-4">
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              handleSubmit();
+              void handleSubmit();
             }}
-            className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2"
+            className="space-y-2"
           >
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={t("aiTest.placeholder")}
-              rows={2}
-              className="min-h-[52px] w-full resize-none text-base sm:min-h-[60px] sm:flex-1"
+              rows={3}
+              className="min-h-[4.5rem] w-full resize-none text-base leading-relaxed"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  handleSubmit();
+                  void handleSubmit();
                 }
               }}
               aria-label={t("aiTest.placeholder")}
             />
-            <div className="flex shrink-0 flex-row justify-end gap-2 sm:justify-start">
+            <div className="flex gap-2">
               <Button
                 type="button"
                 variant={isListening ? "destructive" : "outline"}
-                size="icon"
-                className="h-11 w-11 sm:h-[60px] sm:w-12"
+                className="h-11 flex-1 sm:flex-none sm:px-4"
                 onClick={toggleMic}
                 disabled={isTyping}
-                aria-label={isListening ? "Detener micrófono" : "Dictar con micrófono"}
-                title={isListening ? "Detener micrófono" : "Dictar (es-GT)"}
               >
-                {isListening ? (
-                  <Square className="h-5 w-5" />
-                ) : (
-                  <Mic className="h-5 w-5" />
-                )}
+                {isListening ? <Square className="mr-2 h-4 w-4" /> : <Mic className="mr-2 h-4 w-4" />}
+                {isListening ? "Detener" : "Micrófono"}
               </Button>
-              <Button
-                type="submit"
-                size="icon"
-                className="h-11 w-11 sm:h-[60px] sm:w-12"
-                disabled={!input.trim() || isTyping}
-                aria-label={t("aiTest.send")}
-              >
-                <Send className="h-5 w-5" />
+              <Button type="submit" className="h-11 flex-1 sm:flex-none sm:px-6" disabled={!input.trim() || isTyping}>
+                <Send className="mr-2 h-4 w-4" />
+                {t("aiTest.send")}
               </Button>
             </div>
           </form>
+
           {speechError && (
             <p className="text-sm text-destructive" role="alert">
               {speechError}
@@ -378,7 +337,7 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
 
           <Button
             onClick={onComplete}
-            className="w-full pr-14 sm:pr-4"
+            className="h-12 w-full text-base"
             size="lg"
             disabled={messages.length === 0 || isTyping}
           >

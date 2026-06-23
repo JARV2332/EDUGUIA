@@ -207,14 +207,18 @@ function DashboardAssessmentPageContent() {
   };
 
   return (
-    <div className="p-6 lg:p-8">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("assessment.title")}</h1>
-        <p className="mt-2 text-muted-foreground">{t("assessment.subtitle")}</p>
+    <div className={cn("min-w-0 overflow-x-hidden", currentStep === 4 ? "p-3 sm:p-6 lg:p-8" : "p-6 lg:p-8")}>
+      <header className={cn("mb-8", currentStep === 4 && "mb-4 sm:mb-6")}>
+        <h1 className={cn("font-bold tracking-tight text-foreground", currentStep === 4 ? "text-xl sm:text-3xl" : "text-3xl")}>
+          {t("assessment.title")}
+        </h1>
+        {currentStep !== 4 && (
+          <p className="mt-2 text-muted-foreground">{t("assessment.subtitle")}</p>
+        )}
       </header>
 
       <AssessmentStepper steps={steps} currentStep={currentStep} />
-      <div className="mt-8">{renderStepContent()}</div>
+      <div className={cn("min-w-0", currentStep === 4 ? "mt-4 sm:mt-8" : "mt-8")}>{renderStepContent()}</div>
 
       {currentStep !== 4 && currentStep !== 5 && (
         <div className="mt-8 flex justify-between">

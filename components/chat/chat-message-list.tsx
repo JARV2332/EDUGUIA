@@ -44,7 +44,7 @@ export function ChatMessageList({
               isUser ? "flex-row-reverse" : "flex-row"
             )}
           >
-            <Avatar className="mt-1 h-9 w-9 shrink-0 shadow-sm ring-2 ring-background sm:h-10 sm:w-10">
+            <Avatar className="mt-0.5 h-8 w-8 shrink-0 shadow-sm ring-2 ring-background sm:mt-1 sm:h-10 sm:w-10">
               <AvatarFallback
                 className={cn(
                   "text-xs font-semibold",
@@ -74,7 +74,7 @@ export function ChatMessageList({
 
               <div
                 className={cn(
-                  "w-full rounded-2xl px-4 py-3 shadow-sm sm:px-4 sm:py-3.5",
+                  "w-full rounded-2xl px-3 py-3 shadow-sm sm:px-4 sm:py-3.5",
                   isUser
                     ? "rounded-tr-md bg-primary text-primary-foreground shadow-primary/15"
                     : "rounded-tl-md border border-border/60 bg-card text-card-foreground"
