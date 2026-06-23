@@ -163,7 +163,7 @@ export default async function HomePage() {
                   Los docentes se enfrentan cada día a nuevos retos. Por eso deben contar con herramientas y métodos
                   vanguardistas para acompañar a sus estudiantes.
                 </p>
-                <Link className="btn-primary" href="/login">
+                <Link className="btn-primary" href="/eduguia">
                   EDUGUIA
                 </Link>
               </div>

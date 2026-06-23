@@ -77,7 +77,7 @@ export default function AccesoPage() {
 
         <p className="mt-10 text-center text-sm text-muted-foreground">
           ¿Buscas EDUGUIA (inclusión educativa)?{" "}
-          <Link href="/login" className="text-primary underline">
+          <Link href="/eduguia" className="text-primary underline">
             Entrar a EDUGUIA
           </Link>
         </p>

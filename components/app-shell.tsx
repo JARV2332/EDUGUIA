@@ -6,6 +6,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/language-context";
+import { EDUGUIA_ROUTES } from "@/lib/auth/eduguia-routes";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -36,7 +37,7 @@ interface AppShellProps {
   brandTitle?: string;
   brandSubtitle?: string;
   brandLogo?: string;
-  /** Tras cerrar sesión (EDUGUIA: /login, campus: /campus/login). */
+  /** Tras cerrar sesión (EDUGUIA: /eduguia, campus: /campus/login). */
   logoutPath?: string;
 }
 
@@ -47,6 +48,7 @@ export function AppShell({
   brandTitle = "EDUGUIA",
   brandSubtitle = "Plataforma de Inclusión",
   brandLogo = "/logo.jpeg",
+  logoutPath = EDUGUIA_ROUTES.login,
 }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();

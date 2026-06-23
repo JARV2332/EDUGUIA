@@ -65,13 +65,13 @@ export function LandingHeader({ current }: { current?: NavKey }) {
             <Link className="site-header__cta site-header__cta--secondary" href="/acceso">
               Campus virtual
             </Link>
-            <Link className="site-header__cta" href="/login">
+            <Link className="site-header__cta" href="/eduguia">
               EDUGUIA
             </Link>
           </>
         )}
         {current !== "inicio" && (
-          <Link className="site-header__cta" href="/login">
+          <Link className="site-header__cta" href="/eduguia">
             EDUGUIA
           </Link>
         )}

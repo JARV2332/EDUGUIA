@@ -1,4 +1,5 @@
 import { getEduguiaHomePath } from "@/lib/auth/roles";
+import { EDUGUIA_ROUTES, isEduguiaAuthPath } from "@/lib/auth/eduguia-routes";
 import { getEduguiaUserRole } from "@/lib/auth/get-user-role";
 import { getCampusHomeForRole, getLmsUserRole } from "@/lib/auth/get-lms-user-role";
 import { createServerClient } from "@supabase/ssr";
@@ -65,9 +66,8 @@ export async function updateSession(request: NextRequest) {
   const isCampusDocente = path.startsWith("/campus/docente");
   const isAdmin = path.startsWith("/admin");
   const isAlumno = path.startsWith("/alumno");
-  const isEduguiaAuth =
-    path === "/login" || path === "/register" || path === "/forgot-password";
-  const isPasswordRecovery = path === "/reset-password";
+  const isEduguiaAuth = isEduguiaAuthPath(path);
+  const isPasswordRecovery = path === EDUGUIA_ROUTES.resetPassword || path === "/reset-password";
 
   const eduguiaRole = user ? await getEduguiaUserRole(supabase, user.id) : null;
   const lmsRole = user ? await getLmsUserRole(supabase, user.id) : null;
@@ -75,7 +75,7 @@ export async function updateSession(request: NextRequest) {
   const campusHome = lmsRole ? getCampusHomeForRole(lmsRole) : "/campus/login";
 
   if (isEduguiaDashboard && !user) {
-    const redirect = new URL("/login", request.url);
+    const redirect = new URL(EDUGUIA_ROUTES.login, request.url);
     redirect.searchParams.set("redirect", path);
     return NextResponse.redirect(redirect);
   }

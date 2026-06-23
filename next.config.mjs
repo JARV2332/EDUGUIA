@@ -23,6 +23,14 @@ const nextConfig = {
   },
   /** Las páginas estáticas de la landing usan rutas con / final */
   skipTrailingSlashRedirect: true,
+  async redirects() {
+    return [
+      { source: "/login", destination: "/eduguia", permanent: true },
+      { source: "/register", destination: "/eduguia/register", permanent: true },
+      { source: "/forgot-password", destination: "/eduguia/forgot-password", permanent: true },
+      { source: "/reset-password", destination: "/eduguia/reset-password", permanent: true },
+    ];
+  },
   async rewrites() {
     return {
       beforeFiles: [

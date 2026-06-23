@@ -31,7 +31,7 @@ export default async function ServiciosPage() {
             <Link href="/preguntas-frecuentes/">FAQ</Link>
             <Link href="/comunicate-con-nosotros/">Contacto</Link>
           </nav>
-          <Link className="site-header__cta" href="/login">
+          <Link className="site-header__cta" href="/eduguia">
             EDUGUIA
           </Link>
         </div>
