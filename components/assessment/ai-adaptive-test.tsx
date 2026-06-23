@@ -9,6 +9,7 @@ import { useLanguage } from "@/contexts/language-context";
 import { useAccessibility } from "@/contexts/accessibility-context";
 import { Bot, Send, ArrowRight, Mic, Square } from "lucide-react";
 import type { AssessmentData } from "@/app/assessment/page";
+import { formatAssistantChatContent } from "@/lib/format-chat-content";
 
 interface AIAdaptiveTestProps {
   data: AssessmentData;
@@ -181,7 +182,10 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
 
         throw new Error(friendlyError);
       }
-      const reply = dataResp.reply?.trim();
+      const reply = formatAssistantChatContent(
+        dataResp.reply?.trim() ?? "",
+        language === "es" ? "es" : "en"
+      );
 
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
     } catch (error) {
@@ -233,7 +237,10 @@ Responde en el mismo idioma que usa el usuario (español salvo que pida otro).
               "Hubo un problema al conectar con la IA. Intenta recargar el paso."
           );
         }
-        const reply = dataResp.reply.trim();
+        const reply = formatAssistantChatContent(
+          dataResp.reply.trim(),
+          language === "es" ? "es" : "en"
+        );
         setMessages([{ role: "assistant", content: reply }]);
       } catch (e) {
         if (e instanceof Error && e.name === "AbortError") return;

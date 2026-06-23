@@ -688,47 +688,47 @@ function ProgressPageContent() {
         )}
 
         <Tabs defaultValue="overview" className="mt-8 space-y-0">
-          <Card className="overflow-hidden">
-            <div className="border-b bg-muted/30 px-2 pt-2 sm:px-4 overflow-x-auto">
-              <TabsList className="h-11 w-max min-w-full grid grid-cols-5 gap-1 rounded-lg bg-transparent p-0 shadow-none sm:w-full">
+          <Card className="min-w-0 overflow-hidden">
+            <div className="overflow-x-auto border-b bg-muted/30 px-2 pt-2 sm:px-4">
+              <TabsList className="inline-flex h-auto min-h-11 w-max max-w-full gap-1 rounded-lg bg-transparent p-0 shadow-none sm:flex sm:w-full sm:flex-wrap">
                 <TabsTrigger
                   value="overview"
-                  className="flex items-center justify-center gap-2 rounded-md border-0 bg-transparent py-3 text-sm font-medium shadow-none transition-colors hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                  className="flex shrink-0 items-center justify-center gap-1.5 rounded-md border-0 bg-transparent px-3 py-2.5 text-xs font-medium shadow-none transition-colors hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm sm:gap-2 sm:text-sm sm:flex-1"
                 >
                   <TrendingUp className="h-4 w-4 shrink-0" aria-hidden="true" />
                   <span>{language === "es" ? "Resumen" : "Overview"}</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="timeline"
-                  className="flex items-center justify-center gap-2 rounded-md border-0 bg-transparent py-3 text-sm font-medium shadow-none transition-colors hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                  className="flex shrink-0 items-center justify-center gap-1.5 rounded-md border-0 bg-transparent px-3 py-2.5 text-xs font-medium shadow-none transition-colors hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm sm:gap-2 sm:text-sm sm:flex-1"
                 >
                   <Calendar className="h-4 w-4 shrink-0" aria-hidden="true" />
                   <span>{t("progress.timeline")}</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="analytics"
-                  className="flex items-center justify-center gap-1.5 rounded-md border-0 bg-transparent px-2 py-3 text-xs font-medium shadow-none transition-colors hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm sm:gap-2 sm:text-sm"
+                  className="flex shrink-0 items-center justify-center gap-1.5 rounded-md border-0 bg-transparent px-3 py-2.5 text-xs font-medium shadow-none transition-colors hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm sm:gap-2 sm:text-sm sm:flex-1"
                 >
                   <BarChart3 className="h-4 w-4 shrink-0" aria-hidden="true" />
                   <span className="truncate">{t("progress.charts")}</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="chat"
-                  className="flex items-center justify-center gap-1.5 rounded-md border-0 bg-transparent px-2 py-3 text-xs font-medium shadow-none transition-colors hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm sm:gap-2 sm:text-sm"
+                  className="flex shrink-0 items-center justify-center gap-1.5 rounded-md border-0 bg-transparent px-3 py-2.5 text-xs font-medium shadow-none transition-colors hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm sm:gap-2 sm:text-sm sm:flex-1"
                 >
                   <MessageSquare className="h-4 w-4 shrink-0" aria-hidden="true" />
                   <span className="truncate">{t("progress.chatTab")}</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="report"
-                  className="flex items-center justify-center gap-1.5 rounded-md border-0 bg-transparent px-2 py-3 text-xs font-medium shadow-none transition-colors hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm sm:gap-2 sm:text-sm"
+                  className="flex shrink-0 items-center justify-center gap-1.5 rounded-md border-0 bg-transparent px-3 py-2.5 text-xs font-medium shadow-none transition-colors hover:bg-background/80 data-[state=active]:bg-background data-[state=active]:shadow-sm sm:gap-2 sm:text-sm sm:flex-1"
                 >
                   <FileText className="h-4 w-4 shrink-0" aria-hidden="true" />
                   <span className="truncate">{t("progress.reportTab")}</span>
                 </TabsTrigger>
               </TabsList>
             </div>
-            <div className="p-4 sm:p-6">
+            <div className="min-w-0 p-3 sm:p-6">
           <TabsContent value="overview" className="mt-0 outline-none">
             <div className="grid gap-6 lg:grid-cols-2">
               {effectiveStudent && <ProgressChart student={effectiveStudent} />}
@@ -802,7 +802,7 @@ function ProgressPageContent() {
             </div>
           </TabsContent>
 
-          <TabsContent value="chat" className="mt-0 outline-none">
+          <TabsContent value="chat" className="mt-0 min-w-0 outline-none px-0 sm:px-0">
             {savedSelected ? (
               <StudentAgentPanel
                 key={savedSelected.id}

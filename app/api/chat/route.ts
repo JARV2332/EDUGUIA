@@ -147,6 +147,9 @@ export async function POST(req: Request) {
       );
     }
 
+    const { formatAssistantChatContent } = await import("@/lib/format-chat-content");
+    const replyText = formatAssistantChatContent(text, "es");
+
     if (estudiante_id && docenteId && supabase) {
       const observacion =
         typeof observacion_resumen === "string" && observacion_resumen.trim()
@@ -156,7 +159,7 @@ export async function POST(req: Request) {
         estudiante_id,
         docente_id: docenteId,
         observacion_docente: observacion,
-        respuesta_ia: text,
+        respuesta_ia: replyText,
       });
 
       const tipo =
@@ -179,11 +182,11 @@ export async function POST(req: Request) {
         docenteId,
         tipo,
         userMessage: userMsg,
-        assistantMessage: text,
+        assistantMessage: replyText,
       });
     }
 
-    return new Response(JSON.stringify({ reply: text }), {
+    return new Response(JSON.stringify({ reply: replyText }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

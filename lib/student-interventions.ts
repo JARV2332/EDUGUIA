@@ -1,5 +1,6 @@
 import type { AssessmentData } from "@/lib/student-store";
 import type { ChatMessage } from "@/components/chat/chat-message-list";
+import { formatAssistantChatContent } from "@/lib/format-chat-content";
 
 export interface InterventionPlanRow {
   id: string;
@@ -15,7 +16,10 @@ export function assessmentChatToMessages(
   const messages: ChatMessage[] = [];
   for (const pair of aiResponses) {
     if (pair.question?.trim()) {
-      messages.push({ role: "assistant", content: pair.question.trim() });
+      messages.push({
+        role: "assistant",
+        content: formatAssistantChatContent(pair.question.trim(), "es"),
+      });
     }
     if (pair.answer?.trim()) {
       messages.push({ role: "user", content: pair.answer.trim() });
@@ -47,7 +51,10 @@ export function interventionPlansToMessages(plans: InterventionPlanRow[]): ChatM
       messages.push({ role: "user", content: userText });
     }
     if (plan.respuesta_ia?.trim()) {
-      messages.push({ role: "assistant", content: plan.respuesta_ia.trim() });
+      messages.push({
+        role: "assistant",
+        content: formatAssistantChatContent(plan.respuesta_ia.trim(), "es"),
+      });
     }
   }
   return messages;

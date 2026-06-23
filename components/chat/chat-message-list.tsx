@@ -59,7 +59,7 @@ export function ChatMessageList({
 
             <div
               className={cn(
-                "flex min-w-0 max-w-[min(100%,36rem)] flex-col gap-1",
+                "flex min-w-0 max-w-[calc(100%-2.75rem)] flex-col gap-1 sm:max-w-[min(100%,36rem)]",
                 isUser ? "items-end" : "items-start"
               )}
             >
