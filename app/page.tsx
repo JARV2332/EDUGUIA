@@ -30,9 +30,14 @@ export default async function HomePage() {
               loading="eager"
             />
             <p className="home-hero__text">{home.hero_text}</p>
-            <Link className="btn-primary" href={home.hero_btn_href}>
-              {home.hero_btn_text} <i className="fas fa-arrow-right" aria-hidden="true"></i>
-            </Link>
+            <div className="home-hero__actions">
+              <Link className="btn-primary" href={home.hero_btn_href}>
+                {home.hero_btn_text} <i className="fas fa-arrow-right" aria-hidden="true"></i>
+              </Link>
+              <Link className="btn-secondary" href="/comunicate-con-nosotros/">
+                Inscribirse
+              </Link>
+            </div>
           </div>
         </section>
 

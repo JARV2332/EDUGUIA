@@ -23,9 +23,9 @@ const DEFAULT_HOME: LandingHomeContent = {
   hero_tagline: "Educación para todos los niños",
   hero_logo_url: "/assets/logo-edukids.png",
   hero_text:
-    "Nuestro método educativo está basado en el método científico, de manera que se motiva al alumno a mejorar su autonomía y pensamiento crítico.",
-  hero_btn_text: "Leer más",
-  hero_btn_href: "#nosotros",
+    "Robótica, programación y STEAM para niñas y niños de 4 a 17 años en Guatemala. Aprenden construyendo, probando y creando con autonomía.",
+  hero_btn_text: "Ver cursos",
+  hero_btn_href: "/servicios/",
   about_img_main: "/wp-content/uploads/2021/09/imagen-2_optimized.png",
   about_img_secondary_1: "/wp-content/uploads/2021/09/imagen-3_optimized.png",
   about_img_secondary_2: "/wp-content/uploads/2021/09/imagen-1_optimized-3.png",
