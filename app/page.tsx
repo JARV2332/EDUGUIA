@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublicHome } from "@/lib/landing/get-home";
+import { getPublicCursos } from "@/lib/lms/get-public-cursos";
+import { PublicCursoCardView } from "@/components/landing/public-curso-card";
 import { LandingFooter, LandingHeader, LandingLayout } from "@/components/landing/landing-shell";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +14,8 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   const home = await getPublicHome();
+  const cursos = await getPublicCursos();
+  const cursosDestacados = cursos.slice(0, 3);
 
   return (
     <LandingLayout pageClass="landing-page--home">
@@ -107,6 +111,68 @@ export default async function HomePage() {
                 </Link>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section id="cursos" className="home-section home-section--light">
+          <div className="landing-content" style={{ paddingBottom: 0 }}>
+            <span className="home-label">Programas</span>
+            <h2 className="section-title" style={{ textAlign: "left", marginBottom: 12 }}>
+              Nuestros cursos
+            </h2>
+            <p className="page-intro" style={{ marginTop: 0, marginBottom: 32, textAlign: "left" }}>
+              Robótica, programación y STEAM para que cada niño pase de consumidor a creador de tecnología.
+            </p>
+            <div className="courses-grid">
+              {cursosDestacados.map((curso) => (
+                <PublicCursoCardView key={curso.id} curso={curso} />
+              ))}
+              {cursosDestacados.length === 0 && (
+                <>
+                  <article className="course-card">
+                    <div className="course-card__image">
+                      <img
+                        src="/wp-content/uploads/2020/08/CodingCritters-LearningResources-scaled.jpg"
+                        alt="Robótica preescolar"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="course-card__body">
+                      <h3 className="course-card__title">Robótica preescolar</h3>
+                      <p className="course-card__meta">
+                        <strong>Dirigido a:</strong> Niños y niñas desde 3 años
+                      </p>
+                      <p className="course-card__desc">
+                        Desarrollo de habilidades motrices finas, espaciales y lógicas mediante programación.
+                      </p>
+                    </div>
+                  </article>
+                  <article className="course-card">
+                    <div className="course-card__image">
+                      <img
+                        src="/wp-content/uploads/2020/08/STEAMlogo_1024x1024.png"
+                        alt="Ingeniería preescolar"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="course-card__body">
+                      <h3 className="course-card__title">Ingeniería en preescolar</h3>
+                      <p className="course-card__meta">
+                        <strong>Dirigido a:</strong> 4 a 6 años
+                      </p>
+                      <p className="course-card__desc">
+                        Fortalecimiento de habilidades motoras y cognitivas con kits y proyectos STEAM.
+                      </p>
+                    </div>
+                  </article>
+                </>
+              )}
+            </div>
+            <p style={{ textAlign: "center", marginBottom: 0 }}>
+              <Link className="btn-primary" href="/servicios/">
+                Ver todos los cursos <i className="fas fa-arrow-right" aria-hidden="true"></i>
+              </Link>
+            </p>
           </div>
         </section>
 
