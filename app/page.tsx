@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublicHome } from "@/lib/landing/get-home";
+import { getPublicFaq } from "@/lib/landing/get-faq";
 import { getPublicCursos } from "@/lib/lms/get-public-cursos";
 import { PublicCursoCardView } from "@/components/landing/public-curso-card";
 import { LandingFooter, LandingHeader, LandingLayout } from "@/components/landing/landing-shell";
@@ -16,6 +17,7 @@ export default async function HomePage() {
   const home = await getPublicHome();
   const cursos = await getPublicCursos();
   const cursosDestacados = cursos.slice(0, 3);
+  const faqItems = (await getPublicFaq()).slice(0, 4);
 
   return (
     <LandingLayout pageClass="landing-page--home">
@@ -192,6 +194,28 @@ export default async function HomePage() {
             <p style={{ textAlign: "center", marginBottom: 0 }}>
               <Link className="btn-primary" href="/servicios/">
                 Ver todos los cursos <i className="fas fa-arrow-right" aria-hidden="true"></i>
+              </Link>
+            </p>
+          </div>
+        </section>
+
+        <section id="faq" className="home-section home-section--light">
+          <div className="landing-content" style={{ paddingBottom: 0 }}>
+            <span className="home-label">Dudas frecuentes</span>
+            <h2 className="section-title" style={{ textAlign: "left", marginBottom: 24 }}>
+              Preguntas comunes
+            </h2>
+            <div className="home-faq">
+              {faqItems.map((item) => (
+                <details key={item.id} className="home-faq__item">
+                  <summary className="home-faq__question">{item.pregunta}</summary>
+                  <p className="home-faq__answer">{item.respuesta}</p>
+                </details>
+              ))}
+            </div>
+            <p style={{ marginTop: 24, marginBottom: 0 }}>
+              <Link href="/preguntas-frecuentes/" className="home-faq__more">
+                Ver todas las preguntas <i className="fas fa-arrow-right" aria-hidden="true"></i>
               </Link>
             </p>
           </div>

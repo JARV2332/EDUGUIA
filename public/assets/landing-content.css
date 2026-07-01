@@ -960,6 +960,59 @@
   }
 }
 
+.home-faq {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.home-faq__item {
+  border: 1px solid rgba(26, 77, 122, 0.12);
+  border-radius: var(--eduguia-radius);
+  background: #fff;
+  overflow: hidden;
+}
+
+.home-faq__question {
+  padding: 16px 20px;
+  font-weight: 600;
+  color: var(--eduguia-primary);
+  cursor: pointer;
+  list-style: none;
+}
+
+.home-faq__question::-webkit-details-marker {
+  display: none;
+}
+
+.home-faq__question::after {
+  content: "+";
+  float: right;
+  font-weight: 700;
+  color: var(--eduguia-secondary);
+}
+
+.home-faq__item[open] .home-faq__question::after {
+  content: "−";
+}
+
+.home-faq__answer {
+  margin: 0;
+  padding: 0 20px 16px;
+  line-height: 1.7;
+  color: var(--eduguia-muted);
+}
+
+.home-faq__more {
+  color: var(--eduguia-secondary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.home-faq__more:hover {
+  text-decoration: underline;
+}
+
 /* —— Campus virtual / LMS —— */
 .home-section--lms {
   background: linear-gradient(180deg, #fff 0%, var(--eduguia-bg) 100%);
