@@ -697,6 +697,17 @@
   color: rgba(255, 255, 255, 0.95);
 }
 
+.home-hero__headline {
+  margin: 0 0 20px;
+  font-family: var(--eduguia-font);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: #fff;
+  letter-spacing: -0.02em;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
 .home-hero__logo {
   display: block;
   width: auto;
