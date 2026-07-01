@@ -123,7 +123,7 @@ export default async function HomePage() {
           <div className="landing-content">
             <div className="home-split">
               <div className="home-split__media">
-                <img src={home.metodo_image_url} alt="EduKids" loading="lazy" className="home-split__img-logo" />
+                <img src={home.metodo_image_url} alt="Estudiantes aplicando el metodo EduKids" loading="lazy" className="home-split__img-main" />
               </div>
               <div className="home-split__text">
                 <span className="home-label">Innovación educativa</span>
@@ -287,13 +287,14 @@ export default async function HomePage() {
           <div className="landing-content">
             <div className="home-eduguia-card">
               <div className="home-eduguia-card__text">
-                <h2>Actualización docente</h2>
+                <span className="home-label home-label--light">Para docentes</span>
+                <h2>EDUGUIA — inclusión educativa con IA</h2>
                 <p>
-                  Los docentes se enfrentan cada día a nuevos retos. Por eso deben contar con herramientas y métodos
-                  vanguardistas para acompañar a sus estudiantes.
+                  Plataforma de apoyo docente con evaluaciones adaptativas, seguimiento de progreso y herramientas de
+                  inclusión para acompañar a estudiantes con necesidades diversas de aprendizaje.
                 </p>
                 <Link className="btn-primary" href="/eduguia">
-                  EDUGUIA
+                  Conocer EDUGUIA <i className="fas fa-arrow-right" aria-hidden="true"></i>
                 </Link>
               </div>
             </div>
