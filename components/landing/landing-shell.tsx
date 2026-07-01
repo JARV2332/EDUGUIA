@@ -58,19 +58,17 @@ export function LandingHeader({ current }: { current?: NavKey }) {
           {link("portafolio", "/portafolio/", "Portafolio")}
           {link("faq", "/preguntas-frecuentes/", "FAQ")}
           {link("contacto", "/comunicate-con-nosotros/", "Contacto")}
-          {current === "inicio" && link("inicio", "/acceso", "Aprendizaje")}
         </nav>
-        {current === "inicio" && (
+        {current === "inicio" ? (
           <>
-            <Link className="site-header__cta site-header__cta--secondary" href="/acceso">
-              Campus virtual
-            </Link>
-            <Link className="site-header__cta" href="/eduguia">
+            <Link className="site-header__cta site-header__cta--secondary" href="/eduguia">
               EDUGUIA
             </Link>
+            <Link className="site-header__cta" href="/comunicate-con-nosotros/">
+              Inscribirse
+            </Link>
           </>
-        )}
-        {current !== "inicio" && (
+        ) : (
           <Link className="site-header__cta" href="/eduguia">
             EDUGUIA
           </Link>
