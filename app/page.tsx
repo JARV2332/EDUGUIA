@@ -96,8 +96,8 @@ export default async function HomePage() {
                   className="home-split__img-main"
                 />
                 <div className="home-split__img-grid">
-                  <img src={home.about_img_secondary_1} alt="" loading="lazy" />
-                  <img src={home.about_img_secondary_2} alt="" loading="lazy" />
+                  <img src={home.about_img_secondary_1} alt="Taller de robótica EduKids" loading="lazy" />
+                  <img src={home.about_img_secondary_2} alt="Proyecto STEAM con niños" loading="lazy" />
                 </div>
               </div>
               <div className="home-split__text">
