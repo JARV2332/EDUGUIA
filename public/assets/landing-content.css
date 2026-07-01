@@ -960,6 +960,10 @@
   }
 }
 
+.home-gallery-preview {
+  margin-top: 0;
+}
+
 .home-faq {
   display: flex;
   flex-direction: column;

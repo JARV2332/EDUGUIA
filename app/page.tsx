@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublicHome } from "@/lib/landing/get-home";
 import { getPublicFaq } from "@/lib/landing/get-faq";
+import { getPublicGaleria } from "@/lib/landing/get-galeria";
 import { getPublicCursos } from "@/lib/lms/get-public-cursos";
 import { PublicCursoCardView } from "@/components/landing/public-curso-card";
 import { LandingFooter, LandingHeader, LandingLayout } from "@/components/landing/landing-shell";
@@ -18,6 +19,7 @@ export default async function HomePage() {
   const cursos = await getPublicCursos();
   const cursosDestacados = cursos.slice(0, 3);
   const faqItems = (await getPublicFaq()).slice(0, 4);
+  const galeriaPreview = (await getPublicGaleria()).slice(0, 4);
 
   return (
     <LandingLayout pageClass="landing-page--home">
@@ -194,6 +196,27 @@ export default async function HomePage() {
             <p style={{ textAlign: "center", marginBottom: 0 }}>
               <Link className="btn-primary" href="/servicios/">
                 Ver todos los cursos <i className="fas fa-arrow-right" aria-hidden="true"></i>
+              </Link>
+            </p>
+          </div>
+        </section>
+
+        <section className="home-section home-section--pattern">
+          <div className="landing-content" style={{ paddingBottom: 0 }}>
+            <span className="home-label">Experiencias</span>
+            <h2 className="section-title" style={{ textAlign: "left", marginBottom: 24 }}>
+              Momentos en EduKids
+            </h2>
+            <div className="gallery-grid home-gallery-preview">
+              {galeriaPreview.map((item) => (
+                <figure key={item.id} className="gallery-item">
+                  <img src={item.imagen_url} alt={item.alt_text || "Actividad EduKids"} loading="lazy" />
+                </figure>
+              ))}
+            </div>
+            <p style={{ textAlign: "center", marginTop: 28, marginBottom: 0 }}>
+              <Link className="btn-primary" href="/galeria/">
+                Ver galería completa <i className="fas fa-arrow-right" aria-hidden="true"></i>
               </Link>
             </p>
           </div>
