@@ -2,11 +2,14 @@
   if (!document.body.classList.contains("landing-page")) return;
   if (document.getElementById("whatsapp-float")) return;
 
+  var whatsappBase =
+    document.querySelector(".landing-page")?.getAttribute("data-whatsapp-url") ||
+    "https://wa.me/50259886915";
   var message = encodeURIComponent("Hola, me gustaría obtener más información sobre EduKids GT.");
   var link = document.createElement("a");
   link.id = "whatsapp-float";
   link.className = "whatsapp-float";
-  link.href = "https://wa.me/50259886915?text=" + message;
+  link.href = whatsappBase + (whatsappBase.indexOf("?") >= 0 ? "&" : "?") + "text=" + message;
   link.target = "_blank";
   link.rel = "noopener noreferrer";
   link.setAttribute("aria-label", "Escríbenos por WhatsApp al 5988 6915");

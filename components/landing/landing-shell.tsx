@@ -5,15 +5,20 @@ import { getPublicContacto } from "@/lib/landing/get-contacto";
 
 type NavKey = "inicio" | "servicios" | "galeria" | "portafolio" | "faq" | "contacto";
 
-export function LandingLayout({
+export async function LandingLayout({
   children,
   pageClass,
 }: {
   children: ReactNode;
   pageClass: string;
 }) {
+  const contacto = await getPublicContacto();
+
   return (
-    <div className={`wp-static-export landing-page ${pageClass} min-h-screen`}>
+    <div
+      className={`wp-static-export landing-page ${pageClass} min-h-screen`}
+      data-whatsapp-url={contacto.whatsapp_url}
+    >
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" crossOrigin="anonymous" />
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
       <link rel="stylesheet" href="/assets/site.css" />
