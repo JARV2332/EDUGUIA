@@ -186,7 +186,7 @@ export default async function HomePage() {
               Entorno en línea para cursos de robótica y STEAM: clases grabadas, materiales, actividades y seguimiento
               docente.
             </p>
-            <div className="lms-access-grid">
+            <div className="lms-access-grid lms-access-grid--compact">
               <Link className="lms-access-card" href="/campus/login?role=estudiante">
                 <span className="lms-access-card__icon" aria-hidden="true">
                   <i className="fas fa-user-graduate"></i>
@@ -207,20 +207,10 @@ export default async function HomePage() {
                   Iniciar sesión <i className="fas fa-arrow-right" aria-hidden="true"></i>
                 </span>
               </Link>
-              <Link className="lms-access-card lms-access-card--admin" href="/campus/login?role=admin">
-                <span className="lms-access-card__icon" aria-hidden="true">
-                  <i className="fas fa-shield-alt"></i>
-                </span>
-                <h3>Administrador</h3>
-                <p>Crear cursos y matricular alumnos.</p>
-                <span className="lms-access-card__link">
-                  Acceso admin <i className="fas fa-arrow-right" aria-hidden="true"></i>
-                </span>
-              </Link>
             </div>
             <p className="lms-access-note">
-              ¿Primera vez? Pide al administrador tu usuario y contraseña, o entra por{" "}
-              <Link href="/acceso"> el hub de acceso</Link>.
+              ¿Primera vez o necesitas otro acceso? Entra por el{" "}
+              <Link href="/acceso">hub de acceso</Link> (administradores, EDUGUIA y más).
             </p>
           </div>
         </section>

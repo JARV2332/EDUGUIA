@@ -940,6 +940,10 @@
   margin-bottom: 24px;
 }
 
+.lms-access-grid--compact {
+  max-width: 640px;
+}
+
 .lms-access-card {
   display: flex;
   flex-direction: column;
