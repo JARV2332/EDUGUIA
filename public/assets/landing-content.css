@@ -755,6 +755,38 @@
   padding: 72px 0;
 }
 
+.home-stats {
+  background: var(--eduguia-primary);
+  color: #fff;
+  padding: 32px 0;
+}
+
+.home-stats__inner {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  padding-bottom: 0;
+  text-align: center;
+}
+
+.home-stats__item strong {
+  display: block;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.home-stats__item span {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+@media (max-width: 700px) {
+  .home-stats__inner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 .home-section--light {
   background: #fff;
 }
