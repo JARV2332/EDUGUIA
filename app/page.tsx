@@ -241,6 +241,18 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+
+        <section className="home-section home-section--light">
+          <div className="landing-content" style={{ paddingBottom: 0 }}>
+            <div className="landing-cta">
+              <h3>¿Listo para inscribir a tu hijo o hija?</h3>
+              <p>Escríbenos y te orientamos sobre el curso ideal para su edad e intereses.</p>
+              <Link className="btn-primary" href="/comunicate-con-nosotros/">
+                Comunícate con nosotros
+              </Link>
+            </div>
+          </div>
+        </section>
       </main>
       <LandingFooter />
     </LandingLayout>
