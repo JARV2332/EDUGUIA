@@ -12,6 +12,28 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "EduKids GT | Robótica y STEAM para niños",
   description: "EduKids GT - Robótica educativa y STEAM para niños en Guatemala",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://edukidsgt.com"),
+  openGraph: {
+    title: "EduKids GT | Robótica y STEAM para niños",
+    description: "Robótica educativa y STEAM para niñas y niños de 4 a 17 años en Guatemala.",
+    type: "website",
+    locale: "es_GT",
+    siteName: "EduKids GT",
+    images: [
+      {
+        url: "/wp-content/uploads/2021/09/slider1-2-min.jpg",
+        width: 1200,
+        height: 630,
+        alt: "EduKids GT — Robótica y STEAM",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EduKids GT | Robótica y STEAM para niños",
+    description: "Robótica educativa y STEAM para niñas y niños de 4 a 17 años en Guatemala.",
+    images: ["/wp-content/uploads/2021/09/slider1-2-min.jpg"],
+  },
 };
 
 export default async function HomePage() {
