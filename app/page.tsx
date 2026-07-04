@@ -7,6 +7,7 @@ import { getPublicPortafolio } from "@/lib/landing/get-portafolio";
 import { getPublicTestimonios } from "@/lib/landing/get-testimonios";
 import { getPublicCursos } from "@/lib/lms/get-public-cursos";
 import { PublicCursoCardView } from "@/components/landing/public-curso-card";
+import { CourseListJsonLd, OrganizationJsonLd } from "@/components/landing/landing-json-ld";
 import { LandingFooter, LandingHeader, LandingLayout } from "@/components/landing/landing-shell";
 
 export const dynamic = "force-dynamic";
@@ -46,9 +47,23 @@ export default async function HomePage() {
   const galeriaPreview = (await getPublicGaleria()).slice(0, 4);
   const testimonios = await getPublicTestimonios();
   const portafolioDestacado = (await getPublicPortafolio())[0] ?? null;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://edukidsgt.com";
 
   return (
     <LandingLayout pageClass="landing-page--home">
+      <OrganizationJsonLd
+        siteUrl={siteUrl}
+        logoUrl="/assets/logo-edukids.png"
+        description="Robótica educativa y STEAM para niñas y niños de 4 a 17 años en Guatemala."
+      />
+      <CourseListJsonLd
+        siteUrl={siteUrl}
+        courses={cursosDestacados.map((curso) => ({
+          name: curso.titulo,
+          description: curso.descripcion ?? "Curso de robótica y STEAM en EduKids GT.",
+          url: `${siteUrl}/servicios/#${curso.slug}`,
+        }))}
+      />
       <LandingHeader current="inicio" />
       <main className="site-main">
         <section className="home-hero" style={{ backgroundImage: `url('${home.hero_bg_url}')` }}>
