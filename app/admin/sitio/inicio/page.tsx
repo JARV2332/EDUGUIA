@@ -28,6 +28,14 @@ const FIELD_LABELS: Record<keyof LandingHomeContent, string> = {
   enfoque_text: "Enfoque — texto",
   metodo_image_url: "Método — imagen",
   metodo_text: "Método — texto",
+  stat_1_value: "Stats 1 — valor",
+  stat_1_label: "Stats 1 — etiqueta",
+  stat_2_value: "Stats 2 — valor",
+  stat_2_label: "Stats 2 — etiqueta",
+  stat_3_value: "Stats 3 — valor",
+  stat_3_label: "Stats 3 — etiqueta",
+  stat_4_value: "Stats 4 — valor",
+  stat_4_label: "Stats 4 — etiqueta",
 };
 
 function ImageField({

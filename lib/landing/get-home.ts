@@ -17,6 +17,14 @@ export type LandingHomeContent = {
   enfoque_text: string;
   metodo_image_url: string;
   metodo_text: string;
+  stat_1_value: string;
+  stat_1_label: string;
+  stat_2_value: string;
+  stat_2_label: string;
+  stat_3_value: string;
+  stat_3_label: string;
+  stat_4_value: string;
+  stat_4_label: string;
 };
 
 const DEFAULT_HOME: LandingHomeContent = {
@@ -41,6 +49,14 @@ const DEFAULT_HOME: LandingHomeContent = {
   metodo_image_url: "/wp-content/uploads/2019/08/portfolio-1a.jpg",
   metodo_text:
     "Nuestro método se basa en el método científico: se motiva al alumno a mejorar su autonomía y pensamiento crítico, dejando que marquen los objetivos reales de los proyectos. Ensayan el método de prueba y error para estimular autonomía y confianza.",
+  stat_1_value: "+500",
+  stat_1_label: "Estudiantes",
+  stat_2_value: "4–17",
+  stat_2_label: "Años de edad",
+  stat_3_value: "10+",
+  stat_3_label: "Años en Guatemala",
+  stat_4_value: "STEAM",
+  stat_4_label: "Robótica y programación",
 };
 
 export async function getPublicHome(): Promise<LandingHomeContent> {
@@ -72,4 +88,12 @@ export const LANDING_HOME_FIELDS: (keyof LandingHomeContent)[] = [
   "enfoque_text",
   "metodo_image_url",
   "metodo_text",
+  "stat_1_value",
+  "stat_1_label",
+  "stat_2_value",
+  "stat_2_label",
+  "stat_3_value",
+  "stat_3_label",
+  "stat_4_value",
+  "stat_4_label",
 ];

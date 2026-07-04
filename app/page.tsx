@@ -71,20 +71,20 @@ export default async function HomePage() {
         <section className="home-stats" aria-label="Datos de EduKids">
           <div className="landing-content home-stats__inner">
             <div className="home-stats__item">
-              <strong>4–17</strong>
-              <span>Años de edad</span>
+              <strong>{home.stat_1_value}</strong>
+              <span>{home.stat_1_label}</span>
             </div>
             <div className="home-stats__item">
-              <strong>STEAM</strong>
-              <span>Robótica y programación</span>
+              <strong>{home.stat_2_value}</strong>
+              <span>{home.stat_2_label}</span>
             </div>
             <div className="home-stats__item">
-              <strong>Guatemala</strong>
-              <span>Empresa guatemalteca</span>
+              <strong>{home.stat_3_value}</strong>
+              <span>{home.stat_3_label}</span>
             </div>
             <div className="home-stats__item">
-              <strong>Maker</strong>
-              <span>Método científico</span>
+              <strong>{home.stat_4_value}</strong>
+              <span>{home.stat_4_label}</span>
             </div>
           </div>
         </section>
