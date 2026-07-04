@@ -6,6 +6,7 @@ import { getPublicGaleria } from "@/lib/landing/get-galeria";
 import { getPublicPortafolio } from "@/lib/landing/get-portafolio";
 import { getPublicTestimonios } from "@/lib/landing/get-testimonios";
 import { getPublicCursos } from "@/lib/lms/get-public-cursos";
+import { HomeHero } from "@/components/landing/home-hero";
 import { PublicCursoCardView } from "@/components/landing/public-curso-card";
 import { CourseListJsonLd, OrganizationJsonLd } from "@/components/landing/landing-json-ld";
 import { LandingFooter, LandingHeader, LandingLayout } from "@/components/landing/landing-shell";
@@ -66,22 +67,7 @@ export default async function HomePage() {
       />
       <LandingHeader current="inicio" />
       <main className="site-main">
-        <section className="home-hero" style={{ backgroundImage: `url('${home.hero_bg_url}')` }}>
-          <div className="home-hero__overlay"></div>
-          <div className="home-hero__content landing-content">
-            <p className="home-hero__tagline">{home.hero_tagline}</p>
-            <h1 className="home-hero__headline">{home.hero_headline}</h1>
-            <p className="home-hero__text">{home.hero_text}</p>
-            <div className="home-hero__actions">
-              <Link className="btn-primary" href={home.hero_btn_href}>
-                {home.hero_btn_text} <i className="fas fa-arrow-right" aria-hidden="true"></i>
-              </Link>
-              <Link className="btn-secondary" href="/comunicate-con-nosotros/">
-                Inscribirse
-              </Link>
-            </div>
-          </div>
-        </section>
+        <HomeHero home={home} />
 
         <section className="home-stats" aria-label="Datos de EduKids">
           <div className="landing-content home-stats__inner">
