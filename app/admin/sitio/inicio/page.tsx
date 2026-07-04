@@ -14,7 +14,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const FIELD_LABELS: Record<keyof LandingHomeContent, string> = {
   hero_bg_url: "Hero — imagen de fondo",
   hero_tagline: "Hero — frase superior",
-  hero_logo_url: "Hero — logo",
+  hero_headline: "Hero — titular principal",
+  hero_logo_url: "Hero — logo (respaldo)",
   hero_text: "Hero — texto principal",
   hero_btn_text: "Hero — texto del botón",
   hero_btn_href: "Hero — enlace del botón",

@@ -51,7 +51,7 @@ export default async function HomePage() {
           <div className="home-hero__overlay"></div>
           <div className="home-hero__content landing-content">
             <p className="home-hero__tagline">{home.hero_tagline}</p>
-            <h1 className="home-hero__headline">Robótica y STEAM para niños en Guatemala</h1>
+            <h1 className="home-hero__headline">{home.hero_headline}</h1>
             <p className="home-hero__text">{home.hero_text}</p>
             <div className="home-hero__actions">
               <Link className="btn-primary" href={home.hero_btn_href}>

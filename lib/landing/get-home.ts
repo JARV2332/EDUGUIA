@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 export type LandingHomeContent = {
   hero_bg_url: string;
   hero_tagline: string;
+  hero_headline: string;
   hero_logo_url: string;
   hero_text: string;
   hero_btn_text: string;
@@ -21,6 +22,7 @@ export type LandingHomeContent = {
 const DEFAULT_HOME: LandingHomeContent = {
   hero_bg_url: "/wp-content/uploads/2021/09/slider1-2-min.jpg",
   hero_tagline: "Educación para todos los niños",
+  hero_headline: "Robótica y STEAM para niños en Guatemala",
   hero_logo_url: "/assets/logo-edukids.png",
   hero_text:
     "Robótica, programación y STEAM para niñas y niños de 4 a 17 años en Guatemala. Aprenden construyendo, probando y creando con autonomía.",
@@ -56,6 +58,7 @@ export async function getPublicHome(): Promise<LandingHomeContent> {
 export const LANDING_HOME_FIELDS: (keyof LandingHomeContent)[] = [
   "hero_bg_url",
   "hero_tagline",
+  "hero_headline",
   "hero_logo_url",
   "hero_text",
   "hero_btn_text",
