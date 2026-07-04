@@ -682,12 +682,13 @@
 .home-hero__overlay {
   position: absolute;
   inset: 0;
+  z-index: 1;
   background: linear-gradient(105deg, rgba(26, 77, 122, 0.92) 0%, rgba(26, 77, 122, 0.75) 45%, rgba(26, 77, 122, 0.2) 100%);
 }
 
 .home-hero__content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   max-width: 560px;
   padding-top: 0;
   padding-bottom: 0;
