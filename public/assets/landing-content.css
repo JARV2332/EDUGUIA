@@ -1013,6 +1013,54 @@
   color: var(--eduguia-secondary);
 }
 
+.home-portfolio-teaser {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.home-portfolio-teaser__gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.home-portfolio-teaser__gallery img {
+  width: 100%;
+  border-radius: var(--eduguia-radius);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.home-portfolio-teaser__tag {
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.85;
+}
+
+.home-portfolio-teaser h3 {
+  margin: 0 0 16px;
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  line-height: 1.25;
+}
+
+.home-portfolio-teaser__text p:last-of-type {
+  margin: 0 0 24px;
+  line-height: 1.75;
+  opacity: 0.92;
+}
+
+@media (max-width: 900px) {
+  .home-portfolio-teaser {
+    grid-template-columns: 1fr;
+  }
+}
+
 .home-faq {
   display: flex;
   flex-direction: column;

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getPublicHome } from "@/lib/landing/get-home";
 import { getPublicFaq } from "@/lib/landing/get-faq";
 import { getPublicGaleria } from "@/lib/landing/get-galeria";
+import { getPublicPortafolio } from "@/lib/landing/get-portafolio";
 import { getPublicTestimonios } from "@/lib/landing/get-testimonios";
 import { getPublicCursos } from "@/lib/lms/get-public-cursos";
 import { PublicCursoCardView } from "@/components/landing/public-curso-card";
@@ -44,6 +45,7 @@ export default async function HomePage() {
   const faqItems = (await getPublicFaq()).slice(0, 4);
   const galeriaPreview = (await getPublicGaleria()).slice(0, 4);
   const testimonios = await getPublicTestimonios();
+  const portafolioDestacado = (await getPublicPortafolio())[0] ?? null;
 
   return (
     <LandingLayout pageClass="landing-page--home">
@@ -258,6 +260,32 @@ export default async function HomePage() {
             </p>
           </div>
         </section>
+
+        {portafolioDestacado && (
+          <section className="home-section home-section--accent">
+            <div className="landing-content" style={{ paddingBottom: 0 }}>
+              <span className="home-label home-label--light">Proyectos</span>
+              <h2 className="section-title section-title--light" style={{ textAlign: "left", marginBottom: 24 }}>
+                Proyecto destacado
+              </h2>
+              <div className="home-portfolio-teaser">
+                <div className="home-portfolio-teaser__gallery">
+                  {portafolioDestacado.imagenes.slice(0, 2).map((img, index) => (
+                    <img key={`${portafolioDestacado.id}-${index}`} src={img.url} alt={img.alt || portafolioDestacado.titulo} loading="lazy" />
+                  ))}
+                </div>
+                <div className="home-portfolio-teaser__text">
+                  <p className="home-portfolio-teaser__tag">{portafolioDestacado.etiqueta}</p>
+                  <h3>{portafolioDestacado.titulo}</h3>
+                  <p>{portafolioDestacado.descripcion}</p>
+                  <Link className="btn-primary" href="/portafolio/">
+                    Ver portafolio <i className="fas fa-arrow-right" aria-hidden="true"></i>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         <section id="faq" className="home-section home-section--light">
           <div className="landing-content" style={{ paddingBottom: 0 }}>
