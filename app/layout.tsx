@@ -30,14 +30,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body className="font-sans antialiased">
         <LanguageProvider>
           <AccessibilityProvider>
             <StudentsProvider>
             <TeacherProfileProvider>
             <a href="#main-content" className="skip-link">
-              Skip to main content
+              Saltar al contenido principal
             </a>
             {children}
             <AccessibilityMenu />
