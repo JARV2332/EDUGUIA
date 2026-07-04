@@ -3,40 +3,15 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { getPublicCursos } from "@/lib/lms/get-public-cursos";
 import { PublicCursoCardView } from "@/components/landing/public-curso-card";
-import { LandingFooter } from "@/components/landing/landing-shell";
+import { LandingFooter, LandingHeader, LandingLayout } from "@/components/landing/landing-shell";
 
 export default async function ServiciosPage() {
   const cursosPublicados = await getPublicCursos();
   const showStaticFallback = cursosPublicados.length === 0;
 
   return (
-    <>
-      <header className="site-header" role="banner">
-        <div className="site-header__bar">
-          <Link className="site-logo" href="/" aria-label="EduKids - Inicio">
-            <img src="/assets/logo-edukids.png" alt="EduKids" width={140} height={64} loading="eager" />
-          </Link>
-          <button className="site-nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" data-nav-toggle>
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-          <nav className="site-nav" id="site-nav" aria-label="Principal">
-            <Link href="/">Inicio</Link>
-            <Link href="/servicios/" aria-current="page">
-              Servicios
-            </Link>
-            <Link href="/galeria/">Galería</Link>
-            <Link href="/portafolio/">Portafolio</Link>
-            <Link href="/preguntas-frecuentes/">FAQ</Link>
-            <Link href="/comunicate-con-nosotros/">Contacto</Link>
-          </nav>
-          <Link className="site-header__cta" href="/eduguia">
-            EDUGUIA
-          </Link>
-        </div>
-      </header>
-
+    <LandingLayout pageClass="landing-page--servicios">
+      <LandingHeader current="servicios" />
       <main className="site-main">
         <header className="page-hero">
           <div className="page-hero__inner">
@@ -117,8 +92,7 @@ export default async function ServiciosPage() {
           </div>
         </div>
       </main>
-
       <LandingFooter />
-    </>
+    </LandingLayout>
   );
 }
