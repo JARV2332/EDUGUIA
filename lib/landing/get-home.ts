@@ -46,7 +46,7 @@ const DEFAULT_HOME: LandingHomeContent = {
   enfoque_image_url: "/wp-content/uploads/2019/08/portfolio-1a.jpg",
   enfoque_text:
     "Desarrollar la inteligencia y creatividad, fomentar el trabajo en equipo y resolver problemas con división de tareas. Los niños identifican los mejores componentes para cada reto, desarrollan habilidades sociales y refuerzan su autoestima.",
-  metodo_image_url: "/wp-content/uploads/2019/08/portfolio-1a.jpg",
+  metodo_image_url: "/wp-content/uploads/2020/03/robotica-5.png",
   metodo_text:
     "Nuestro método se basa en el método científico: se motiva al alumno a mejorar su autonomía y pensamiento crítico, dejando que marquen los objetivos reales de los proyectos. Ensayan el método de prueba y error para estimular autonomía y confianza.",
   stat_1_value: "+500",
