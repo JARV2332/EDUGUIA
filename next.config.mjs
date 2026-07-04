@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const landingRewrites = [
-  "/comunicate-con-nosotros",
   "/pestana",
 ].flatMap((path) => {
   const base = path === "/" ? "" : path;
