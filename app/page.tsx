@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getPublicHome } from "@/lib/landing/get-home";
 import { getPublicFaq } from "@/lib/landing/get-faq";
 import { getPublicGaleria } from "@/lib/landing/get-galeria";
+import { getPublicTestimonios } from "@/lib/landing/get-testimonios";
 import { getPublicCursos } from "@/lib/lms/get-public-cursos";
 import { PublicCursoCardView } from "@/components/landing/public-curso-card";
 import { LandingFooter, LandingHeader, LandingLayout } from "@/components/landing/landing-shell";
@@ -42,6 +43,7 @@ export default async function HomePage() {
   const cursosDestacados = cursos.slice(0, 3);
   const faqItems = (await getPublicFaq()).slice(0, 4);
   const galeriaPreview = (await getPublicGaleria()).slice(0, 4);
+  const testimonios = await getPublicTestimonios();
 
   return (
     <LandingLayout pageClass="landing-page--home">
@@ -150,6 +152,26 @@ export default async function HomePage() {
                   Aplicar al programa
                 </Link>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="home-section home-section--light">
+          <div className="landing-content" style={{ paddingBottom: 0 }}>
+            <span className="home-label">Testimonios</span>
+            <h2 className="section-title" style={{ textAlign: "left", marginBottom: 28 }}>
+              Lo que dicen familias y docentes
+            </h2>
+            <div className="home-testimonials">
+              {testimonios.map((item) => (
+                <blockquote key={item.id} className="home-testimonial">
+                  <p className="home-testimonial__text">&ldquo;{item.texto}&rdquo;</p>
+                  <footer className="home-testimonial__author">
+                    <strong>{item.nombre}</strong>
+                    {item.rol && <span>{item.rol}</span>}
+                  </footer>
+                </blockquote>
+              ))}
             </div>
           </div>
         </section>
