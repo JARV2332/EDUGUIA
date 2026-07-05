@@ -18,6 +18,7 @@ const LANDING_PATHS = new Set([
 
 function isLandingPath(path: string): boolean {
   if (LANDING_PATHS.has(path)) return true;
+  if (path === "/ISABEL" || path.startsWith("/ISABEL/")) return true;
   if (path.startsWith("/wp-content/") || path.startsWith("/assets/")) return true;
   if (path.endsWith(".html")) return true;
   return false;
