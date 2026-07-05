@@ -66,6 +66,9 @@ export function LandingHeader({ current }: { current?: NavKey }) {
         </nav>
         {current === "inicio" ? (
           <>
+            <Link className="site-header__cta site-header__cta--secondary" href="/ISABEL">
+              ISABEL
+            </Link>
             <Link className="site-header__cta site-header__cta--secondary" href="/eduguia">
               EDUGUIA
             </Link>
@@ -74,9 +77,14 @@ export function LandingHeader({ current }: { current?: NavKey }) {
             </Link>
           </>
         ) : (
-          <Link className="site-header__cta" href="/eduguia">
-            EDUGUIA
-          </Link>
+          <>
+            <Link className="site-header__cta site-header__cta--secondary" href="/ISABEL">
+              ISABEL
+            </Link>
+            <Link className="site-header__cta" href="/eduguia">
+              EDUGUIA
+            </Link>
+          </>
         )}
       </div>
     </header>

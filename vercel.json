@@ -1,6 +1,20 @@
 {
   "installCommand": "npm install",
   "framework": "nextjs",
+  "rewrites": [
+    {
+      "source": "/ISABEL",
+      "destination": "https://isabel-lake.vercel.app/ISABEL"
+    },
+    {
+      "source": "/ISABEL/",
+      "destination": "https://isabel-lake.vercel.app/ISABEL/"
+    },
+    {
+      "source": "/ISABEL/:path*",
+      "destination": "https://isabel-lake.vercel.app/ISABEL/:path*"
+    }
+  ],
   "headers": [
     {
       "source": "/wp-content/uploads/(.*)",

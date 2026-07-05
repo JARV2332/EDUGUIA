@@ -90,6 +90,27 @@ export default async function HomePage() {
           </div>
         </section>
 
+        <section className="home-section" aria-labelledby="isabel-heading">
+          <div className="landing-content">
+            <div className="home-split">
+              <div className="home-split__text">
+                <span className="home-label">Accesibilidad</span>
+                <h2 id="isabel-heading" className="section-title" style={{ textAlign: "left", marginBottom: 20 }}>
+                  ISABEL — Estación de accesibilidad
+                </h2>
+                <p>
+                  Plataforma con módulos de audición, habla, visual y movilidad para
+                  apoyar la comunicación y la autonomía. Un producto EDUKIDS integrado
+                  en el mismo sitio.
+                </p>
+                <Link className="site-header__cta" href="/ISABEL" style={{ display: "inline-flex", marginTop: 16 }}>
+                  Abrir ISABEL
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="nosotros" className="home-section home-section--light">
           <div className="landing-content">
             <div className="home-split">
