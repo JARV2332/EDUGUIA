@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Script from "next/script";
 import type { ReactNode } from "react";
+import { ISABEL_APP_URL } from "@/lib/constants/isabel";
 import { getPublicContacto } from "@/lib/landing/get-contacto";
 
 type NavKey = "inicio" | "servicios" | "galeria" | "portafolio" | "faq" | "contacto";
@@ -66,9 +67,14 @@ export function LandingHeader({ current }: { current?: NavKey }) {
         </nav>
         {current === "inicio" ? (
           <>
-            <Link className="site-header__cta site-header__cta--secondary" href="https://isabel.edukidsgt.com/ISABEL">
+            <a
+              className="site-header__cta site-header__cta--secondary"
+              href={ISABEL_APP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               ISABEL
-            </Link>
+            </a>
             <Link className="site-header__cta site-header__cta--secondary" href="/eduguia">
               EDUGUIA
             </Link>
@@ -78,9 +84,14 @@ export function LandingHeader({ current }: { current?: NavKey }) {
           </>
         ) : (
           <>
-            <Link className="site-header__cta site-header__cta--secondary" href="https://isabel.edukidsgt.com/ISABEL">
+            <a
+              className="site-header__cta site-header__cta--secondary"
+              href={ISABEL_APP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               ISABEL
-            </Link>
+            </a>
             <Link className="site-header__cta" href="/eduguia">
               EDUGUIA
             </Link>

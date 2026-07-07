@@ -6,6 +6,7 @@ import { getPublicGaleria } from "@/lib/landing/get-galeria";
 import { getPublicPortafolio } from "@/lib/landing/get-portafolio";
 import { getPublicTestimonios } from "@/lib/landing/get-testimonios";
 import { getPublicCursos } from "@/lib/lms/get-public-cursos";
+import { ISABEL_APP_URL } from "@/lib/constants/isabel";
 import { HomeHero } from "@/components/landing/home-hero";
 import { PublicCursoCardView } from "@/components/landing/public-curso-card";
 import { CourseListJsonLd, OrganizationJsonLd } from "@/components/landing/landing-json-ld";
@@ -100,12 +101,18 @@ export default async function HomePage() {
                 </h2>
                 <p>
                   Plataforma con módulos de audición, habla, visual y movilidad para
-                  apoyar la comunicación y la autonomía. Un producto EDUKIDS integrado
-                  en el mismo sitio.
+                  apoyar la comunicación y la autonomía. Producto EDUKIDS en sitio
+                  independiente.
                 </p>
-                <Link className="site-header__cta" href="https://isabel.edukidsgt.com/ISABEL" style={{ display: "inline-flex", marginTop: 16 }}>
+                <a
+                  className="site-header__cta"
+                  href={ISABEL_APP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: "inline-flex", marginTop: 16 }}
+                >
                   Abrir ISABEL
-                </Link>
+                </a>
               </div>
             </div>
           </div>

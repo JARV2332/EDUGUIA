@@ -13,19 +13,6 @@ const landingRewrites = [
   ];
 });
 
-/** ISABEL vive en subdominio directo (sin proxy — ahorra Edge/Functions en Vercel) */
-const ISABEL_ORIGIN = "https://isabel.edukidsgt.com";
-
-const isabelRedirects = [
-  { source: "/ISABEL", destination: `${ISABEL_ORIGIN}/ISABEL`, permanent: false },
-  { source: "/ISABEL/", destination: `${ISABEL_ORIGIN}/ISABEL/`, permanent: false },
-  {
-    source: "/ISABEL/:path*",
-    destination: `${ISABEL_ORIGIN}/ISABEL/:path*`,
-    permanent: false,
-  },
-];
-
 const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
@@ -37,13 +24,6 @@ const nextConfig = {
   skipTrailingSlashRedirect: true,
   async redirects() {
     return [
-      ...isabelRedirects,
-      { source: "/isabel", destination: `${ISABEL_ORIGIN}/ISABEL`, permanent: false },
-      {
-        source: "/isabel/:path*",
-        destination: `${ISABEL_ORIGIN}/ISABEL/:path*`,
-        permanent: false,
-      },
       { source: "/login", destination: "/eduguia", permanent: true },
       { source: "/register", destination: "/eduguia/register", permanent: true },
       { source: "/forgot-password", destination: "/eduguia/forgot-password", permanent: true },
