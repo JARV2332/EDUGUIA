@@ -103,7 +103,7 @@ export default async function HomePage() {
                   apoyar la comunicación y la autonomía. Un producto EDUKIDS integrado
                   en el mismo sitio.
                 </p>
-                <Link className="site-header__cta" href="/ISABEL" style={{ display: "inline-flex", marginTop: 16 }}>
+                <Link className="site-header__cta" href="https://isabel.edukidsgt.com/ISABEL" style={{ display: "inline-flex", marginTop: 16 }}>
                   Abrir ISABEL
                 </Link>
               </div>

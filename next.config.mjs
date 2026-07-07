@@ -13,19 +13,16 @@ const landingRewrites = [
   ];
 });
 
-/** Proxy ISABEL (proyecto aparte en Vercel) bajo /ISABEL */
-const isabelRewrites = [
-  {
-    source: "/ISABEL",
-    destination: "https://isabel-lake.vercel.app/ISABEL",
-  },
-  {
-    source: "/ISABEL/",
-    destination: "https://isabel-lake.vercel.app/ISABEL/",
-  },
+/** ISABEL vive en subdominio directo (sin proxy — ahorra Edge/Functions en Vercel) */
+const ISABEL_ORIGIN = "https://isabel.edukidsgt.com";
+
+const isabelRedirects = [
+  { source: "/ISABEL", destination: `${ISABEL_ORIGIN}/ISABEL`, permanent: false },
+  { source: "/ISABEL/", destination: `${ISABEL_ORIGIN}/ISABEL/`, permanent: false },
   {
     source: "/ISABEL/:path*",
-    destination: "https://isabel-lake.vercel.app/ISABEL/:path*",
+    destination: `${ISABEL_ORIGIN}/ISABEL/:path*`,
+    permanent: false,
   },
 ];
 
@@ -40,8 +37,13 @@ const nextConfig = {
   skipTrailingSlashRedirect: true,
   async redirects() {
     return [
-      { source: "/isabel", destination: "/ISABEL", permanent: true },
-      { source: "/isabel/:path*", destination: "/ISABEL/:path*", permanent: true },
+      ...isabelRedirects,
+      { source: "/isabel", destination: `${ISABEL_ORIGIN}/ISABEL`, permanent: false },
+      {
+        source: "/isabel/:path*",
+        destination: `${ISABEL_ORIGIN}/ISABEL/:path*`,
+        permanent: false,
+      },
       { source: "/login", destination: "/eduguia", permanent: true },
       { source: "/register", destination: "/eduguia/register", permanent: true },
       { source: "/forgot-password", destination: "/eduguia/forgot-password", permanent: true },
@@ -51,7 +53,6 @@ const nextConfig = {
   async rewrites() {
     return {
       beforeFiles: [
-        ...isabelRewrites,
         { source: "/favicon.ico", destination: "/assets/logo-edukids.png" },
         ...landingRewrites,
       ],
