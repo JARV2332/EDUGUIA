@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>ISABEL — En mantenimiento</title>
+  <link rel="icon" href="/ISABEL/logo-icon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #eef4fb;
+      --fg: #061424;
+      --muted: #2d5589;
+      --card: #ffffff;
+      --primary: #0b1f3a;
+      --accent: #0ea5e9;
+      --accent-soft: #22d3ee;
+      --border: rgba(255, 255, 255, 0.85);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      color: var(--fg);
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(34, 211, 238, 0.22), transparent 55%),
+        radial-gradient(ellipse 60% 50% at 100% 100%, rgba(14, 165, 233, 0.12), transparent 50%),
+        var(--bg);
+      display: grid;
+      place-items: center;
+      padding: 1.5rem;
+    }
+
+    main {
+      width: min(100%, 34rem);
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 2.5rem;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      box-shadow:
+        0 24px 60px -20px rgba(11, 31, 58, 0.18),
+        0 0 0 1px rgba(14, 165, 233, 0.06);
+    }
+
+    .logo {
+      width: 6.5rem;
+      height: 6.5rem;
+      border-radius: 1.75rem;
+      box-shadow: 0 12px 32px -8px rgba(11, 31, 58, 0.25);
+      margin: 0 auto 1.5rem;
+      display: block;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(14, 165, 233, 0.12);
+      color: var(--primary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 1.25rem;
+    }
+
+    .badge-dot {
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.25);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.65; transform: scale(0.92); }
+    }
+
+    h1 {
+      margin: 0 0 0.75rem;
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 1.05rem;
+    }
+
+    p + p { margin-top: 0.85rem; }
+
+    .modules {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 1.75rem 0 0;
+    }
+
+    .module-pill {
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--primary);
+      background: #e4edf8;
+    }
+
+    .actions {
+      margin-top: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    a.button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.25rem;
+      border-radius: 999px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    a.button-primary {
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary), #123a6b);
+      box-shadow: 0 10px 24px -10px rgba(11, 31, 58, 0.55);
+    }
+
+    a.button-secondary {
+      color: var(--primary);
+      background: #dce8f5;
+    }
+
+    a.button:hover {
+      transform: translateY(-1px);
+    }
+
+    footer {
+      margin-top: 1.75rem;
+      font-size: 0.82rem;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <img class="logo" src="/ISABEL/logo-icon.png" width="104" height="104" alt="Logo ISABEL" />
+    <div class="badge" role="status" aria-live="polite">
+      <span class="badge-dot" aria-hidden="true"></span>
+      En mantenimiento
+    </div>
+    <h1>ISABEL vuelve pronto</h1>
+    <p>
+      Estamos optimizando la estación de accesibilidad para ofrecerte una mejor experiencia.
+      El servicio está temporalmente pausado.
+    </p>
+    <p>
+      Gracias por tu paciencia. Muy pronto podrás volver a usar los módulos de audición, habla, visión y movilidad.
+    </p>
+    <div class="modules" aria-hidden="true">
+      <span class="module-pill">Audición</span>
+      <span class="module-pill">Habla</span>
+      <span class="module-pill">Visión</span>
+      <span class="module-pill">Movilidad</span>
+    </div>
+    <div class="actions">
+      <a class="button button-primary" href="https://edukidsgt.com">Ir a EduKids GT</a>
+      <a class="button button-secondary" href="mailto:contacto@edukidsgt.com">Contacto</a>
+    </div>
+    <footer>ISABEL · Estación inteligente de accesibilidad</footer>
+  </main>
+</body>
+</html>

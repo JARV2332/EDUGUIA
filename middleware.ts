@@ -18,7 +18,7 @@ const MAINTENANCE_HTML = `<!DOCTYPE html>
   <main>
     <h1>EDUGUIA en pausa temporal</h1>
     <p>Estamos realizando ajustes para optimizar el servicio. Volveremos pronto.</p>
-    <p><a href="https://isabel-lake.vercel.app/ISABEL">ISABEL</a> sigue disponible en su sitio.</p>
+    <p><a href="/ISABEL">ISABEL</a> también está en pausa temporal.</p>
   </main>
 </body>
 </html>`;
@@ -41,6 +41,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|wp-content|assets|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2|woff|ttf|html)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|wp-content|assets|ISABEL(?:/.*)?|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2|woff|ttf|html)$).*)",
   ],
 };

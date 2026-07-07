@@ -35,6 +35,10 @@ const nextConfig = {
       beforeFiles: [
         { source: "/favicon.ico", destination: "/assets/logo-edukids.png" },
         ...landingRewrites,
+        /** ISABEL pausado en Vercel: página estática local, sin proxy ni serverless */
+        { source: "/ISABEL", destination: "/ISABEL/index.html" },
+        { source: "/ISABEL/", destination: "/ISABEL/index.html" },
+        { source: "/ISABEL/:path*", destination: "/ISABEL/index.html" },
       ],
     };
   },
