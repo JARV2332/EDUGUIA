@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Curso } from "@/lib/lms/types";
 import type { LmsRole } from "@/lib/auth/lms-roles";
+import { getLmsRoleLabel } from "@/lib/auth/lms-roles";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +21,8 @@ interface CampusUser {
   created_at: string;
 }
 
+type CreateTab = "estudiante" | "lms_docente" | "admin";
+
 export default function AdminUsuariosPage() {
   const [users, setUsers] = useState<CampusUser[]>([]);
   const [cursos, setCursos] = useState<Curso[]>([]);
@@ -27,7 +30,7 @@ export default function AdminUsuariosPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"estudiante" | "lms_docente">("estudiante");
+  const [tab, setTab] = useState<CreateTab>("estudiante");
 
   const [nombre, setNombre] = useState("");
   const [username, setUsername] = useState("");
@@ -103,12 +106,15 @@ export default function AdminUsuariosPage() {
 
   const filtered = users.filter((u) => u.role === tab);
 
+  const submitLabel =
+    tab === "estudiante" ? "Crear estudiante" : tab === "lms_docente" ? "Crear docente" : "Crear administrador";
+
   return (
     <div className="p-6 lg:p-8">
       <header className="mb-8">
         <h1 className="text-3xl font-bold">Usuarios del campus</h1>
         <p className="mt-2 text-muted-foreground">
-          Crea estudiantes y docentes con usuario y contraseña. No se envía correo de verificación.
+          Crea estudiantes, docentes y administradores con usuario y contraseña. No se envía correo de verificación.
         </p>
       </header>
 
@@ -121,10 +127,11 @@ export default function AdminUsuariosPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
-              <TabsList className="mb-4 grid w-full grid-cols-2">
+            <Tabs value={tab} onValueChange={(v) => setTab(v as CreateTab)}>
+              <TabsList className="mb-4 grid w-full grid-cols-3">
                 <TabsTrigger value="estudiante">Estudiante</TabsTrigger>
                 <TabsTrigger value="lms_docente">Docente</TabsTrigger>
+                <TabsTrigger value="admin">Admin</TabsTrigger>
               </TabsList>
               <TabsContent value="estudiante">
                 <form onSubmit={(e) => void handleCreate(e)} className="space-y-4">
@@ -170,7 +177,7 @@ export default function AdminUsuariosPage() {
                     </Select>
                   </div>
                   <Button type="submit" disabled={saving}>
-                    {saving ? "Creando…" : "Crear estudiante"}
+                    {saving ? "Creando…" : submitLabel}
                   </Button>
                 </form>
               </TabsContent>
@@ -202,7 +209,42 @@ export default function AdminUsuariosPage() {
                     />
                   </div>
                   <Button type="submit" disabled={saving}>
-                    {saving ? "Creando…" : "Crear docente"}
+                    {saving ? "Creando…" : submitLabel}
+                  </Button>
+                </form>
+              </TabsContent>
+              <TabsContent value="admin">
+                <form onSubmit={(e) => void handleCreate(e)} className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Los administradores pueden editar el sitio web, cursos, usuarios y matrículas.
+                  </p>
+                  <div className="space-y-2">
+                    <Label htmlFor="nombre-admin">Nombre completo</Label>
+                    <Input id="nombre-admin" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="username-admin">Usuario de acceso</Label>
+                    <Input
+                      id="username-admin"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="ej. admin.soporte"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password-admin">Contraseña inicial</Label>
+                    <Input
+                      id="password-admin"
+                      type="text"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      minLength={6}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" disabled={saving}>
+                    {saving ? "Creando…" : submitLabel}
                   </Button>
                 </form>
               </TabsContent>
@@ -215,9 +257,7 @@ export default function AdminUsuariosPage() {
         <Card>
           <CardHeader>
             <CardTitle>Cuentas existentes</CardTitle>
-            <CardDescription>
-              {tab === "estudiante" ? "Estudiantes" : "Docentes"} registrados por el administrador
-            </CardDescription>
+            <CardDescription>{getLmsRoleLabel(tab)} registrados por el administrador</CardDescription>
           </CardHeader>
           <CardContent>
             {loading ? (
@@ -232,7 +272,7 @@ export default function AdminUsuariosPage() {
                       <p className="font-medium">{u.nombre || "Sin nombre"}</p>
                       <p className="text-sm text-muted-foreground">@{u.username || "—"}</p>
                     </div>
-                    <Badge variant="secondary">{u.role === "estudiante" ? "Estudiante" : "Docente"}</Badge>
+                    <Badge variant="secondary">{getLmsRoleLabel(u.role)}</Badge>
                   </li>
                 ))}
               </ul>

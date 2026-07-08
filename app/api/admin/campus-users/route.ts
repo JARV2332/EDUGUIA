@@ -15,9 +15,7 @@ export async function GET(request: Request) {
 
   const roleParam = new URL(request.url).searchParams.get("role");
   const roles: LmsRole[] =
-    roleParam && isLmsRole(roleParam) && roleParam !== "admin"
-      ? [roleParam]
-      : ["estudiante", "lms_docente"];
+    roleParam && isLmsRole(roleParam) ? [roleParam] : ["estudiante", "lms_docente", "admin"];
 
   const { data, error } = await auth.supabase
     .from("profiles")
@@ -67,8 +65,8 @@ export async function POST(request: Request) {
   if (password.length < 6) {
     return Response.json({ error: "La contraseña debe tener al menos 6 caracteres" }, { status: 400 });
   }
-  if (!role || (role !== "estudiante" && role !== "lms_docente")) {
-    return Response.json({ error: "Rol inválido (estudiante o lms_docente)" }, { status: 400 });
+  if (!role || !isLmsRole(role)) {
+    return Response.json({ error: "Rol inválido (estudiante, lms_docente o admin)" }, { status: 400 });
   }
 
   const admin = createServiceRoleClient();
@@ -103,7 +101,7 @@ export async function POST(request: Request) {
 
   await admin
     .from("profiles")
-    .update({ username, nombre })
+    .update({ username, nombre, role })
     .eq("id", created.user.id);
 
   let matriculaError: string | null = null;
