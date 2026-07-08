@@ -21,3 +21,19 @@ export function isEdukidsPublicPath(path: string): boolean {
   if (path === "/api/contact") return true;
   return false;
 }
+
+/** Rutas activas mientras EDUGUIA/campus/docente están pausados. */
+export function isAllowedWhileEduguiaPaused(path: string): boolean {
+  if (isEdukidsPublicPath(path)) return true;
+
+  const normalized = normalizePathname(path);
+
+  if (path.startsWith("/auth/")) return true;
+  if (normalized === "/campus/login" || normalized === "/campus/register") return true;
+  if (normalized === "/acceso") return true;
+
+  if (normalized === "/admin" || normalized.startsWith("/admin/")) return true;
+  if (path.startsWith("/api/admin/")) return true;
+
+  return false;
+}

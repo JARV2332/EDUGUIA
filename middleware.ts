@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { isEdukidsPublicPath } from "@/lib/constants/edukids-routes";
+import { isAllowedWhileEduguiaPaused } from "@/lib/constants/edukids-routes";
 import { ISABEL_APP_URL } from "@/lib/constants/isabel";
 import { updateSession } from "@/lib/supabase/middleware";
 
@@ -21,7 +21,7 @@ const EDUGUIA_PAUSED_HTML = `<!DOCTYPE html>
   <main>
     <h1>EDUGUIA en pausa temporal</h1>
     <p>Estamos realizando ajustes para optimizar el servicio. Volveremos pronto.</p>
-    <p><a href="/">Volver a EduKids</a> · <a href="${ISABEL_APP_URL}">ISABEL</a></p>
+    <p><a href="/">Volver a EduKids</a> · <a href="/admin">Admin del sitio</a> · <a href="${ISABEL_APP_URL}">ISABEL</a></p>
   </main>
 </body>
 </html>`;
@@ -34,7 +34,7 @@ function isEduguiaPaused(): boolean {
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  if (isEduguiaPaused() && !isEdukidsPublicPath(path)) {
+  if (isEduguiaPaused() && !isAllowedWhileEduguiaPaused(path)) {
     return new NextResponse(EDUGUIA_PAUSED_HTML, {
       status: 503,
       headers: {
