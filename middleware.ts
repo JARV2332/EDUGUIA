@@ -26,11 +26,15 @@ const EDUGUIA_PAUSED_HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
+/** EDUGUIA/campus/admin pausados por defecto. Solo EduKids público activo. */
+function isEduguiaPaused(): boolean {
+  return process.env.EDUGUIA_ENABLED !== "true";
+}
+
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  const maintenance = process.env.MAINTENANCE_MODE !== "false";
 
-  if (maintenance && !isEdukidsPublicPath(path)) {
+  if (isEduguiaPaused() && !isEdukidsPublicPath(path)) {
     return new NextResponse(EDUGUIA_PAUSED_HTML, {
       status: 503,
       headers: {
