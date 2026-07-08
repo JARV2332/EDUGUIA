@@ -1,7 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { isEdukidsPublicPath } from "@/lib/constants/edukids-routes";
+import { ISABEL_APP_URL } from "@/lib/constants/isabel";
 import { updateSession } from "@/lib/supabase/middleware";
 
-const MAINTENANCE_HTML = `<!DOCTYPE html>
+const EDUGUIA_PAUSED_HTML = `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
@@ -12,21 +14,24 @@ const MAINTENANCE_HTML = `<!DOCTYPE html>
     main { text-align: center; padding: 2rem; max-width: 28rem; }
     h1 { font-size: 1.5rem; margin-bottom: 0.75rem; }
     p { line-height: 1.6; color: #475569; }
+    a { color: #2563eb; }
   </style>
 </head>
 <body>
   <main>
     <h1>EDUGUIA en pausa temporal</h1>
     <p>Estamos realizando ajustes para optimizar el servicio. Volveremos pronto.</p>
-    <p><a href="/ISABEL">ISABEL</a> también está en pausa temporal.</p>
+    <p><a href="/">Volver a EduKids</a> · <a href="${ISABEL_APP_URL}">ISABEL</a></p>
   </main>
 </body>
 </html>`;
 
 export async function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
   const maintenance = process.env.MAINTENANCE_MODE !== "false";
-  if (maintenance) {
-    return new NextResponse(MAINTENANCE_HTML, {
+
+  if (maintenance && !isEdukidsPublicPath(path)) {
+    return new NextResponse(EDUGUIA_PAUSED_HTML, {
       status: 503,
       headers: {
         "Content-Type": "text/html; charset=utf-8",
