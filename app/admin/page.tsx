@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, Inbox, Plus, UserPlus, Users } from "lucide-react";
+import { BookOpen, Calculator, Inbox, Plus, UserPlus, Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -40,6 +40,18 @@ export default function AdminHomePage() {
                 <Plus className="mr-2 h-4 w-4" />
                 Gestionar
               </Link>
+            </Button>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <Calculator className="mb-2 h-8 w-8 text-primary" />
+            <CardTitle>Cotizaciones</CardTitle>
+            <CardDescription>Arma paquetes de robótica con IA y precios de Electrónica DIY.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild>
+              <Link href="/admin/cotizaciones">Crear cotización</Link>
             </Button>
           </CardContent>
         </Card>
