@@ -24,8 +24,15 @@ function normalizeNeeds(items: unknown): QuoteNeed[] {
         notas: typeof row.notas === "string" ? row.notas : undefined,
       };
     })
-    .filter((item) => item.query.length > 0)
-    .slice(0, 20);
+    .filter((item) => item.query.length > 1)
+    .slice(0, 16);
+}
+
+function stripMetaPrefixes(text: string): string {
+  return text
+    .replace(/^leyenda del kit:\s*/gim, "")
+    .replace(/^materiales\s*\/\s*pedido:\s*/gim, "")
+    .trim();
 }
 
 export function parseNeedsHeuristic(prompt: string): {
@@ -35,8 +42,9 @@ export function parseNeedsHeuristic(prompt: string): {
   notas: string;
   items: QuoteNeed[];
 } {
-  const chunks = prompt
-    .split(/[,;\n]+/)
+  const cleaned = stripMetaPrefixes(prompt);
+  const chunks = cleaned
+    .split(/[,;\n]+|\s+y\s+/i)
     .map((part) => part.trim())
     .filter(Boolean);
 
@@ -44,9 +52,17 @@ export function parseNeedsHeuristic(prompt: string): {
   for (const chunk of chunks) {
     const match = chunk.match(/^(?:(\d+)\s*[x×]?\s+)?(.+)$/i);
     if (!match) continue;
-    const query = (match[2] ?? "").replace(/^(de|del|la|el|un|una|unos|unas)\s+/i, "").trim();
+    const query = (match[2] ?? "")
+      .replace(/^(de|del|la|el|un|una|unos|unas)\s+/i, "")
+      .trim();
     if (query.length < 2) continue;
-    if (/^(kit|paquete|cotizaci[oó]n|quiero|necesito|arma|genera|describe|para)\b/i.test(query)) continue;
+    if (
+      /^(kit|paquete|cotizaci[oó]n|quiero|necesito|arma|genera|describe|para|leyenda|colegio|estudiante)/i.test(
+        query
+      )
+    ) {
+      continue;
+    }
     items.push({
       query,
       cantidad: match[1] ? Number.parseInt(match[1], 10) : 1,
@@ -56,25 +72,37 @@ export function parseNeedsHeuristic(prompt: string): {
   return {
     titulo: "Paquete de robótica",
     cliente: "",
-    leyenda: prompt.trim().slice(0, 400),
+    leyenda: cleaned.slice(0, 400),
     notas: "",
-    items: items.slice(0, 20),
+    items: items.slice(0, 16),
   };
 }
 
-export async function parseNeedsWithAi(prompt: string): Promise<{
+export async function parseNeedsWithAi(
+  prompt: string,
+  leyenda?: string
+): Promise<{
   titulo: string;
   cliente: string;
   leyenda: string;
   notas: string;
   items: QuoteNeed[];
   usedAi: boolean;
+  aiError?: string;
 }> {
   const fallback = parseNeedsHeuristic(prompt);
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY?.trim();
   if (!apiKey || apiKey.startsWith("your_")) {
-    return { ...fallback, usedAi: false };
+    return { ...fallback, usedAi: false, aiError: "Falta GROQ_API_KEY" };
   }
+
+  const userContent = [
+    leyenda ? `Leyenda comercial (NO es un material): ${leyenda}` : "",
+    `Materiales pedidos:\n${prompt}`,
+    "Separa cada componente. Ejemplo: 10 Arduino UNO, 20 LEDs, protoboard, jumpers, 10 sensores ultrasónicos → 5 items.",
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
@@ -84,7 +112,7 @@ export async function parseNeedsWithAi(prompt: string): Promise<{
     },
     body: JSON.stringify({
       model: GROQ_MODEL,
-      temperature: 0.2,
+      temperature: 0.15,
       max_tokens: 1200,
       messages: [
         {
@@ -92,21 +120,26 @@ export async function parseNeedsWithAi(prompt: string): Promise<{
           content:
             "Eres un cotizador de kits de robótica educativa en Guatemala. Devuelve SOLO un objeto JSON válido, sin markdown. " +
             'Formato: {"titulo":"","cliente":"","leyenda":"","notas":"","items":[{"query":"arduino uno","cantidad":10,"notas":""}]}. ' +
-            "query debe ser una frase corta para buscar en Electrónica DIY (placas, sensores, LEDs, cables, protoboard). " +
-            "leyenda: resumen comercial del kit (para qué sirve, para cuántos alumnos). " +
-            "Si el usuario da cantidades, respétalas. Máximo 16 items.",
+            "Cada item es UN producto para buscar en Electrónica DIY. query corto: arduino uno, led, protoboard, cables jumper, sensor ultrasonico. " +
+            "Nunca pongas la leyenda como item. Respeta cantidades. Máximo 16 items.",
         },
-        { role: "user", content: prompt },
+        { role: "user", content: userContent },
       ],
     }),
   });
 
   const data = (await response.json()) as {
     choices?: Array<{ message?: { content?: string } }>;
+    error?: { message?: string };
   };
+
+  if (!response.ok) {
+    return { ...fallback, usedAi: false, aiError: data.error?.message ?? `Groq ${response.status}` };
+  }
+
   const content = data.choices?.[0]?.message?.content ?? "";
   const json = extractJsonObject(content);
-  if (!json) return { ...fallback, usedAi: false };
+  if (!json) return { ...fallback, usedAi: false, aiError: "La IA no devolvió JSON" };
 
   try {
     const parsed = JSON.parse(json) as {
@@ -121,12 +154,15 @@ export async function parseNeedsWithAi(prompt: string): Promise<{
     return {
       titulo: typeof parsed.titulo === "string" && parsed.titulo.trim() ? parsed.titulo.trim() : fallback.titulo,
       cliente: typeof parsed.cliente === "string" ? parsed.cliente.trim() : "",
-      leyenda: typeof parsed.leyenda === "string" && parsed.leyenda.trim() ? parsed.leyenda.trim() : fallback.leyenda,
+      leyenda:
+        typeof parsed.leyenda === "string" && parsed.leyenda.trim()
+          ? parsed.leyenda.trim()
+          : leyenda || fallback.leyenda,
       notas: typeof parsed.notas === "string" ? parsed.notas.trim() : "",
       items,
       usedAi: true,
     };
   } catch {
-    return { ...fallback, usedAi: false };
+    return { ...fallback, usedAi: false, aiError: "JSON de IA inválido" };
   }
 }

@@ -33,11 +33,8 @@ export async function POST(request: Request) {
       return Response.json({ error: "Describe el kit o los materiales que necesitas." }, { status: 400 });
     }
 
-    const combined = [leyendaIn && `Leyenda del kit: ${leyendaIn}`, prompt && `Materiales / pedido: ${prompt}`]
-      .filter(Boolean)
-      .join("\n\n");
     const margenPct = Number(body.margenPct);
-    const parsed = await parseNeedsWithAi(combined);
+    const parsed = await parseNeedsWithAi(prompt || leyendaIn, leyendaIn);
     if (!parsed.items.length) {
       return Response.json(
         { error: "No pude extraer materiales. Prueba con: 10 Arduino UNO, 20 LEDs, protoboard" },
@@ -65,6 +62,7 @@ export async function POST(request: Request) {
       margenPct: Number.isFinite(margenPct) ? margenPct : 0,
       items,
       usedAi: parsed.usedAi,
+      aiError: parsed.aiError ?? null,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "No se pudo generar la cotización";

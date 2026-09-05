@@ -280,8 +280,10 @@ export default function AdminCotizacionesPage() {
                 <Calculator className="mr-2 h-4 w-4" />
                 {loadingGenerate ? "Buscando en DIY…" : "Generar con precios DIY"}
               </Button>
-              {usedAi === false && items.length > 0 ? (
-                <p className="text-xs text-muted-foreground">Sin Groq: se armó con reglas locales. Agrega GROQ_API_KEY para mejor IA.</p>
+              {usedAi === true ? (
+                <p className="text-xs text-emerald-700">Armado con IA (Groq) + precios de Electrónica DIY.</p>
+              ) : usedAi === false && items.length > 0 ? (
+                <p className="text-xs text-muted-foreground">Sin Groq: se armó con reglas locales.</p>
               ) : null}
             </CardContent>
           </Card>
