@@ -19,6 +19,9 @@ ALTER TABLE public.profiles ADD CONSTRAINT profiles_role_check
 
 ALTER TABLE public.instructores ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "instructores_own" ON public.instructores;
+DROP POLICY IF EXISTS "instructores_admin" ON public.instructores;
+
 CREATE POLICY "instructores_own" ON public.instructores
   FOR ALL USING (auth.uid() = user_id);
 

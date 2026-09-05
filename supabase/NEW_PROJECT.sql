@@ -1,6 +1,6 @@
-﻿-- EDUGUIA / EduKids — esquema completo para proyecto NUEVO
+﻿-- EDUGUIA / EduKids — esquema completo (idempotente)
+-- Se puede correr otra vez: hace DROP POLICY IF EXISTS antes de crear.
 -- SQL Editor: https://supabase.com/dashboard/project/tijbsmhzszioatizjnpd/sql/new
--- Pegar TODO este archivo y Run. Luego desactiva "Confirm email" en Auth → Providers → Email.
 
 
 -- ========== schema.sql ==========
@@ -62,6 +62,11 @@ ALTER TABLE public.docentes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.estudiantes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sesiones_chat ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.planes_intervencion ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "docentes_own" ON public.docentes;
+DROP POLICY IF EXISTS "estudiantes_docente" ON public.estudiantes;
+DROP POLICY IF EXISTS "sesiones_docente" ON public.sesiones_chat;
+DROP POLICY IF EXISTS "planes_docente" ON public.planes_intervencion;
 
 CREATE POLICY "docentes_own" ON public.docentes FOR ALL USING (auth.uid() = user_id);
 CREATE POLICY "estudiantes_docente" ON public.estudiantes FOR ALL USING (
@@ -262,6 +267,29 @@ RETURNS TEXT AS $$
   SELECT role FROM public.profiles WHERE id = auth.uid()
 $$ LANGUAGE sql STABLE SECURITY DEFINER;
 
+DROP POLICY IF EXISTS "profiles_own" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_admin_read" ON public.profiles;
+DROP POLICY IF EXISTS "alumnos_own" ON public.alumnos;
+DROP POLICY IF EXISTS "alumnos_admin" ON public.alumnos;
+DROP POLICY IF EXISTS "cursos_read_published" ON public.cursos;
+DROP POLICY IF EXISTS "cursos_admin" ON public.cursos;
+DROP POLICY IF EXISTS "cursos_docente_manage" ON public.cursos;
+DROP POLICY IF EXISTS "modulos_read" ON public.modulos;
+DROP POLICY IF EXISTS "modulos_admin" ON public.modulos;
+DROP POLICY IF EXISTS "modulos_docente" ON public.modulos;
+DROP POLICY IF EXISTS "materiales_read" ON public.materiales;
+DROP POLICY IF EXISTS "materiales_admin" ON public.materiales;
+DROP POLICY IF EXISTS "materiales_docente" ON public.materiales;
+DROP POLICY IF EXISTS "matriculas_admin" ON public.matriculas;
+DROP POLICY IF EXISTS "matriculas_docente" ON public.matriculas;
+DROP POLICY IF EXISTS "matriculas_alumno_read" ON public.matriculas;
+DROP POLICY IF EXISTS "tareas_read" ON public.tareas;
+DROP POLICY IF EXISTS "tareas_admin" ON public.tareas;
+DROP POLICY IF EXISTS "tareas_docente" ON public.tareas;
+DROP POLICY IF EXISTS "entregas_admin" ON public.entregas;
+DROP POLICY IF EXISTS "entregas_docente_read" ON public.entregas;
+DROP POLICY IF EXISTS "entregas_alumno" ON public.entregas;
+
 CREATE POLICY "profiles_own" ON public.profiles
   FOR ALL USING (auth.uid() = id);
 
@@ -447,6 +475,9 @@ ALTER TABLE public.profiles ADD CONSTRAINT profiles_role_check
   CHECK (role IN ('admin', 'docente', 'estudiante', 'lms_docente'));
 
 ALTER TABLE public.instructores ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "instructores_own" ON public.instructores;
+DROP POLICY IF EXISTS "instructores_admin" ON public.instructores;
 
 CREATE POLICY "instructores_own" ON public.instructores
   FOR ALL USING (auth.uid() = user_id);

@@ -112,6 +112,29 @@ RETURNS TEXT AS $$
   SELECT role FROM public.profiles WHERE id = auth.uid()
 $$ LANGUAGE sql STABLE SECURITY DEFINER;
 
+DROP POLICY IF EXISTS "profiles_own" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_admin_read" ON public.profiles;
+DROP POLICY IF EXISTS "alumnos_own" ON public.alumnos;
+DROP POLICY IF EXISTS "alumnos_admin" ON public.alumnos;
+DROP POLICY IF EXISTS "cursos_read_published" ON public.cursos;
+DROP POLICY IF EXISTS "cursos_admin" ON public.cursos;
+DROP POLICY IF EXISTS "cursos_docente_manage" ON public.cursos;
+DROP POLICY IF EXISTS "modulos_read" ON public.modulos;
+DROP POLICY IF EXISTS "modulos_admin" ON public.modulos;
+DROP POLICY IF EXISTS "modulos_docente" ON public.modulos;
+DROP POLICY IF EXISTS "materiales_read" ON public.materiales;
+DROP POLICY IF EXISTS "materiales_admin" ON public.materiales;
+DROP POLICY IF EXISTS "materiales_docente" ON public.materiales;
+DROP POLICY IF EXISTS "matriculas_admin" ON public.matriculas;
+DROP POLICY IF EXISTS "matriculas_docente" ON public.matriculas;
+DROP POLICY IF EXISTS "matriculas_alumno_read" ON public.matriculas;
+DROP POLICY IF EXISTS "tareas_read" ON public.tareas;
+DROP POLICY IF EXISTS "tareas_admin" ON public.tareas;
+DROP POLICY IF EXISTS "tareas_docente" ON public.tareas;
+DROP POLICY IF EXISTS "entregas_admin" ON public.entregas;
+DROP POLICY IF EXISTS "entregas_docente_read" ON public.entregas;
+DROP POLICY IF EXISTS "entregas_alumno" ON public.entregas;
+
 CREATE POLICY "profiles_own" ON public.profiles
   FOR ALL USING (auth.uid() = id);
 

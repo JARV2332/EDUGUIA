@@ -57,6 +57,11 @@ ALTER TABLE public.estudiantes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sesiones_chat ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.planes_intervencion ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "docentes_own" ON public.docentes;
+DROP POLICY IF EXISTS "estudiantes_docente" ON public.estudiantes;
+DROP POLICY IF EXISTS "sesiones_docente" ON public.sesiones_chat;
+DROP POLICY IF EXISTS "planes_docente" ON public.planes_intervencion;
+
 CREATE POLICY "docentes_own" ON public.docentes FOR ALL USING (auth.uid() = user_id);
 CREATE POLICY "estudiantes_docente" ON public.estudiantes FOR ALL USING (
   docente_id IN (SELECT id FROM public.docentes WHERE user_id = auth.uid())
