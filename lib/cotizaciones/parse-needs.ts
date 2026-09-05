@@ -28,7 +28,13 @@ function normalizeNeeds(items: unknown): QuoteNeed[] {
     .slice(0, 20);
 }
 
-export function parseNeedsHeuristic(prompt: string): { titulo: string; cliente: string; notas: string; items: QuoteNeed[] } {
+export function parseNeedsHeuristic(prompt: string): {
+  titulo: string;
+  cliente: string;
+  leyenda: string;
+  notas: string;
+  items: QuoteNeed[];
+} {
   const chunks = prompt
     .split(/[,;\n]+/)
     .map((part) => part.trim())
@@ -50,6 +56,7 @@ export function parseNeedsHeuristic(prompt: string): { titulo: string; cliente: 
   return {
     titulo: "Paquete de robótica",
     cliente: "",
+    leyenda: prompt.trim().slice(0, 400),
     notas: "",
     items: items.slice(0, 20),
   };
@@ -58,6 +65,7 @@ export function parseNeedsHeuristic(prompt: string): { titulo: string; cliente: 
 export async function parseNeedsWithAi(prompt: string): Promise<{
   titulo: string;
   cliente: string;
+  leyenda: string;
   notas: string;
   items: QuoteNeed[];
   usedAi: boolean;
@@ -83,8 +91,9 @@ export async function parseNeedsWithAi(prompt: string): Promise<{
           role: "system",
           content:
             "Eres un cotizador de kits de robótica educativa en Guatemala. Devuelve SOLO un objeto JSON válido, sin markdown. " +
-            'Formato: {"titulo":"","cliente":"","notas":"","items":[{"query":"arduino uno","cantidad":10,"notas":""}]}. ' +
-            "query debe ser una frase corta para buscar en la tienda Electrónica DIY (componentes reales: placas, sensores, LEDs, cables, protoboard). " +
+            'Formato: {"titulo":"","cliente":"","leyenda":"","notas":"","items":[{"query":"arduino uno","cantidad":10,"notas":""}]}. ' +
+            "query debe ser una frase corta para buscar en Electrónica DIY (placas, sensores, LEDs, cables, protoboard). " +
+            "leyenda: resumen comercial del kit (para qué sirve, para cuántos alumnos). " +
             "Si el usuario da cantidades, respétalas. Máximo 16 items.",
         },
         { role: "user", content: prompt },
@@ -103,6 +112,7 @@ export async function parseNeedsWithAi(prompt: string): Promise<{
     const parsed = JSON.parse(json) as {
       titulo?: unknown;
       cliente?: unknown;
+      leyenda?: unknown;
       notas?: unknown;
       items?: unknown;
     };
@@ -111,6 +121,7 @@ export async function parseNeedsWithAi(prompt: string): Promise<{
     return {
       titulo: typeof parsed.titulo === "string" && parsed.titulo.trim() ? parsed.titulo.trim() : fallback.titulo,
       cliente: typeof parsed.cliente === "string" ? parsed.cliente.trim() : "",
+      leyenda: typeof parsed.leyenda === "string" && parsed.leyenda.trim() ? parsed.leyenda.trim() : fallback.leyenda,
       notas: typeof parsed.notas === "string" ? parsed.notas.trim() : "",
       items,
       usedAi: true,

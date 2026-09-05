@@ -26,9 +26,22 @@ export type QuoteLine = {
 };
 
 export type QuoteDraft = {
+  id?: string;
+  numero?: number | null;
   titulo: string;
   cliente: string;
+  leyenda: string;
   notas: string;
   margenPct: number;
+  precioVenta: number;
   items: QuoteLine[];
+};
+
+export type SavedQuote = QuoteDraft & {
+  id: string;
+  numero: number;
+  costo: number;
+  ganancia: number;
+  estado: string;
+  created_at: string;
 };

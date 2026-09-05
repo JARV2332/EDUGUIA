@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const auth = await requireLmsAdmin(request);
     if ("error" in auth) return auth.error;
 
-    let body: { prompt?: unknown; margenPct?: unknown };
+    let body: { prompt?: unknown; leyenda?: unknown; margenPct?: unknown };
     try {
       body = await request.json();
     } catch {
@@ -28,12 +28,16 @@ export async function POST(request: Request) {
     }
 
     const prompt = typeof body.prompt === "string" ? body.prompt.trim() : "";
-    if (prompt.length < 8) {
-      return Response.json({ error: "Describe el paquete o los materiales que necesitas." }, { status: 400 });
+    const leyendaIn = typeof body.leyenda === "string" ? body.leyenda.trim() : "";
+    if (prompt.length < 8 && leyendaIn.length < 8) {
+      return Response.json({ error: "Describe el kit o los materiales que necesitas." }, { status: 400 });
     }
 
+    const combined = [leyendaIn && `Leyenda del kit: ${leyendaIn}`, prompt && `Materiales / pedido: ${prompt}`]
+      .filter(Boolean)
+      .join("\n\n");
     const margenPct = Number(body.margenPct);
-    const parsed = await parseNeedsWithAi(prompt);
+    const parsed = await parseNeedsWithAi(combined);
     if (!parsed.items.length) {
       return Response.json(
         { error: "No pude extraer materiales. Prueba con: 10 Arduino UNO, 20 LEDs, protoboard" },
@@ -56,6 +60,7 @@ export async function POST(request: Request) {
     return Response.json({
       titulo: parsed.titulo,
       cliente: parsed.cliente,
+      leyenda: leyendaIn || parsed.leyenda,
       notas: parsed.notas,
       margenPct: Number.isFinite(margenPct) ? margenPct : 0,
       items,

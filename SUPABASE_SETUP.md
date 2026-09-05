@@ -8,11 +8,13 @@ Elige **una** de estas dos opciones.
 
 ### Opción A: SQL Editor (recomendado, sin CLI)
 
-1. Entra a tu proyecto: **https://supabase.com/dashboard/project/tvqbhxprglnrkvrfawqi**
+1. Entra a tu proyecto: **https://supabase.com/dashboard/project/tijbsmhzszioatizjnpd**
 2. En el menú izquierdo abre **SQL Editor**.
 3. Pulsa **New query**.
-4. Copia todo el contenido del archivo **`supabase/schema.sql`** del proyecto y pégalo en el editor.
+4. Copia todo el contenido de **`supabase/NEW_PROJECT.sql`** (esquema completo + cotizaciones) y pégalo.
 5. Pulsa **Run** (o Ctrl+Enter).
+6. Authentication → Providers → Email → desactiva **Confirm email**.
+7. Crea el primer admin en `/campus/setup`.
 
 Con eso se crean las tablas `docentes`, `estudiantes`, `sesiones_chat`, `planes_intervencion`, RLS, triggers y la función que crea el perfil docente al registrarse.
 

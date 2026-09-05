@@ -111,6 +111,11 @@ function CampusLoginForm() {
           <p className="mt-4 text-center text-sm text-muted-foreground">
             ¿No tienes cuenta? Pide al administrador del campus que te cree una.
           </p>
+          <p className="mt-2 text-center text-sm">
+            <Link href="/campus/setup" className="underline">
+              Primer admin (base nueva)
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </div>

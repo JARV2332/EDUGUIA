@@ -29,7 +29,7 @@ export function isAllowedWhileEduguiaPaused(path: string): boolean {
   const normalized = normalizePathname(path);
 
   if (path.startsWith("/auth/")) return true;
-  if (normalized === "/campus/login" || normalized === "/campus/register") return true;
+  if (normalized === "/campus/login" || normalized === "/campus/register" || normalized === "/campus/setup") return true;
   if (normalized === "/acceso") return true;
 
   if (normalized === "/admin" || normalized.startsWith("/admin/")) return true;

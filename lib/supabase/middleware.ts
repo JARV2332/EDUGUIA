@@ -33,7 +33,8 @@ export async function updateSession(request: NextRequest) {
     path.startsWith("/share/") ||
     path === "/acceso" ||
     path === "/campus/login" ||
-    path === "/campus/register";
+    path === "/campus/register" ||
+    path === "/campus/setup";
 
   if (isPublic) {
     return response;

@@ -1,5 +1,5 @@
 -- EDUGUIA - Esquema completo (proyecto nuevo desde cero)
--- SQL Editor: https://supabase.com/dashboard/project/tvqbhxprglnrkvrfawqi/sql/new
+-- SQL Editor: https://supabase.com/dashboard/project/tijbsmhzszioatizjnpd/sql/new
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "supabase:link": "supabase link --project-ref tvqbhxprglnrkvrfawqi",
+    "supabase:link": "supabase link --project-ref tijbsmhzszioatizjnpd",
     "supabase:push": "supabase db push"
   },
   "dependencies": {
