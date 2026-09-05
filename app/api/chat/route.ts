@@ -2,7 +2,7 @@ export const runtime = "nodejs";
 
 import { createClient } from "@/lib/supabase/route-handler";
 
-const GROQ_MODEL = "llama-3.3-70b-versatile";
+import { GROQ_MODEL } from "@/lib/ai/groq";
 
 const systemPromptBase = `Eres EduGuIA, un asistente experto en psicopedagogía bilingüe para el contexto escolar de Guatemala. Tu objetivo es apoyar a docentes a identificar dificultades de aprendizaje (basadas en criterios del DSM-5) y proponer estrategias del Diseño Universal para el Aprendizaje (DUA).
 

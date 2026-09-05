@@ -1,6 +1,5 @@
+import { GROQ_MODEL } from "@/lib/ai/groq";
 import type { QuoteNeed } from "@/lib/cotizaciones/types";
-
-const GROQ_MODEL = "llama-3.3-70b-versatile";
 
 function extractJsonObject(text: string): string | null {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);

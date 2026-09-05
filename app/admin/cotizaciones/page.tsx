@@ -98,6 +98,7 @@ export default function AdminCotizacionesPage() {
         notas?: string;
         items?: QuoteLine[];
         usedAi?: boolean;
+        aiError?: string | null;
       };
       if (!res.ok) {
         setError(data.error ?? "No se pudo generar la cotización");
@@ -110,6 +111,9 @@ export default function AdminCotizacionesPage() {
       const nextItems = data.items ?? [];
       setItems(nextItems);
       setUsedAi(Boolean(data.usedAi));
+      if (data.aiError && !data.usedAi) {
+        setMessage(`IA: ${data.aiError}`);
+      }
       const costo = costoFromItems(nextItems);
       const pct = Number.parseFloat(margenPct) || 0;
       setPrecioVenta(ventaDesdeMargen(costo, pct).toFixed(2));
@@ -283,7 +287,7 @@ export default function AdminCotizacionesPage() {
               {usedAi === true ? (
                 <p className="text-xs text-emerald-700">Armado con IA (Groq) + precios de Electrónica DIY.</p>
               ) : usedAi === false && items.length > 0 ? (
-                <p className="text-xs text-muted-foreground">Sin Groq: se armó con reglas locales.</p>
+                <p className="text-xs text-amber-700">Se usó el modo local porque Groq no respondió.</p>
               ) : null}
             </CardContent>
           </Card>

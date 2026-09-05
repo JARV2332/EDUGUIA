@@ -6,8 +6,7 @@ import {
   buildReportGenerationPrompt,
   parseAIResultsJson,
 } from "@/lib/generate-report";
-
-const GROQ_MODEL = "llama-3.3-70b-versatile";
+import { GROQ_MODEL } from "@/lib/ai/groq";
 
 const systemPrompt = `Eres EduGuIA, experto en psicopedagogía inclusiva para Guatemala (DUA, contexto local).
 Cuando te pidan un informe, devuelves ÚNICAMENTE JSON válido según la estructura indicada, sin markdown ni texto adicional.
