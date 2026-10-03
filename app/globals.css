@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@config '../tailwind.config.ts';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -126,6 +127,12 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-brand-cyan: #00bceb;
+  --color-brand-yellow: #ffc800;
+  --color-brand-coral: #ff6b6b;
+  --color-brand-orange: #ffaa67;
+  --color-brand-darkblue: #0e1b38;
+  --color-brand-light: #f8fafc;
 }
 
 @layer base {
@@ -223,4 +230,160 @@
 
 .skip-link:focus {
   top: 0;
+}
+
+/* EDUKIDS: cursor, botones, flip 3D y glow */
+@keyframes ek-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes ek-shine {
+  from { transform: translateX(-130%); }
+  to { transform: translateX(130%); }
+}
+@keyframes ek-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes ek-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.ek-gear {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 80;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  pointer-events: none;
+  color: #00bceb;
+  filter: drop-shadow(0 2px 4px rgba(14, 27, 56, 0.35));
+}
+.ek-gear svg {
+  width: 100%;
+  height: 100%;
+  animation: ek-spin 9s linear infinite;
+}
+.ek-gear.is-hot {
+  color: #ffc800;
+}
+.ek-gear.is-hot svg {
+  animation-duration: 0.9s;
+}
+.ek-site.ek-has-cursor,
+.ek-site.ek-has-cursor * {
+  cursor: none !important;
+}
+.ek-site.ek-has-cursor input,
+.ek-site.ek-has-cursor textarea,
+.ek-site.ek-has-cursor select {
+  cursor: text !important;
+}
+
+.ek-btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease, background 0.25s ease;
+}
+.ek-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 32%, rgba(255, 255, 255, 0.55) 50%, transparent 68%);
+  transform: translateX(-140%);
+  pointer-events: none;
+}
+.ek-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px rgba(0, 188, 235, 0.35);
+  filter: brightness(1.05);
+}
+.ek-btn:hover::after {
+  animation: ek-shine 0.7s ease;
+}
+.ek-btn:active {
+  transform: translateY(-1px);
+}
+
+.ek-flip {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 340px;
+  perspective: 1200px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  color: inherit;
+}
+.ek-flip__inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ek-flip.is-flipped .ek-flip__inner {
+  transform: rotateY(180deg);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .ek-flip:hover .ek-flip__inner,
+  .ek-flip:focus-visible .ek-flip__inner {
+    transform: rotateY(180deg);
+  }
+}
+.ek-flip__face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 1.5rem;
+  padding: 1.35rem;
+  overflow: auto;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.ek-flip__front {
+  background: #fff;
+  color: #0e1b38;
+  border: 1px solid rgba(14, 27, 56, 0.08);
+  box-shadow: 0 12px 30px rgba(14, 27, 56, 0.06);
+  transform: rotateY(0deg);
+}
+.ek-flip__back {
+  background: #0e1b38;
+  color: #fff;
+  transform: rotateY(180deg);
+}
+.ek-icon-bob {
+  animation: ek-bob 2.8s ease-in-out infinite;
+}
+.ek-glow {
+  position: relative;
+  border-radius: 1.5rem;
+  box-shadow: 0 0 0 1px rgba(0, 188, 235, 0.35), 0 16px 40px rgba(0, 188, 235, 0.08);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.ek-glow:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 0 1px #ffc800, 0 0 32px rgba(0, 188, 235, 0.45), 0 18px 40px rgba(255, 200, 0, 0.2);
+}
+.ek-rise {
+  animation: ek-rise 0.4s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ek-gear svg,
+  .ek-icon-bob,
+  .ek-rise,
+  .ek-btn::after {
+    animation: none !important;
+  }
+  .ek-btn:hover,
+  .ek-glow:hover {
+    transform: none;
+  }
 }
