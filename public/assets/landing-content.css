@@ -139,10 +139,47 @@
   color: var(--eduguia-muted);
 }
 
-.course-card__cta {
+.course-card__actions {
   margin-top: auto;
   padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   width: 100%;
+}
+
+.course-card__pay {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.course-card__recurrente {
+  min-height: 48px;
+  width: 100%;
+}
+
+.course-card__pay-error {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #b91c1c;
+  line-height: 1.4;
+}
+
+.course-card__cta {
+  width: 100%;
+}
+
+.course-card__cta--secondary {
+  background: #fff;
+  color: var(--eduguia-secondary);
+  border: 2px solid var(--eduguia-secondary);
+  box-shadow: none;
+}
+
+.course-card__cta--secondary:hover {
+  background: rgba(26, 77, 122, 0.06);
 }
 
 .course-card__cta i {

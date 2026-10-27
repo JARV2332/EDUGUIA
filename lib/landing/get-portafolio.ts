@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { fixUtf8Mojibake } from "@/lib/landing/fix-mojibake";
 
 export type PortafolioImagen = { url: string; alt: string };
 
@@ -51,7 +52,7 @@ function normalizeImagenes(raw: unknown): PortafolioImagen[] {
       if (!item || typeof item !== "object") return null;
       const row = item as Record<string, unknown>;
       const url = typeof row.url === "string" ? row.url : "";
-      const alt = typeof row.alt === "string" ? row.alt : "";
+      const alt = typeof row.alt === "string" ? fixUtf8Mojibake(row.alt) : "";
       if (!url) return null;
       return { url, alt };
     })
@@ -61,9 +62,9 @@ function normalizeImagenes(raw: unknown): PortafolioImagen[] {
 function mapRow(row: Record<string, unknown>): PortafolioItem {
   return {
     id: String(row.id),
-    etiqueta: String(row.etiqueta ?? ""),
-    titulo: String(row.titulo ?? ""),
-    descripcion: String(row.descripcion ?? ""),
+    etiqueta: fixUtf8Mojibake(String(row.etiqueta ?? "")),
+    titulo: fixUtf8Mojibake(String(row.titulo ?? "")),
+    descripcion: fixUtf8Mojibake(String(row.descripcion ?? "")),
     imagenes: normalizeImagenes(row.imagenes),
     orden: Number(row.orden ?? 0),
     activo: Boolean(row.activo ?? true),

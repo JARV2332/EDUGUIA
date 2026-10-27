@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { fixUtf8Mojibake } from "@/lib/landing/fix-mojibake";
 
 export type FaqItem = {
   id: string;
@@ -55,7 +56,15 @@ export async function getPublicFaq(): Promise<FaqItem[]> {
     .order("orden", { ascending: true });
 
   if (error || !data?.length) return FALLBACK_FAQ;
-  return data as FaqItem[];
+  return (data as FaqItem[]).map(mapFaqItem);
+}
+
+function mapFaqItem(row: FaqItem): FaqItem {
+  return {
+    ...row,
+    pregunta: fixUtf8Mojibake(row.pregunta),
+    respuesta: fixUtf8Mojibake(row.respuesta),
+  };
 }
 
 export async function getAdminFaq(supabase: ReturnType<typeof createClient>): Promise<FaqItem[]> {
@@ -65,5 +74,5 @@ export async function getAdminFaq(supabase: ReturnType<typeof createClient>): Pr
     .order("orden", { ascending: true });
 
   if (error) throw new Error(error.message);
-  return (data ?? []) as FaqItem[];
+  return ((data ?? []) as FaqItem[]).map(mapFaqItem);
 }

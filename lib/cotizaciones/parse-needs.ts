@@ -38,6 +38,9 @@ export function parseNeedsHeuristic(prompt: string): {
   titulo: string;
   cliente: string;
   leyenda: string;
+  descripcion: string;
+  incluye: string;
+  validez: string;
   notas: string;
   items: QuoteNeed[];
 } {
@@ -72,7 +75,11 @@ export function parseNeedsHeuristic(prompt: string): {
     titulo: "Paquete de robótica",
     cliente: "",
     leyenda: cleaned.slice(0, 400),
-    notas: "",
+    descripcion: "",
+    incluye: "",
+    validez: "15 días calendario",
+    notas:
+      "Precios en quetzales (GTQ). Sujeto a existencia en Electrónica DIY. No incluye IVA si aplica facturación especial. Entrega o armado del kit se coordina aparte.",
     items: items.slice(0, 16),
   };
 }
@@ -84,6 +91,9 @@ export async function parseNeedsWithAi(
   titulo: string;
   cliente: string;
   leyenda: string;
+  descripcion: string;
+  incluye: string;
+  validez: string;
   notas: string;
   items: QuoteNeed[];
   usedAi: boolean;
@@ -112,15 +122,16 @@ export async function parseNeedsWithAi(
     body: JSON.stringify({
       model: GROQ_MODEL,
       temperature: 0.15,
-      max_tokens: 1200,
+      max_tokens: 1800,
       messages: [
         {
           role: "system",
           content:
-            "Eres un cotizador de kits de robótica educativa en Guatemala. Devuelve SOLO un objeto JSON válido, sin markdown. " +
-            'Formato: {"titulo":"","cliente":"","leyenda":"","notas":"","items":[{"query":"arduino uno","cantidad":10,"notas":""}]}. ' +
-            "Cada item es UN producto para buscar en Electrónica DIY. query corto: arduino uno, led, protoboard, cables jumper, sensor ultrasonico. " +
-            "Nunca pongas la leyenda como item. Respeta cantidades. Máximo 16 items.",
+            "Eres un cotizador comercial de EduKids GT (robótica educativa en Guatemala). Devuelve SOLO JSON válido, sin markdown. " +
+            'Formato: {"titulo":"","cliente":"","descripcion":"","incluye":"","validez":"15 días calendario","notas":"","items":[{"query":"arduino uno","cantidad":10,"notas":""}]}. ' +
+            "descripcion: 2 o 3 párrafos formales para la cotización (para quién es el kit, qué aprenden, cómo se usa). Conserva y AMPLÍA la leyenda del usuario, no la acortes. " +
+            "incluye: viñetas separadas por salto de línea (qué trae el paquete a nivel pedagógico, no solo piezas). " +
+            "Cada item es UN producto para Electrónica DIY. query corto. Nunca pongas la leyenda como item. Respeta cantidades. Máximo 16 items.",
         },
         { role: "user", content: userContent },
       ],
@@ -144,20 +155,24 @@ export async function parseNeedsWithAi(
     const parsed = JSON.parse(json) as {
       titulo?: unknown;
       cliente?: unknown;
-      leyenda?: unknown;
+      descripcion?: unknown;
+      incluye?: unknown;
+      validez?: unknown;
       notas?: unknown;
       items?: unknown;
     };
     const items = normalizeNeeds(parsed.items);
     if (!items.length) return { ...fallback, usedAi: true };
+    const text = (value: unknown, backup: string) =>
+      typeof value === "string" && value.trim() ? value.trim() : backup;
     return {
-      titulo: typeof parsed.titulo === "string" && parsed.titulo.trim() ? parsed.titulo.trim() : fallback.titulo,
-      cliente: typeof parsed.cliente === "string" ? parsed.cliente.trim() : "",
-      leyenda:
-        typeof parsed.leyenda === "string" && parsed.leyenda.trim()
-          ? parsed.leyenda.trim()
-          : leyenda || fallback.leyenda,
-      notas: typeof parsed.notas === "string" ? parsed.notas.trim() : "",
+      titulo: text(parsed.titulo, fallback.titulo),
+      cliente: text(parsed.cliente, ""),
+      leyenda: leyenda || fallback.leyenda,
+      descripcion: text(parsed.descripcion, leyenda || fallback.descripcion),
+      incluye: text(parsed.incluye, fallback.incluye),
+      validez: text(parsed.validez, fallback.validez),
+      notas: text(parsed.notas, fallback.notas),
       items,
       usedAi: true,
     };

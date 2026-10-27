@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Calculator, ExternalLink, FileDown, Plus, Save, Search, Sparkles, Trash2 } from "lucide-react";
 import type { DiyProduct, QuoteLine, SavedQuote } from "@/lib/cotizaciones/types";
 import { downloadQuotePdf } from "@/lib/cotizaciones/export-pdf";
+import { DEFAULT_NOTAS, DEFAULT_VALIDEZ, packQuoteCopy, unpackQuoteCopy } from "@/lib/cotizaciones/quote-copy";
 import { computeQuoteMoney, costoFromItems, formatQ, formatQuoteNumber, ventaDesdeMargen } from "@/lib/cotizaciones/totals";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,11 +32,14 @@ export default function AdminCotizacionesPage() {
     "10 Arduino UNO, 20 LEDs, protoboard, cables jumper y 10 sensores ultrasónicos"
   );
   const [leyenda, setLeyenda] = useState(
-    "Kit de robótica para 10 estudiantes: cada uno arma un robot básico y practica programación."
+    "Kit de robótica educativa para un grupo de estudiantes. Cada participante arma, programa y pone a prueba un robot básico, practicando electrónica, sensores y pensamiento computacional. El paquete se cotiza como un todo: materiales de referencia de Electrónica DIY más la inversión propuesta por EduKids GT."
   );
+  const [descripcion, setDescripcion] = useState("");
+  const [incluye, setIncluye] = useState("");
+  const [validez, setValidez] = useState(DEFAULT_VALIDEZ);
   const [titulo, setTitulo] = useState("Kit de robótica");
   const [cliente, setCliente] = useState("");
-  const [notas, setNotas] = useState("");
+  const [notas, setNotas] = useState(DEFAULT_NOTAS);
   const [margenPct, setMargenPct] = useState("25");
   const [precioVenta, setPrecioVenta] = useState("");
   const [items, setItems] = useState<QuoteLine[]>([]);
@@ -94,7 +98,9 @@ export default function AdminCotizacionesPage() {
         error?: string;
         titulo?: string;
         cliente?: string;
-        leyenda?: string;
+        descripcion?: string;
+        incluye?: string;
+        validez?: string;
         notas?: string;
         items?: QuoteLine[];
         usedAi?: boolean;
@@ -106,7 +112,9 @@ export default function AdminCotizacionesPage() {
       }
       setTitulo(data.titulo || "Kit de robótica");
       if (data.cliente) setCliente(data.cliente);
-      if (data.leyenda) setLeyenda(data.leyenda);
+      if (data.descripcion) setDescripcion(data.descripcion);
+      if (data.incluye) setIncluye(data.incluye);
+      if (data.validez) setValidez(data.validez);
       if (data.notas) setNotas(data.notas);
       const nextItems = data.items ?? [];
       setItems(nextItems);
@@ -172,7 +180,7 @@ export default function AdminCotizacionesPage() {
         titulo,
         cliente,
         leyenda,
-        notas,
+        notas: packQuoteCopy({ descripcion, incluye, validez, notas }),
         precioVenta: totals.precioVenta,
         items,
       }),
@@ -195,7 +203,11 @@ export default function AdminCotizacionesPage() {
     setTitulo(row.titulo);
     setCliente(row.cliente);
     setLeyenda(row.leyenda ?? "");
-    setNotas(row.notas ?? "");
+    const copy = unpackQuoteCopy(row.notas);
+    setDescripcion(copy.descripcion || row.descripcion || "");
+    setIncluye(copy.incluye || row.incluye || "");
+    setValidez(copy.validez || row.validez || DEFAULT_VALIDEZ);
+    setNotas(copy.notas);
     setItems(Array.isArray(row.items) ? row.items : []);
     setPrecioVenta(String(row.precioVenta ?? (row as unknown as { precio_venta?: number }).precio_venta ?? 0));
     setMargenPct(String(row.margenPct ?? (row as unknown as { margen_pct?: number }).margen_pct ?? 0));
@@ -206,6 +218,10 @@ export default function AdminCotizacionesPage() {
     setQuoteNumero(null);
     setItems([]);
     setCliente("");
+    setDescripcion("");
+    setIncluye("");
+    setValidez(DEFAULT_VALIDEZ);
+    setNotas(DEFAULT_NOTAS);
     setMessage(null);
   };
 
@@ -260,7 +276,15 @@ export default function AdminCotizacionesPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Leyenda del kit</Label>
-                <Textarea rows={3} value={leyenda} onChange={(e) => setLeyenda(e.target.value)} />
+                <Textarea
+                  rows={6}
+                  value={leyenda}
+                  onChange={(e) => setLeyenda(e.target.value)}
+                  placeholder="Texto comercial completo: para quién es, qué aprenden, alcance del paquete…"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Esta leyenda no se recorta al generar. La IA solo la amplía en la descripción comercial.
+                </p>
               </div>
               <div className="space-y-2">
                 <Label>Materiales / cantidades</Label>
@@ -345,11 +369,14 @@ export default function AdminCotizacionesPage() {
                   variant="outline"
                   disabled={items.length === 0}
                   onClick={() =>
-                    downloadQuotePdf({
+                    void downloadQuotePdf({
                       numero: quoteNumero,
                       titulo,
                       cliente,
                       leyenda,
+                      descripcion,
+                      incluye,
+                      validez,
                       notas,
                       items,
                       precioVenta: totals.precioVenta,
@@ -366,7 +393,64 @@ export default function AdminCotizacionesPage() {
             {error ? <p className="text-sm text-destructive">{error}</p> : null}
             {message ? <p className="text-sm text-emerald-700">{message}</p> : null}
 
-            {leyenda ? <p className="rounded-lg bg-muted p-3 text-sm">{leyenda}</p> : null}
+            <div className="overflow-hidden rounded-2xl border bg-white text-slate-900 shadow-sm">
+              <div className="flex items-center justify-between bg-slate-900 px-5 py-4 text-white">
+                <div>
+                  <p className="text-lg font-semibold">EduKids GT</p>
+                  <p className="text-xs text-slate-300">Robótica educativa y STEAM · Guatemala</p>
+                </div>
+                <div className="text-right text-xs">
+                  <p className="font-semibold">{formatQuoteNumber(quoteNumero)}</p>
+                  <p>COTIZACIÓN</p>
+                  <p>Válida: {validez}</p>
+                </div>
+              </div>
+              <div className="space-y-4 px-5 py-5 text-sm">
+                <div className="grid gap-3 rounded-lg bg-slate-50 p-3 sm:grid-cols-2">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Cliente</p>
+                    <p className="font-medium">{cliente || "Por definir"}</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Paquete</p>
+                    <p className="font-medium">{titulo || "Kit de robótica"}</p>
+                  </div>
+                </div>
+                {leyenda ? (
+                  <section>
+                    <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-cyan-800">Leyenda / alcance</p>
+                    <p className="whitespace-pre-wrap leading-relaxed">{leyenda}</p>
+                  </section>
+                ) : null}
+                {descripcion && descripcion !== leyenda ? (
+                  <section>
+                    <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-cyan-800">Descripción comercial</p>
+                    <p className="whitespace-pre-wrap leading-relaxed">{descripcion}</p>
+                  </section>
+                ) : null}
+                {incluye ? (
+                  <section>
+                    <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-cyan-800">El kit incluye</p>
+                    <p className="whitespace-pre-wrap leading-relaxed">{incluye}</p>
+                  </section>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Descripción comercial (IA)</Label>
+                <Textarea rows={5} value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>El kit incluye</Label>
+                <Textarea rows={5} value={incluye} onChange={(e) => setIncluye(e.target.value)} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Validez de la oferta</Label>
+              <Input value={validez} onChange={(e) => setValidez(e.target.value)} />
+            </div>
 
             {items.length === 0 ? (
               <p className="text-sm text-muted-foreground">Genera el kit o agrega productos.</p>
@@ -465,8 +549,8 @@ export default function AdminCotizacionesPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Notas</Label>
-              <Textarea rows={3} value={notas} onChange={(e) => setNotas(e.target.value)} placeholder="Validez, envío, armado…" />
+              <Label>Condiciones comerciales</Label>
+              <Textarea rows={5} value={notas} onChange={(e) => setNotas(e.target.value)} />
             </div>
           </CardContent>
         </Card>

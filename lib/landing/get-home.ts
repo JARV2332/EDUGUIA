@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { fixUtf8MojibakeFields } from "@/lib/landing/fix-mojibake";
 
 export type LandingHomeContent = {
   hero_bg_url: string;
@@ -68,7 +69,12 @@ export async function getPublicHome(): Promise<LandingHomeContent> {
   const { data, error } = await supabase.from("landing_home").select("*").eq("id", 1).maybeSingle();
 
   if (error || !data) return DEFAULT_HOME;
-  return { ...DEFAULT_HOME, ...data } as LandingHomeContent;
+  const merged = { ...DEFAULT_HOME, ...data } as LandingHomeContent;
+  return fixUtf8MojibakeFields(merged, LANDING_HOME_FIELDS);
+}
+
+export function normalizeLandingHomeContent(content: LandingHomeContent): LandingHomeContent {
+  return fixUtf8MojibakeFields(content, LANDING_HOME_FIELDS);
 }
 
 export const LANDING_HOME_FIELDS: (keyof LandingHomeContent)[] = [

@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { fixUtf8Mojibake } from "@/lib/landing/fix-mojibake";
 
 export type GaleriaItem = {
   id: string;
@@ -27,7 +28,11 @@ export async function getPublicGaleria(): Promise<GaleriaItem[]> {
     .order("orden", { ascending: true });
 
   if (error || !data?.length) return FALLBACK_GALERIA;
-  return data as GaleriaItem[];
+  return (data as GaleriaItem[]).map(mapGaleriaItem);
+}
+
+function mapGaleriaItem(row: GaleriaItem): GaleriaItem {
+  return { ...row, alt_text: fixUtf8Mojibake(row.alt_text) };
 }
 
 export async function getAdminGaleria(supabase: ReturnType<typeof createClient>): Promise<GaleriaItem[]> {
@@ -37,7 +42,7 @@ export async function getAdminGaleria(supabase: ReturnType<typeof createClient>)
     .order("orden", { ascending: true });
 
   if (error) throw new Error(error.message);
-  return (data ?? []) as GaleriaItem[];
+  return ((data ?? []) as GaleriaItem[]).map(mapGaleriaItem);
 }
 
 export function publicStorageUrl(path: string): string {

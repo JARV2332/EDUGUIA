@@ -1,8 +1,10 @@
 import type { PublicCursoCard } from "@/lib/lms/get-public-cursos";
+import { RecurrentePayActions } from "@/components/payments/recurrente-pay-actions";
 import { buildComprarCursoWhatsAppUrl } from "@/lib/landing/whatsapp-compra";
 
 export function PublicCursoCardView({ curso }: { curso: PublicCursoCard }) {
   const whatsappUrl = buildComprarCursoWhatsAppUrl(curso);
+  const canPayOnline = curso.amount_in_cents != null && curso.amount_in_cents > 0;
 
   return (
     <article className="course-card">
@@ -31,16 +33,27 @@ export function PublicCursoCardView({ curso }: { curso: PublicCursoCard }) {
           </p>
         )}
         {curso.descripcion && <p className="course-card__desc">{curso.descripcion}</p>}
-        <a
-          className="btn-primary course-card__cta"
-          href={whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`Comprar curso ${curso.titulo} por WhatsApp`}
-        >
-          <i className="fab fa-whatsapp" aria-hidden="true"></i>
-          Comprar curso
-        </a>
+        <div className="course-card__actions">
+          {canPayOnline && (
+            <RecurrentePayActions
+              cursoId={curso.id}
+              itemName={curso.titulo}
+              amountInCents={curso.amount_in_cents!}
+              currency={curso.currency}
+              reference={curso.slug}
+            />
+          )}
+          <a
+            className={`btn-primary course-card__cta${canPayOnline ? " course-card__cta--secondary" : ""}`}
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Consultar curso ${curso.titulo} por WhatsApp`}
+          >
+            <i className="fab fa-whatsapp" aria-hidden="true"></i>
+            {canPayOnline ? "Consultar por WhatsApp" : "Comprar curso"}
+          </a>
+        </div>
       </div>
     </article>
   );

@@ -2,6 +2,7 @@ export const runtime = "nodejs";
 
 import { requireLmsAdmin } from "@/lib/auth/require-lms-admin";
 import { getPublicHome, LANDING_HOME_FIELDS, type LandingHomeContent } from "@/lib/landing/get-home";
+import { fixUtf8Mojibake } from "@/lib/landing/fix-mojibake";
 
 export async function GET(request: Request) {
   const auth = await requireLmsAdmin(request);
@@ -25,20 +26,18 @@ export async function PATCH(request: Request) {
   const patch: Record<string, string> = {};
   for (const key of LANDING_HOME_FIELDS) {
     const value = body[key];
-    if (typeof value === "string") patch[key] = value.trim();
+    if (typeof value === "string") patch[key] = fixUtf8Mojibake(value.trim());
   }
 
   if (Object.keys(patch).length === 0) {
     return Response.json({ error: "Nada que actualizar" }, { status: 400 });
   }
 
-  const { data, error } = await auth.supabase
+  const { error } = await auth.supabase
     .from("landing_home")
     .update({ ...patch, updated_at: new Date().toISOString() })
-    .eq("id", 1)
-    .select("*")
-    .single();
+    .eq("id", 1);
 
   if (error) return Response.json({ error: error.message }, { status: 500 });
-  return Response.json({ content: data });
+  return Response.json({ content: await getPublicHome() });
 }

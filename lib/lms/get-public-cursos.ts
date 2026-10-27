@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { precioToAmountInCents } from "@/lib/constants/recurrente";
 import { formatEdadPublico, formatInversionLine, cursoImagenDefault } from "@/lib/lms/format-catalog";
 import type { Curso } from "@/lib/lms/types";
 
@@ -12,6 +13,8 @@ export type PublicCursoCard = {
   duracion: string | null;
   modalidad: string | null;
   imagen_url: string;
+  amount_in_cents: number | null;
+  currency: string;
 };
 
 export async function getPublicCursos(): Promise<PublicCursoCard[]> {
@@ -41,5 +44,8 @@ export async function getPublicCursos(): Promise<PublicCursoCard[]> {
     duracion: curso.duracion ?? null,
     modalidad: curso.modalidad ?? null,
     imagen_url: curso.imagen_url || cursoImagenDefault(),
+    amount_in_cents:
+      curso.precio != null && Number(curso.precio) > 0 ? precioToAmountInCents(Number(curso.precio)) : null,
+    currency: curso.precio_moneda || "GTQ",
   }));
 }

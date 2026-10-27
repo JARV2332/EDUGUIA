@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { fixUtf8Mojibake } from "@/lib/landing/fix-mojibake";
 
 export type TestimonioItem = {
   id: string;
@@ -52,5 +53,14 @@ export async function getPublicTestimonios(): Promise<TestimonioItem[]> {
     .order("orden", { ascending: true });
 
   if (error || !data?.length) return FALLBACK_TESTIMONIOS;
-  return data as TestimonioItem[];
+  return (data as TestimonioItem[]).map(mapTestimonioItem);
+}
+
+function mapTestimonioItem(row: TestimonioItem): TestimonioItem {
+  return {
+    ...row,
+    nombre: fixUtf8Mojibake(row.nombre),
+    rol: fixUtf8Mojibake(row.rol),
+    texto: fixUtf8Mojibake(row.texto),
+  };
 }

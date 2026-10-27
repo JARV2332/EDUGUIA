@@ -31,6 +31,9 @@ export type QuoteDraft = {
   titulo: string;
   cliente: string;
   leyenda: string;
+  descripcion: string;
+  incluye: string;
+  validez: string;
   notas: string;
   margenPct: number;
   precioVenta: number;

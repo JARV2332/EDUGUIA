@@ -54,10 +54,17 @@ export async function POST(request: Request) {
       };
     });
 
+    const incluye =
+      parsed.incluye.trim() ||
+      items.map((line) => `• ${line.cantidad} × ${line.product?.title ?? line.query}`).join("\n");
+
     return Response.json({
       titulo: parsed.titulo,
       cliente: parsed.cliente,
       leyenda: leyendaIn || parsed.leyenda,
+      descripcion: parsed.descripcion,
+      incluye,
+      validez: parsed.validez,
       notas: parsed.notas,
       margenPct: Number.isFinite(margenPct) ? margenPct : 0,
       items,

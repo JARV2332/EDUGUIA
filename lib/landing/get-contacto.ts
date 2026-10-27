@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { fixUtf8MojibakeFields } from "@/lib/landing/fix-mojibake";
 
 export type LandingContacto = {
   facebook_url: string;
@@ -33,5 +34,6 @@ export async function getPublicContacto(): Promise<LandingContacto> {
   const { data, error } = await supabase.from("landing_contacto").select(LANDING_CONTACTO_FIELDS.join(", ")).eq("id", 1).maybeSingle();
 
   if (error || !data) return DEFAULT_CONTACTO;
-  return { ...DEFAULT_CONTACTO, ...(data as LandingContacto) };
+  const merged = { ...DEFAULT_CONTACTO, ...(data as unknown as LandingContacto) };
+  return fixUtf8MojibakeFields(merged, LANDING_CONTACTO_FIELDS);
 }

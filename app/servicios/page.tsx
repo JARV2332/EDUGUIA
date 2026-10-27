@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { getPublicCursos } from "@/lib/lms/get-public-cursos";
 import { PublicCursoCardView } from "@/components/landing/public-curso-card";
+import { StaticCursoCardView } from "@/components/landing/static-curso-card";
 import { LandingFooter, LandingHeader, LandingLayout } from "@/components/landing/landing-shell";
 
 export default async function ServiciosPage() {
@@ -34,28 +35,29 @@ export default async function ServiciosPage() {
 
             {showStaticFallback && (
               <>
-                <article className="course-card">
-                  <div className="course-card__image">
-                    <img src="/wp-content/uploads/2020/08/CodingCritters-LearningResources-scaled.jpg" alt="Robótica preescolar" loading="lazy" />
-                  </div>
-                  <div className="course-card__body">
-                    <h3 className="course-card__title">Robótica preescolar</h3>
-                    <p className="course-card__meta"><strong>Dirigido a:</strong> Niños y niñas desde 3 años</p>
-                    <p className="course-card__meta"><strong>Duración:</strong> 6 clases</p>
-                    <p className="course-card__desc">Desarrollo de habilidades motrices finas, espaciales y lógicas mediante programación desde casa.</p>
-                  </div>
-                </article>
-                <article className="course-card">
-                  <div className="course-card__image">
-                    <img src="/wp-content/uploads/2020/08/STEAMlogo_1024x1024.png" alt="Ingeniería preescolar" loading="lazy" />
-                  </div>
-                  <div className="course-card__body">
-                    <h3 className="course-card__title">Ingeniería en preescolar</h3>
-                    <p className="course-card__meta"><strong>Dirigido a:</strong> 4 a 6 años</p>
-                    <p className="course-card__meta"><strong>Inversión:</strong> Q225 · 10 clases virtuales</p>
-                    <p className="course-card__desc">Fortalecimiento de habilidades motoras y cognitivas con nuestros kits y proyectos STEAM.</p>
-                  </div>
-                </article>
+                <StaticCursoCardView
+                  id="static-robotica-preescolar"
+                  titulo="Robótica preescolar"
+                  imagenUrl="/wp-content/uploads/2020/08/CodingCritters-LearningResources-scaled.jpg"
+                  imagenAlt="Robótica preescolar"
+                  meta={[
+                    { label: "Dirigido a", value: "Niños y niñas desde 3 años" },
+                    { label: "Duración", value: "6 clases" },
+                  ]}
+                  descripcion="Desarrollo de habilidades motrices finas, espaciales y lógicas mediante programación desde casa."
+                />
+                <StaticCursoCardView
+                  id="static-ingenieria-preescolar"
+                  titulo="Ingeniería en preescolar"
+                  imagenUrl="/wp-content/uploads/2020/08/STEAMlogo_1024x1024.png"
+                  imagenAlt="Ingeniería preescolar"
+                  meta={[
+                    { label: "Dirigido a", value: "4 a 6 años" },
+                    { label: "Inversión", value: "Q225 · 10 clases virtuales" },
+                  ]}
+                  descripcion="Fortalecimiento de habilidades motoras y cognitivas con nuestros kits y proyectos STEAM."
+                  amountInCents={22500}
+                />
               </>
             )}
           </div>
