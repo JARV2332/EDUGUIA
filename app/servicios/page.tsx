@@ -1,9 +1,11 @@
 export const dynamic = "force-dynamic";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { getPublicCursos } from "@/lib/lms/get-public-cursos";
 import { PublicCursoCardView } from "@/components/landing/public-curso-card";
 import { StaticCursoCardView } from "@/components/landing/static-curso-card";
+import { ServiciosPagoNotice } from "@/components/landing/servicios-pago-notice";
 import { LandingFooter, LandingHeader, LandingLayout } from "@/components/landing/landing-shell";
 
 export default async function ServiciosPage() {
@@ -22,6 +24,19 @@ export default async function ServiciosPage() {
         </header>
 
         <div className="landing-content">
+          <Suspense fallback={null}>
+            <ServiciosPagoNotice />
+          </Suspense>
+
+          {process.env.NODE_ENV === "development" && (
+            <p className="servicios-dev-preview" aria-label="Enlaces de prueba local">
+              Prueba sin cobrar:{" "}
+              <Link href="/servicios/?pago=exito">simular pago exitoso</Link>
+              {" · "}
+              <Link href="/servicios/?pago=cancelado">simular pago cancelado</Link>
+            </p>
+          )}
+
           <p className="page-intro">
             En <strong>EduKids</strong> contamos con profesores apasionados por la cultura maker. Nuestro método se basa en el método científico: motivamos al alumno a mejorar su <strong>autonomía y pensamiento crítico</strong>, dejando que ellos marquen los objetivos de cada proyecto.
           </p>
